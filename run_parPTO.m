@@ -1,26 +1,26 @@
-% run_refPTO.m script m-file
+% run_parPTO.m script m-file
 % AUTHORS:
 % Jeremy Simmons (email: simmo536@umn.edu)
 % University of Minnesota
 % Department of Mechanical Engineering
 %
 % CREATION DATE:
-% 6/12/2023
+% 11/2/2023
 %
 % PURPOSE/DESCRIPTION:
 % This script serves as a shell for running a single simulation
-% using the model contained in sys_refPTO.m and solved by 
-% sim_refPTO.m.
+% using the model contained in sys_parPTO.m and solved by 
+% sim_parPTO.m.
 % The parameter initiallization functions are called within this
-% script before the sim_refPTO.m script is called.
+% script before the sim_parPTO.m script is called.
 %
 % FILE DEPENDENCY:
-% ./Reference PTO/
-%   initialConditionDefault_refPTO
-%   parameters_refPTO.m
-%   sim_refPTO.m
-%   stateIndex_refPTO.m
-%   sys_refPTO.m
+% ./Parallel-type PTO/
+%   initialConditionDefault_parPTO
+%   parameters_parPTO.m
+%   sim_parPTO.m
+%   stateIndex_parPTO.m
+%   sys_parPTO.m
 % ./WEC model/
 %   flapModel.m
 %   hydroStaticTorque.m
@@ -40,7 +40,7 @@
 %   flowPRV.m
 %
 % UPDATES:
-% 6/12/2023 - Created from run_parallelPTO.m.
+% 11/2/2023 - Created from run_refPTO.m.
 %
 % Copyright (C) 2023  Jeremy W. Simmons II
 % 
@@ -62,8 +62,9 @@ clear
 % clc
 addpath('WEC model') 
 addpath(['WEC model' filesep 'WECdata']) 
-addpath('Reference PTO')
+addpath('Parallel-type PTO')
 addpath('Components')
+addpath(['Components' filesep 'Pipeline'])
 addpath('Sea States')
 addpath('Solvers')
 addpath('Utilities')
@@ -92,12 +93,12 @@ par.WEC.nw = 1000; % num. of frequency components for harmonic superposition
 par.wave.rngSeedPhase = 3; % seed for the random number generator
 
 % load parameters
-par = parameters_refPTO(par,...
+par = parameters_parPTO(par,...
     'nemohResults_vantHoff2009_20180802.mat','vantHoffTFCoeff.mat');
 
 % Define initial conditions
-stateIndex_refPTO % load state indices, provides 'iy_...'
-initialConditionDefault_refPTO % default ICs, provides 'y0'
+stateIndex_parPTO % load state indices, provides 'iy_...'
+initialConditionDefault_parPTO % default ICs, provides 'y0'
 
 %% Special modifications to base parameters
 % par.Sro = 3000; % [m^3]
@@ -125,7 +126,7 @@ par.w_c = (2500)*2*pi/60; % [(rpm) -> rad/s]
 %% %%%%%%%%%%%%   COLLECT DATA  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 ticSIM = tic;
-out = sim_refPTO(y0,par);
+out = sim_parPTO(y0,par);
 toc(ticSIM)
 
 %% %%%%%%%%%%%%   PLOTTING  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

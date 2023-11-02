@@ -1,20 +1,21 @@
-function [dydt, nonState, control] = sys_refPTO(t,y,par)
+function [dydt, nonState, control] = sys_parPTO(t,y,par)
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% sys_refPTO.m function m-file
+% sys_parPTO.m function m-file
 % AUTHORS: 
 % Jeremy Simmons (email: simmo536@umn.edu)
 % University of Minnesota
 % Department of Mechanical Engineering
 %
 % CREATION DATE:
-% 6/12/2023
+% 11/2/2023
 %
 % PURPOSE/DESCRIPTION:
-% Calculate the state derivatives for a wave energy PTO specified in the 
-% NSF-Cyber-Physical Systems project proposal.
+% Calculate the state derivatives for a parallel-type wave energy PTO 
+% with long high- and low-pressure pipelines and an option for a throttling
+% valve for enhanced pressure ripple filtering.
 %
 % FILE DEPENDENCY:
-% ../Reference PTO/
+% ../Parallel-type PTO/
 %   stateIndex_refPTO.m
 % ../WEC model/
 %   flapModel.m
@@ -26,7 +27,7 @@ function [dydt, nonState, control] = sys_refPTO(t,y,par)
 %   flowPRV.m
 %
 % UPDATES:
-% 6/12/2023 - created from sys_parallelPTO.m.
+% 11/2/2023 - created from sys_refPTO.m.
 %
 % Copyright (C) 2023  Jeremy W. Simmons II
 %
@@ -48,8 +49,10 @@ function [dydt, nonState, control] = sys_refPTO(t,y,par)
 iyp_a = [];
 iyp_b = [];
 
-iyp_l = [];
-iyp_h = [];
+iyp_lin = [];
+iyp_lout = [];
+iyp_hin = [];
+iyp_hout = [];
 iyp_ro = [];
 
 iyp_filt = [];
@@ -60,7 +63,14 @@ iytheta = [];
 iytheta_dot = [];
 iyrad = [];
 
-stateIndex_refPTO
+iyLPPL = [];
+iyqLP = [];
+iypLP = [];
+iyHPPL = [];
+iyqHP = [];
+iypHP = [];
+
+stateIndex_parPTO
 
 iWEC = [iytheta iytheta_dot iyrad];
 

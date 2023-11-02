@@ -1,22 +1,22 @@
-function out = sim_refPTO(y0,par)
+function out = sim_parPTO(y0,par)
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% sim_refPTO.m function m-file
+% sim_parfPTO.m function m-file
 % AUTHORS:
 % Jeremy Simmons (email: simmo536@umn.edu)
 % University of Minnesota
 % Department of Mechanical Engineering
 %
 % CREATION DATE:
-% 6/12/2023
+% 11/2/2023
 %
 % PURPOSE/DESCRIPTION:
 % This script executes the set-up, solution, and basic post-processing for
-% the refPTO model.
+% the parPTO model.
 %
 % FILE DEPENDENCY:
-% ../Reference PTO/
-%   sys_refPTO.m
-%   stateIndex_refPTO.m
+% ../Parallel-type PTO/
+%   sys_parPTO.m
+%   stateIndex_parPTO.m
 % ../WEC model/
 %   flapModel.m
 %   hydroStaticTorque.m
@@ -32,7 +32,7 @@ function out = sim_refPTO(y0,par)
 %   flowPRV.m
 %
 % UPDATES:
-% 6/12/2023 - Created from sim_parallelPTO.m.
+% 11/2/2023 - Created from sim_refPTO.m.
 % 
 % Copyright (C) 2023  Jeremy W. Simmons II
 % 
@@ -54,8 +54,10 @@ function out = sim_refPTO(y0,par)
 iyp_a = [];
 iyp_b = [];
 
-iyp_l = [];
-iyp_h = [];
+iyp_lin = [];
+iyp_lout = [];
+iyp_hin = [];
+iyp_hout = [];
 iyp_ro = [];
 
 iyp_filt = [];
@@ -66,7 +68,14 @@ iytheta = [];
 iytheta_dot = [];
 iyrad = [];
 
-stateIndex_refPTO % load state indices
+iyLPPL = [];
+iyqLP = [];
+iypLP = [];
+iyHPPL = [];
+iyqHP = [];
+iypHP = [];
+
+stateIndex_parPTO % load state indices
 
 %% %%%%%%%%%%%%   SOLUTION   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% Solve for states of the dynamic system
@@ -101,8 +110,10 @@ stateIndex_refPTO % load state indices
     out.p_a = y(itVec,iyp_a);
     out.p_b = y(itVec,iyp_b);
     
-    out.p_l = y(itVec,iyp_l);
-    out.p_h = y(itVec,iyp_h);
+    out.p_lin = y(itVec,iyp_lin);
+    out.p_lout = y(itVec,iyp_lout);
+    out.p_hin = y(itVec,iyp_hin);
+    out.p_hout = y(itVec,iyp_hout);
     out.p_ro = y(itVec,iyp_ro);
     
     out.control.p_filt = y(itVec,iyp_filt);
@@ -110,6 +121,14 @@ stateIndex_refPTO % load state indices
     
     out.theta = y(itVec,iytheta); % [rad] position of the WEC
     out.theta_dot = y(itVec,iytheta_dot); % [rad/s] angular velocity of the WEC
+
+    out.yLP = y(itVec,iyLPPL);
+    out.qLP = y(itVec,iyqLP);
+    out.pLP = y(itVec,iypLP);
+    
+    out.yLP = y(itVec,iyHPPL);
+    out.qHP = y(itVec,iyqHP);
+    out.pHP = y(itVec,iypHP);
             
     % Post-process non-state variables and state derivatives
     syspost = @(t,y,par) sysPost(t,y,par);
@@ -351,6 +370,6 @@ stateIndex_refPTO % load state indices
     end
 
     function [dydt, nonState, control] = sys_prototype(t,y,par)
-        [dydt, nonState, control] = sys_refPTO(t,y,par);
+        [dydt, nonState, control] = sys_parPTO(t,y,par);
     end
 end

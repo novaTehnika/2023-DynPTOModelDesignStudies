@@ -1,13 +1,13 @@
-function par = parameters_refPTO(par,filenameCoeff,filenameRadSS)
+function par = parameters_parPTO(par,filenameCoeff,filenameRadSS)
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% parameters_refPTO.m function m-file
+% parameters_parPTO.m function m-file
 % AUTHORS: 
 % Jeremy Simmons (email: simmo536@umn.edu)
 % University of Minnesota
 % Department of Mechanical Engineering
 %
 % CREATION DATE:
-% 6/12/2023
+% 11/2/2023
 %
 % PURPOSE/DESCRIPTION:
 % This function loads default parameters into the "par" structure. This
@@ -17,14 +17,14 @@ function par = parameters_refPTO(par,filenameCoeff,filenameRadSS)
 % without issue. Changing parameters in any design study script should be
 % check for affecting the other parameters.
 %
-% This function is for a use with sys_refPTO.m.
+% This function is for a use with sys_parPTO.m.
 %
 % FILE DEPENDENCY:
 % ../WEC model/
 %   parameters_WECmodel.m
 %
 % UPDATES:
-% 6/12/2023 - created from parameters_parallelPTO.m.
+% 11/2/2023 - created from parameters_refPTO.m.
 %
 % Copyright (C) 2023  Jeremy W. Simmons II
 % 
@@ -127,15 +127,36 @@ function par = parameters_refPTO(par,filenameCoeff,filenameRadSS)
     % Accumulators
     par.f = 1e-2; % fraction of dead volume of working fluid compared to 
                   % charge volume
-     % LPA
-    par.Vc_l = (3000)*1e-3; % [(L) -> m^3] gas volume at charge pressure
-    par.pc_l = 0.2e6; % [Pa] charge pressure
-     % HPA at outlet of WEC-driven pump
-    par.Vc_h = (5000)*1e-3; % [(L) -> m^3] gas volume at charge pressure
-    par.pc_h = 4e6; % [Pa] charge pressure
+     % LPA, onshore
+    par.Vc_lin = (3000)*1e-3; % [(L) -> m^3] gas volume at charge pressure
+    par.pc_lin = 0.2e6; % [Pa] charge pressure
+     % LPA, offshore/at inelt of WEC-driven pump
+    par.Vc_lout = (3000)*1e-3; % [(L) -> m^3] gas volume at charge pressure
+    par.pc_lout = 0.2e6; % [Pa] charge pressure
+     % HPA at outlet of WEC-driven pump and inlet of high-pressure pipeline
+     % (offshore)
+    par.Vc_hin = (5000)*1e-3; % [(L) -> m^3] gas volume at charge pressure
+    par.pc_hin = 4e6; % [Pa] charge pressure
+     % HPA at outlet of high-pressure pipeline (onshore)
+    par.Vc_hout = (5000)*1e-3; % [(L) -> m^3] gas volume at charge pressure
+    par.pc_hout = 4e6; % [Pa] charge pressure
      % HPA at inlet to RO module
     par.Vc_ro = (5000)*1e-3; % [(L) -> m^3] gas volume at charge pressure
     par.pc_ro = 4e6; % [Pa] charge pressure
+
+    % Pipelines    
+     % LP pipeline
+    par.L_line(1) = 500; % [m] length of LP pipeline
+    par.d_line(1) = 0.2; % [m] diameter of LP pipeline
+    par.A_line(1) = pi/4*par.d_line(1); % crosssectional flow area
+    par.n_seg(1) = 2; % minimum of 2
+    par.I(1) = par.rho*(par.L_line(1)/par.n_seg(1))/par.A_line(1);
+     % HP pipeline
+    par.L_line(2) = 500; % [m] length of HP pipeline
+    par.d_line(2) = 0.1; % [m] diameter of HP pipeline
+    par.A_line(2) = pi/4*par.d_line(2); % crosssectional flow area
+    par.n_seg(2) = 2; % minimum of 2
+    par.I(2) = par.rho*(par.L_line(1)/par.n_seg(2))/par.A_line(1);
 
     % Contoller Parameters
     par.control.p_h_nom = 6e6; % [Pa]
@@ -171,7 +192,7 @@ function par = parameters_refPTO(par,filenameCoeff,filenameRadSS)
     % par.p_c = .65e6;
 
     % Pressure relief valves
-     % low-pressure inlet to WEC-driven pump/outlet of charge pump
+     % inlet to low-pressure pipeline/outlet of charge pump
     maxPressure = 10e6; % [Pa]
     margin = 5e4; % [Pa]
     maxFlow = 100e-3; % [m^3/s]

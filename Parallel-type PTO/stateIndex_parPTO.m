@@ -1,19 +1,19 @@
-% stateIndex_refPTO.m script m-file
+% stateIndex_parPTO.m script m-file
 % AUTHORS:
 % Jeremy Simmons (email: simmo536@umn.edu)
 % University of Minnesota
 % Department of Mechanical Engineering
 %
 % CREATION DATE:
-% 6/12/2023
+% 11/2/2023
 %
 % PURPOSE/DESCRIPTION:
-% This script loads the state indices for the refPTO model
+% This script loads the state indices for the parPTO model
 %
 % FILE DEPENDENCY:
 %
 % UPDATES:
-% 6/12/2023 - Created from stateIndex_parallelPTO.m.
+% 11/2/2023 - Created from stateIndex_refPTO.m.
 %
 % Copyright (C) 2023  Jeremy W. Simmons II
 % 
@@ -35,14 +35,24 @@
 iyp_a = 1;
 iyp_b = 2;
 
-iyp_l = 3;
-iyp_h = 4;
-iyp_ro = 5;
+iyp_lin = 3;
+iyp_lout = 4;
+iyp_hin = 5;
+iyp_hout = 6;
+iyp_ro = 7;
 
-iyp_filt = 6;
-iy_errInt_p_filt = 7;
+iyp_filt = 8;
+iy_errInt_p_filt = 9;
 iycontrol = [iyp_filt; iy_errInt_p_filt];
 
-iytheta = 8;
-iytheta_dot = 9;
+iytheta = 10;
+iytheta_dot = 11;
 iyrad = (1:par.WEC.ny_rad) + iytheta_dot; % state vector indices for radiation damping states for WEC model
+
+iyLPPL = (1:2*par.n_seg(1)-1) + iyrad(end);
+iyqLP = (1:2:2*par.n_seg(1)-1) + (iyLPPL(1)-1);
+iypLP = (2:2:2*par.n_seg(1)-1) + (iyLPPL(1)-1);
+
+iyHPPL = (1:2*par.n_seg(2)-1) + iyLPPL(end);
+iyqHP = (1:2:2*par.n_seg(2)-1) + (iyHPPL(1)-1);
+iypHP = (2:2:2*par.n_seg(2)-1) + (iyHPPL(1)-1);
