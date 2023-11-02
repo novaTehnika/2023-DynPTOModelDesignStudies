@@ -1,0 +1,5 @@
+data*
+*.err
+*.out
+Data/
+*.asv
