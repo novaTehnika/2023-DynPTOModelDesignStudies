@@ -77,6 +77,7 @@ addpath('Components')
 addpath('Sea States')
 addpath('Solvers')
 addpath('Utilities')
+git_hash_string = get_current_git_hash();
 %% %%%%%%%%%%%%   SIMULATION PARAMETERS  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Simulation timeframe
