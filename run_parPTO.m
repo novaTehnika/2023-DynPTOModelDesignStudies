@@ -357,7 +357,7 @@ fig.Units = 'inches';
 fig.Position = [leftEdge bottomEdge width height ];
 
 ax(1) = subplot(2,1,1);
-plot(out.t,1e-6out.p_a)
+plot(out.t,1e-6*out.p_a)
 hold on
 plot(out.t,1e-6*out.p_b)
 plot(out.t,1e-6*out.p_hin,'k-')
