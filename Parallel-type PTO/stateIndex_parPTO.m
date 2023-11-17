@@ -56,3 +56,5 @@ iypLP = (2:2:2*par.n_seg(1)-1) + (iyLPPL(1)-1);
 iyHPPL = (1:2*par.n_seg(2)-1) + iyLPPL(end);
 iyqHP = (1:2:2*par.n_seg(2)-1) + (iyHPPL(1)-1);
 iypHP = (2:2:2*par.n_seg(2)-1) + (iyHPPL(1)-1);
+
+ny = iyHPPL(end);
