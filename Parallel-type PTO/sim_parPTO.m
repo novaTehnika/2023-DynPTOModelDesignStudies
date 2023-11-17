@@ -75,6 +75,8 @@ iyHPPL = [];
 iyqHP = [];
 iypHP = [];
 
+ny = [];
+
 stateIndex_parPTO % load state indices
 
 %% %%%%%%%%%%%%   SOLUTION   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
