@@ -177,8 +177,8 @@ stateIndex_parPTO % load state indices
     out.q_bout = [nonState(:).q_bout]';
     out.q_sv = [nonState(:).q_sv]';
 
-    out.q_h = [nonState(:).q_aout]' + [nonState(:).q_bout]';
-    out.q_l = [nonState(:).q_ain]' + [nonState(:).q_bin]';
+    out.q_hwp = [nonState(:).q_aout]' + [nonState(:).q_bout]';
+    out.q_lwp = [nonState(:).q_ain]' + [nonState(:).q_bin]';
 
      % pump/motor flow
     out.w_pm = out.control.w_pm;
