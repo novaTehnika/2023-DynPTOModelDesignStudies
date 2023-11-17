@@ -127,10 +127,14 @@ stateIndex_parPTO % load state indices
     out.yLP = y(itVec,iyLPPL);
     out.qLP = y(itVec,iyqLP);
     out.pLP = y(itVec,iypLP);
+    out.qlin = out.qLP(itVec,1);
+    out.qlout = out.qLP(itVec,end);
     
-    out.yLP = y(itVec,iyHPPL);
+    out.yHP = y(itVec,iyHPPL);
     out.qHP = y(itVec,iyqHP);
     out.pHP = y(itVec,iypHP);
+    out.qhin = out.qHP(itVec,1);
+    out.qhout = out.qHP(itVec,end);
             
     % Post-process non-state variables and state derivatives
     syspost = @(t,y,par) sysPost(t,y,par);
@@ -138,15 +142,23 @@ stateIndex_parPTO % load state indices
     nt_ramp = itVec(1)-1;
     startParPool
     parfor it = 1:length(itVec)
-        
+        it_star = it+nt_ramp;
+        y_star = y(it_star,:);
         [dydt(it,:), nonState(it), control(it)] = ...
-                            syspost(t(it+nt_ramp),y(it+nt_ramp,:),par);
+                            syspost(t(it_true),y_star,par);
         
         % Move WEC torque results up a level in nonState stucture so that
         % they can be used like arrays in assiging to the output structure
         temp(it).T_hydroStatic = nonState(it).torqueWEC.hydroStatic;
         temp(it).T_wave = nonState(it).torqueWEC.wave;
-        temp(it).T_rad = nonState(it).torqueWEC.radiation;    
+        temp(it).T_rad = nonState(it).torqueWEC.radiation;
+
+        [~ ,~, ~, pLsoln_LP(it)] = ...
+                        pipelineNPi([],y_star(iyLPPL), ...
+                        y_star(iyp_lin),y_star(iyp_lout),par,1,1);
+        [~ ,~, ~, pLsoln_HP(it)] = ...
+                        pipelineNPi([],y_star(iyHPPL), ...
+                        y_star(iyp_hin),y_star(iyp_hout),par,1,1);
     end
     
     % State derivatives
@@ -255,6 +267,10 @@ stateIndex_parPTO % load state indices
     out.power.P_hPRV = out.q_hPRV.*(out.p_h-out.p_l);
     out.power.P_roPRV = out.q_roPRV.*(out.p_ro-out.p_l);
 
+    % Pipeline losses
+    out.power.P_LPPL = pLsoln_LP(:).PPfric;
+    out.power.P_HPPL = pLsoln_HP(:).PPfric;
+
     % Electrical Energy Storage
     out.power.P_battery = out.power.P_gen ...
                         - out.power.P_cElec - out.power.P_ERUelec;
@@ -281,22 +297,58 @@ stateIndex_parPTO % load state indices
 
     % Change in available potential energy in accumulators
     dp = 1e2;
-     % Low-pressure
-    cap = @(p) capAccum(p,par.pc_l,par.Vc_l,par.f,par);
-    deltaE_l = deltaE_NI(out.p_l(1),out.p_l(end),cap,dp);
+     % Low-pressure pipeline inlet (charge pump outlet)
+    cap = @(p) capAccum(p,par.pc_lin,par.Vc_lin,par.f,par);
+    deltaE_lin = deltaE_NI(out.p_lin(1),out.p_lin(end),cap,dp);
 
-     % High-pressure outlet of WEC-driven pump
-    cap = @(p) capAccum(p,par.pc_h,par.Vc_h,par.f,par);
-    deltaE_h = deltaE_NI(out.p_h(1),out.p_h(end),cap,dp);
+     % Low-pressure pipeline outlet (inlet of WEC-driven pump)
+    cap = @(p) capAccum(p,par.pc_lout,par.Vc_lout,par.f,par);
+    deltaE_lout = deltaE_NI(out.p_lout(1),out.p_lout(end),cap,dp);
+
+     % High-pressure pipeline inlet (outlet of WEC-driven pump)
+    cap = @(p) capAccum(p,par.pc_hin,par.Vc_hin,par.f,par);
+    deltaE_hin = deltaE_NI(out.p_hin(1),out.p_hin(end),cap,dp);
+
+     % High-pressure pipeline outlet
+    cap = @(p) capAccum(p,par.pc_hout,par.Vc_hout,par.f,par);
+    deltaE_hout = deltaE_NI(out.p_hout(1),out.p_hout(end),cap,dp);
 
      % High-pressure inlet of RO module
     cap = @(p) capAccum(p,par.pc_ro,par.Vc_ro,par.f,par);
     deltaE_ro = deltaE_NI(out.p_ro(1),out.p_ro(end),cap,dp);
 
+    % Change in available potential energy in pipelines
+    dp = 1e2;
+     % Low-pressure pipeline
+    cap = @(p) lineCap(p,1,par);
+    pPL = out.pLP;
+    deltaE_PL = zeros(size(pPL,2));
+    for iyp = 1:size(pPL,2)
+        deltaE_PL(iyp) = deltaE_NI(pPL(1,iyp),pPL(end,iyp),cap,dp);
+    end
+    deltaPE_LPPL = sum(deltaE_PL);
+     % High-pressure pipeline
+    cap = @(p) lineCap(p,2,par);
+    pPL = out.pHP;
+    deltaE_PL = zeros(size(pPL,2));
+    for iyp = 1:size(pPL,2)
+        deltaE_PL(iyp) = deltaE_NI(pPL(1,iyp),pPL(end,iyp),cap,dp);
+    end
+    deltaPE_HPPL = sum(deltaE_PL);
+
+    % Change in kinetic energy in pipelines
+     % Low-pressure pipeline
+    deltaKE_LPPL = sum(par.I(1)/2*(out.qLP(end,:).^2 - out.qLP(1,:).^2));
+     % High-pressure pipeline
+    deltaKE_HPPL = sum(par.I(2)/2*(out.qHP(end,:).^2 - out.qHP(1,:).^2));
 
     % Total change in stored energy in the system
     deltaE_sys = deltaE_a + deltaE_b ...
-        + deltaE_l + deltaE_h + deltaE_ro ...
+        + deltaE_lin + deltaE_lout ...
+        + deltaE_hin + deltaE_hout ...
+        + deltaE_ro ...
+        + deltaPE_LPPL + deltaKE_LPPL ...
+        + deltaPE_HPPL + deltaKE_HPPL ...
         + out.power.deltaE_battery;
 
     % Power flow at boundaries
@@ -309,7 +361,8 @@ stateIndex_parPTO % load state indices
             + out.power.P_rv ...
             + out.power.P_cLoss ...
             + out.power.P_ERULoss + out.power.P_ERUelecLoss...
-            + out.power.P_lPRV + out.power.P_hPRV + out.power.P_roPRV;
+            + out.power.P_lPRV + out.power.P_hPRV + out.power.P_roPRV ...
+            + out.power.P_LPPL + out.power.P_HPPL;
     P_bnds = P_in - P_out - P_loss;
 
     % Total balance of energy: energy added minus change in energy stored
@@ -337,25 +390,55 @@ stateIndex_parPTO % load state indices
 
     % Change in fluid volume in accumulators
     dp = 1e2;
-     % Low-pressure
-    cap = @(p) capAccum(p,par.pc_l,par.Vc_l,par.f,par);
-    deltaV_l = deltaV_NI(out.p_l(1),out.p_l(end),cap,dp);
+     % Low-pressure pipeline inlet (charge pump outlet)
+    cap = @(p) capAccum(p,par.pc_lin,par.Vc_lin,par.f,par);
+    deltaV_lin = deltaV_NI(out.p_lin(1),out.p_lin(end),cap,dp);
 
-     % High-pressure outlet of WEC-driven pump
-    cap = @(p) capAccum(p,par.pc_h,par.Vc_h,par.f,par);
-    deltaV_h = deltaV_NI(out.p_h(1),out.p_h(end),cap,dp);
+     % Low-pressure pipeline outlet (inlet of WEC-driven pump)
+    cap = @(p) capAccum(p,par.pc_lout,par.Vc_lout,par.f,par);
+    deltaV_lout = deltaV_NI(out.p_lout(1),out.p_lout(end),cap,dp);
+
+     % High-pressure pipeline inlet (outlet of WEC-driven pump)
+    cap = @(p) capAccum(p,par.pc_hin,par.Vc_hin,par.f,par);
+    deltaV_hin = deltaV_NI(out.p_hin(1),out.p_hin(end),cap,dp);
+
+     % High-pressure pipeline outlet
+    cap = @(p) capAccum(p,par.pc_hout,par.Vc_hout,par.f,par);
+    deltaV_hout = deltaV_NI(out.p_hout(1),out.p_hout(end),cap,dp);
 
      % High-pressure inlet of RO module
     cap = @(p) capAccum(p,par.pc_ro,par.Vc_ro,par.f,par);
     deltaV_ro = deltaV_NI(out.p_ro(1),out.p_ro(end),cap,dp);
 
+    % Equivalent change in fluid volume in pipelines
+    dp = 1e2;
+     % Low-pressure pipeline
+    cap = @(p) lineCap(p,1,par);
+    pPL = out.pLP;
+    deltaV_PL = zeros(size(pPL,2));
+    for iyp = 1:size(pPL,2)
+        deltaV_PL(iyp) = deltaV_NI(pPL(1,iyp),pPL(end,iyp),cap,dp);
+    end
+    deltaV_LPPL = sum(deltaV_PL);
+     % High-pressure pipeline
+    cap = @(p) lineCap(p,2,par);
+    pPL = out.pHP;
+    deltaV_PL = zeros(size(pPL,2));
+    for iyp = 1:size(pPL,2)
+        deltaV_PL(iyp) = deltaV_NI(pPL(1,iyp),pPL(end,iyp),cap,dp);
+    end
+    deltaV_HPPL = sum(deltaV_PL);
+
     % Total change in stored volume in the system
     out.deltaV_total = deltaV_a + deltaV_b ...
-                     + deltaV_l + deltaV_h + deltaV_ro;
+                     + deltaV_lin + deltaV_lout ...
+                     + deltaV_hin + deltaV_hout ...
+                     + deltaV_ro ...
+                     + deltaV_LPPL + deltaV_HPPL;
 
     % Flow at boundaries
     qbnds = out.q_c ...
-            - (out.q_perm + out.q_brine + out.q_lPRV);
+            - (out.q_perm + out.q_brine + out.q_linPRV);
 
     % Total balance of flow: flow in minus change in volume stored
     out.Vbal = trapz(out.t,qbnds) - out.deltaV_total;
