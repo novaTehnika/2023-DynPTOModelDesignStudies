@@ -193,19 +193,21 @@ fig.Units = 'inches';
 fig.Position = [leftEdge bottomEdge width height ];
 
 ax(1) = subplot(3,1,1);
-plot(out.t,out.p_h)
+plot(out.t,1e-6*out.p_hin)
 hold on
-plot(out.t,out.p_ro)
+plot(out.t,1e-6*out.p_hout)
+plot(out.t,1e-6*out.p_ro)
 xlabel('Time (s)')
-ylabel('Pressure (Pa)')
-legend('p_{h}','p_{ro}')
+ylabel('Pressure (MPa)')
+legend('p_{hin}','p_{hout}','p_{ro}')
 
 ax(2) = subplot(3,1,2);
-plot(out.t,out.p_l)
+plot(out.t,1e-6*out.p_lin)
 hold on
+plot(out.t,1e-6*out.p_lout)
 xlabel('Time (s)')
-ylabel('Pressure (Pa)')
-legend('p_{l}')
+ylabel('Pressure (MPa)')
+legend('p_{lin}','p_{lout}')
 
 ax(3) = subplot(3,1,3);
 plot(out.t,1e-5*out.dydt(:,iyp_ro))
@@ -249,33 +251,35 @@ fig.Units = 'inches';
 fig.Position = [leftEdge bottomEdge width height ];
 
 ax(1) = subplot(3,1,1);
-plot(out.t,out.q_h(:))
+plot(out.t,out.q_hwp(:))
 hold on
-plot(out.t,out.q_pm(:))
-plot(out.t,out.q_rv(:))
+plot(out.t,1e3*60*out.q_hin(:))
+plot(out.t,1e3*60*out.q_hout(:))
+plot(out.t,1e3*60*out.q_pm(:))
+plot(out.t,1e3*60*out.q_rv(:))
 xlabel('Time (s)')
-ylabel('Flow rate (m^3/s)')
-legend('q_{h}','q_{pm}','q_{rv}')
+ylabel('Flow rate (Lpm)')
+legend('q_{hwp}','q_{hin}','q_{hout}','q_{pm}','q_{rv}')
 
 ax(2) = subplot(3,1,2);
-plot(out.t,out.q_rv(:))
+plot(out.t,1e3*60*out.q_rv(:))
 hold on
-plot(out.t,out.q_ERUfeed(:))
-plot(out.t,out.q_feed(:))
-plot(out.t,out.q_perm(:))
+plot(out.t,1e3*60*out.q_ERUfeed(:))
+plot(out.t,1e3*60*out.q_feed(:))
+plot(out.t,1e3*60*out.q_perm(:))
 xlabel('Time (s)')
-ylabel('Flow rate (m^3/s)')
+ylabel('Flow rate (Lpm)')
 legend('q_{rv}','q_{ERUfeed}','q_{feed}','q_{perm}')
 
 ax(3) = subplot(3,1,3);
-plot(out.t,out.q_l(:))
+plot(out.t,1e3*60*out.q_lwp(:))
 hold on
-plot(out.t,out.q_pm(:))
-plot(out.t,out.q_c(:))
-plot(out.t,out.q_ERUfeed(:))
+plot(out.t,1e3*60*out.q_pm(:))
+plot(out.t,1e3*60*out.q_c(:))
+plot(out.t,1e3*60*out.q_ERUfeed(:))
 xlabel('Time (s)')
-ylabel('Flow rate (m^3/s)')
-legend('q_{l}','q_{pm}','q_{c}','q_{ERUfeed}')
+ylabel('Flow rate (Lpm)')
+legend('q_{lwp}','q_{pm}','q_{c}','q_{ERUfeed}')
 
 linkaxes(ax,'x')
 
@@ -316,8 +320,8 @@ legend('nominal','actual','Generator')
 
 ax(3) = subplot(5,1,3);
 hold on
-plot(out.t,1e3*out.q_pm)
-plot(out.t,1e3*out.q_h)
+plot(out.t,1e3*60*out.q_pm)
+plot(out.t,1e3*60*out.q_h)
 ylabel('Flow rate (Lpm)')
 legend('q_{pm}','q_{h}')
 
@@ -330,8 +334,8 @@ xlabel('Time (s)')
 
 ax(5) = subplot(5,1,5);
 hold on
-plot(out.t,sqrt(1e3)*out.control.kv_ideal)
-plot(out.t,sqrt(1e3)*out.control.kv_rv)
+plot(out.t,sqrt(1e3)*1e3*out.control.kv_ideal)
+plot(out.t,sqrt(1e3)*1e3*out.control.kv_rv)
 legend('kv_ideal','kv_rv')
 ylabel('valve coefficient (L/s/kPa^{1/2})')
 xlabel('Time (s)')
@@ -353,24 +357,72 @@ fig.Units = 'inches';
 fig.Position = [leftEdge bottomEdge width height ];
 
 ax(1) = subplot(2,1,1);
-plot(out.t,out.p_a)
+plot(out.t,1e-6out.p_a)
 hold on
-plot(out.t,out.p_b)
-plot(out.t,out.p_h,'k-')
-plot(out.t,out.p_l,'k--')
+plot(out.t,1e-6*out.p_b)
+plot(out.t,1e-6*out.p_hin,'k-')
+plot(out.t,1e-6*out.p_lout,'k--')
 xlabel('Time (s)')
-ylabel('Pressure (Pa)')
-legend('p_{a}','p_{b}','p_{h}','p_{l}')
+ylabel('Pressure (MPa)')
+legend('p_{a}','p_{b}','p_{hin}','p_{lout}')
 
 ax(2) = subplot(2,1,2);
-plot(out.t,out.q_h,'k-')
+plot(out.t,1e3*60*out.q_hwp,'k-')
 hold on
-plot(out.t,out.q_l,'k--')
-plot(out.t,out.q_sv,'b')
+plot(out.t,1e3*60*out.q_lwp,'k--')
+plot(out.t,1e3*60*out.q_sv,'b')
 xlabel('Time (s)')
 ylabel('Flow rate (Lpm)')
-legend('q_{h}','q_{l}','q_{sv}')
+legend('q_{hin}','q_{lout}','q_{sv}')
 
 linkaxes(ax,'x');
 
 sgtitle('WEC-driven Pump Dynamics')
+
+%% Pipelines
+bottomEdge = 1;
+leftEdge = 3;
+width = 7.5; % one column: 3+9/16, two column: 7.5
+height = 8;
+fontSize = 8;
+lineWidth = 1;
+
+fig = figure;
+fig.Units = 'inches';
+fig.Position = [leftEdge bottomEdge width height ];
+
+ax(1) = subplot(4,1,1);
+plot(out.t,1e-6*out.p_hin)
+hold on
+plot(out.t,1e-6*out.p_hout)
+xlabel('Time (s)')
+ylabel('Pressure (MPa)')
+legend('p_{hin}','p_{hout}')
+
+ax(2) = subplot(4,1,2);
+plot(out.t,1e3*60*out.q_hin,'k-')
+hold on
+plot(out.t,1e3*60*out.q_hout,'k--')
+xlabel('Time (s)')
+ylabel('Flow rate (Lpm)')
+legend('q_{hin}','q_{hout}')
+
+ax(3) = subplot(4,1,3);
+plot(out.t,1e-6*out.p_lin)
+hold on
+plot(out.t,1e-6*out.p_lout)
+xlabel('Time (s)')
+ylabel('Pressure (MPa)')
+legend('p_{lin}','p_{lout}')
+
+ax(4) = subplot(4,1,4);
+plot(out.t,1e3*60*out.q_lin,'k-')
+hold on
+plot(out.t,1e3*60*out.q_lout,'k--')
+xlabel('Time (s)')
+ylabel('Flow rate (Lpm)')
+legend('q_{lin}','q_{lout}')
+
+linkaxes(ax,'x');
+
+sgtitle('Pipeline Dynamics')
