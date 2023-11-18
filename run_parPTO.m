@@ -299,13 +299,13 @@ fig.Units = 'inches';
 fig.Position = [leftEdge bottomEdge width height ];
 
 ax(1) = subplot(5,1,1);
-plot(out.t,1e-6*out.p_h)
+plot(out.t,1e-6*out.p_hout)
 hold on
 plot(out.t,1e-6*out.p_ro)
 plot(out.t,1e-6*out.control.p_filt)
 xlabel('Time (s)')
 ylabel('Pressure (MPa)')
-legend('p_{h}','p_{ro}','p_{filt}')
+legend('p_{hout}','p_{ro}','p_{filt}')
 
 ax(2) = subplot(5,1,2);
 hold on
@@ -321,9 +321,10 @@ legend('nominal','actual','Generator')
 ax(3) = subplot(5,1,3);
 hold on
 plot(out.t,1e3*60*out.q_pm)
-plot(out.t,1e3*60*out.q_h)
+plot(out.t,1e3*60*out.q_hout)
+plot(out.t,1e3*60*out.q_rv)
 ylabel('Flow rate (Lpm)')
-legend('q_{pm}','q_{h}')
+legend('q_{pm}','q_{hout}','q_{rv}')
 
 ax(4) = subplot(5,1,4);
 hold on
