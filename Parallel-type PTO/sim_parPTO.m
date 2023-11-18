@@ -127,14 +127,14 @@ stateIndex_parPTO % load state indices
     out.yLP = y(itVec,iyLPPL);
     out.qLP = y(itVec,iyqLP);
     out.pLP = y(itVec,iypLP);
-    out.qlin = out.qLP(itVec,1);
-    out.qlout = out.qLP(itVec,end);
+    out.q_lin = out.qLP(:,1);
+    out.q_lout = out.qLP(:,end);
     
     out.yHP = y(itVec,iyHPPL);
     out.qHP = y(itVec,iyqHP);
     out.pHP = y(itVec,iypHP);
-    out.qhin = out.qHP(itVec,1);
-    out.qhout = out.qHP(itVec,end);
+    out.q_hin = out.qHP(:,1);
+    out.q_hout = out.qHP(:,end);
             
     % Post-process non-state variables and state derivatives
     syspost = @(t,y,par) sysPost(t,y,par);
@@ -143,9 +143,11 @@ stateIndex_parPTO % load state indices
     startParPool
     parfor it = 1:length(itVec)
         it_star = it+nt_ramp;
+        t_star = t(it_star);
         y_star = y(it_star,:);
+
         [dydt(it,:), nonState(it), control(it)] = ...
-                            syspost(t(it_true),y_star,par);
+                            syspost(t_star,y_star,par);
         
         % Move WEC torque results up a level in nonState stucture so that
         % they can be used like arrays in assiging to the output structure
@@ -211,8 +213,8 @@ stateIndex_parPTO % load state indices
     out.q_c = [nonState(:).q_c]';
 
      % Pressure relief valves at system pressure nodes
-    out.q_lPRV = [nonState(:).q_lPRV]';
-    out.q_hPRV = [nonState(:).q_hPRV]';
+    out.q_linPRV = [nonState(:).q_linPRV]';
+    out.q_hinPRV = [nonState(:).q_hinPRV]';
     out.q_roPRV = [nonState(:).q_roPRV]';
 
 %% Post-process analysis
@@ -220,20 +222,20 @@ stateIndex_parPTO % load state indices
     %% Energy analysis
     % WEC-driven pump
     out.power.P_WEC = -out.T_pto.*out.theta_dot;
-    out.power.P_wp = out.p_h.*out.q_h - out.p_l.*out.q_l;
+    out.power.P_wp = out.p_hin.*out.q_hwp - out.p_lout.*out.q_lwp;
     out.power.P_wpLoss = out.power.P_WEC - out.power.P_wp;
     
      % switching valve
     out.power.P_sv = out.q_sv.*(out.p_a-out.p_b);
     
      % check valve rectifier
-    out.power.P_ain = out.q_ain.*(out.p_l-out.p_a);
-    out.power.P_aout = out.q_aout.*(out.p_a-out.p_h);
-    out.power.P_bin = out.q_bin.*(out.p_l-out.p_b);
-    out.power.P_bout = out.q_bout.*(out.p_b-out.p_h);
+    out.power.P_ain = out.q_ain.*(out.p_lout-out.p_a);
+    out.power.P_aout = out.q_aout.*(out.p_a-out.p_hin);
+    out.power.P_bin = out.q_bin.*(out.p_lout-out.p_b);
+    out.power.P_bout = out.q_bout.*(out.p_b-out.p_hin);
 
     % Pump/motor and generator
-    out.power.P_pmLoss = (out.p_l - out.p_h).*out.q_pm ...
+    out.power.P_pmLoss = (out.p_lin - out.p_hout).*out.q_pm ...
                        - out.Tpm.*out.w_pm;
     out.power.P_gen = -((-out.Tgen.*out.w_pm > 0).*par.eta_g ...
                     + (-out.Tgen.*out.w_pm < 0)./par.eta_g) ...
@@ -241,16 +243,16 @@ stateIndex_parPTO % load state indices
     out.power.P_genLoss = -out.Tgen.*out.w_pm - out.power.P_gen;
 
     % RO ripple control valve
-    out.power.P_rv = out.q_rv.*(out.p_h-out.p_ro);
+    out.power.P_rv = out.q_rv.*(out.p_hout-out.p_ro);
 
     % Charge pump
-    out.power.P_cElec = 1/(par.eta_c*par.eta_m)*out.q_c.*(out.p_l-out.par.p_o);
-    out.power.P_cLoss = out.power.P_cElec - out.q_c.*(out.p_l-out.par.p_o);
+    out.power.P_cElec = 1/(par.eta_c*par.eta_m)*out.q_c.*(out.p_lin-out.par.p_o);
+    out.power.P_cLoss = out.power.P_cElec - out.q_c.*(out.p_lin-out.par.p_o);
 
     % ERU
     dp_ERUfeed = par.ERUconfig.outlet*out.p_ro ...
-                + (~par.ERUconfig.outlet)*out.p_h ...
-                - out.p_l;
+                + (~par.ERUconfig.outlet)*out.p_hout ...
+                - out.p_lin;
     P_ERUfeed = out.q_ERUfeed.*dp_ERUfeed;
     P_ERUbrine = out.q_brine.*(out.p_ro - out.par.p_o);
     PbalERU = par.ERUconfig.present ...
@@ -263,9 +265,9 @@ stateIndex_parPTO % load state indices
     out.power.P_ERUelecLoss = out.power.P_ERUelec - PbalERU;
 
     % Pressure relief valves
-    out.power.P_lPRV = out.q_lPRV.*(out.p_l-out.par.p_o);
-    out.power.P_hPRV = out.q_hPRV.*(out.p_h-out.p_l);
-    out.power.P_roPRV = out.q_roPRV.*(out.p_ro-out.p_l);
+    out.power.P_linPRV = out.q_linPRV.*(out.p_lin-out.par.p_o);
+    out.power.P_hinPRV = out.q_hinPRV.*(out.p_hin-out.p_lout);
+    out.power.P_roPRV = out.q_roPRV.*(out.p_ro-out.p_lin);
 
     % Pipeline losses
     out.power.P_LPPL = pLsoln_LP(:).PPfric;
@@ -361,7 +363,7 @@ stateIndex_parPTO % load state indices
             + out.power.P_rv ...
             + out.power.P_cLoss ...
             + out.power.P_ERULoss + out.power.P_ERUelecLoss...
-            + out.power.P_lPRV + out.power.P_hPRV + out.power.P_roPRV ...
+            + out.power.P_linPRV + out.power.P_hinPRV + out.power.P_roPRV ...
             + out.power.P_LPPL + out.power.P_HPPL;
     P_bnds = P_in - P_out - P_loss;
 
