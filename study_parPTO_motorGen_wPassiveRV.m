@@ -1,18 +1,18 @@
-% study_refPTO_motorGen_wPassiveRV.m script m-file
+% study_parPTO_motorGen_wPassiveRV.m script m-file
 % AUTHORS:
 % Jeremy Simmons (email: simmo536@umn.edu)
 % University of Minnesota
 % Department of Mechanical Engineering
 %
 % CREATION DATE:
-% 7/18/2023
+% 11/22/2023
 %
 % PURPOSE/DESCRIPTION:
 % This script performs parameter variation studies
-% using the model contained in sys_refPTO.m and solved by
-% sim_refPTO.m.
+% using the model contained in sys_parPTO.m and solved by
+% sim_parPTO.m.
 % The parameter initiallization functions are called within this
-% script before the sim_refPTO.m script is called.
+% script before the sim_parPTO.m script is called.
 %
 % This specific script studies the size of hydraulic motor driving the 
 % electric generator.
@@ -23,12 +23,12 @@
 %   SS=1;
 %
 % FILE DEPENDENCY:
-% ./Reference PTO/
-%   initialConditionDefault_refPTO
-%   parameters_refPTO.m
-%   sim_refPTO.m
-%   stateIndex_refPTO.m
-%   sys_refPTO.m
+% ./Parallel-type PTO/
+%   initialConditionDefault_parPTO
+%   parameters_parPTO.m
+%   sim_parPTO.m
+%   stateIndex_parPTO.m
+%   sys_parPTO.m
 % ./WEC model/
 %   flapModel.m
 %   hydroStaticTorque.m
@@ -48,9 +48,11 @@
 %   flowPRV.m
 % ./Utilities/
 %   statsTimeVar_cdf.m
+%   get_current_git_hash.m
+%   leadingZeros.m
 %
 % UPDATES:
-% 7/18/2023 - Created from study_refPTO_accum_woRV.m
+% 11/22/2023 - Created from study_refPTO_motorGen_wPassiveRV.m
 %
 % Copyright (C) 2023  Jeremy W. Simmons II
 % 
@@ -78,6 +80,7 @@ addpath('Sea States')
 addpath('Solvers')
 addpath('Utilities')
 git_hash_string = get_current_git_hash();
+
 %% %%%%%%%%%%%%   SIMULATION PARAMETERS  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Simulation timeframe
@@ -103,17 +106,17 @@ par.WEC.nw = 1000; % num. of frequency components for harmonic superposition
 par.wave.rngSeedPhase = 3; % seed for the random number generator
 
 % load parameters
-par = parameters_refPTO(par,...
+par = parameters_parPTO(par,...
     'nemohResults_vantHoff2009_20180802.mat','vantHoffTFCoeff.mat');
 
 % Define initial conditions
-stateIndex_refPTO % load state indices, provides 'iy_...'
-initialConditionDefault_refPTO % default ICs, provides 'y0'
+stateIndex_parPTO % load state indices, provides 'iy_...'
+initialConditionDefault_parPTO % default ICs, provides 'y0'
 
 %% Special modifications to base parameters
-% par.Sro = 3000; % [m^3]
-% par.D_WEC = 0.3;         % [m^3/rad] flap pump displacement
-p_ro_nom = [4.28e6 6.11e6 8e6 6.07e6 8e6 8e6]; % [Pa]
+% par.Sro = 3700; % [m^3]
+% par.D_WEC = 0.23;         % [m^3/rad] flap pump displacement
+p_ro_nom = 1e6*[4.0000 4.9435 8.0000 5.2661 8.0000 7.1052]; % [Pa]
 par.control.p_ro_nom = p_ro_nom(SS);
 par.duty_sv = 0;
 
@@ -147,7 +150,7 @@ par.D_pm = Dpm(iVar);
 
 % run simulation
 ticSIM = tic;
-out = sim_refPTO(y0,par);
+out = sim_parPTO(y0,par);
 toc(ticSIM)
 
 if ~saveSimData
@@ -159,7 +162,7 @@ end
 %% %%%%%%%%%%%%   Save Data  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 timeStamp = datetime("now",'format','yyyy-MM-dd''T''HH:mm'); % time in ISO8601
 
-filename = ['data_refPTO_motorGen_wPassiveRV', ...
+filename = ['data_parPTO_motorGen_wPassiveRV', ...
             '_',char(datetime("now",'format','yyyyMMdd')), ...
             '_',num2str(SS,leadingZeros(999)), ...
             '_',num2str(iVar,leadingZeros(nVar))];

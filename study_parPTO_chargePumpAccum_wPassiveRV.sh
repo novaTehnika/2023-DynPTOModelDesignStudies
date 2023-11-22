@@ -2,7 +2,7 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --mem=16gb
-#SBATCH -t 8:00:00
+#SBATCH -t 12:00:00
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=simmo536@umn.edu
 #SBATCH -p small
@@ -14,9 +14,8 @@ module load matlab
 matlab -nodisplay -r \
 "iVar = ${SLURM_ARRAY_TASK_ID}; \
 SS = $SS; \
-study_refPTO_accum_woRV"
+study_parPTO_chargePumpAccum_wPassiveRV"
 
 # Commands to use
-# sbatch --export=SS=1 --array=1-15 ~/2023-NSF_CPS-wavePoweredRO/study_refPTO_accum_woRV.sh
-# dos2unix  study_refPTO_accum_woRV.sh
-
+# sbatch --export=SS=1 --array=1-280 ~/2023-NSF_CPS-wavePoweredRO/study_parPTO_chargePumpAccum_wPassiveRV.sh
+# dos2unix  study_parPTO_chargePumpAccum_wPassiveRV.sh

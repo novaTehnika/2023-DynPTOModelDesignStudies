@@ -1,7 +1,7 @@
 #!/bin/bash -l
 #SBATCH --nodes=1
-#SBATCH --ntasks=10
-#SBATCH --mem=32g
+#SBATCH --ntasks=64
+#SBATCH --mem=128g
 #SBATCH -t 24:00:00
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=simmo536@umn.edu
@@ -14,9 +14,9 @@ module load matlab
 matlab -nodisplay -r \
 "addpath('Utilities'); \
 startParPool(${SLURM_JOB_CPUS_PER_NODE}); \
-study_refPTO_checkValves"
+study_parPTO_switchingValve"
 
 # Commands to use
-# sbatch ~/2023-NSF_CPS-wavePoweredRO/study_refPTO_checkValves.sh
-# dos2unix  study_refPTO_checkValves.sh
+# sbatch ~/2023-NSF_CPS-wavePoweredRO/study_parPTO_switchingValve.sh
+# dos2unix  study_parPTO_switchingValve.sh
 

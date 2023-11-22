@@ -1,20 +1,22 @@
-% study_refPTO_accum_woRV.m script m-file
+% study_parPTO_accum_wPassiveRV.m script m-file
 % AUTHORS:
 % Jeremy Simmons (email: simmo536@umn.edu)
 % University of Minnesota
 % Department of Mechanical Engineering
 %
 % CREATION DATE:
-% 6/28/2023
+% 11/22/2023
 %
 % PURPOSE/DESCRIPTION:
 % This script performs parameter variation studies
-% using the model contained in sys_refPTO.m and solved by
-% sim_refPTO.m.
+% using the model contained in sys_parPTO.m and solved by
+% sim_parPTO.m.
 % The parameter initiallization functions are called within this
-% script before the sim_refPTO.m script is called.
+% script before the sim_parPTO.m script is called.
 %
-% This specific script studies the size of high-pressure accumulator.
+% This specific script studies the size of high-pressure accumulators and
+% an passive valve at the inlet to the RO module for managing pressure rate
+% of change.
 %
 % This script is set up to be run as part of a SLURM job array. The
 % following lines are required before this script is called:
@@ -22,12 +24,12 @@
 %   SS=1;
 %
 % FILE DEPENDENCY:
-% ./Reference PTO/
-%   initialConditionDefault_refPTO
-%   parameters_refPTO.m
-%   sim_refPTO.m
-%   stateIndex_refPTO.m
-%   sys_refPTO.m
+% ./Parallel-type PTO/
+%   initialConditionDefault_parPTO
+%   parameters_parPTO.m
+%   sim_parPTO.m
+%   stateIndex_parPTO.m
+%   sys_parPTO.m
 % ./WEC model/
 %   flapModel.m
 %   hydroStaticTorque.m
@@ -47,9 +49,11 @@
 %   flowPRV.m
 % ./Utilities/
 %   statsTimeVar_cdf.m
+%   get_current_git_hash.m
+%   leadingZeros.m
 %
 % UPDATES:
-% 6/28/2023 - Created from study_refPTO_accum_wActiveRV.m
+% 11/22/2023 - Created from sstudy_refPTO_accum_wPassiveRV.m
 %
 % Copyright (C) 2023  Jeremy W. Simmons II
 % 
@@ -77,6 +81,7 @@ addpath('Sea States')
 addpath('Solvers')
 addpath('Utilities')
 git_hash_string = get_current_git_hash();
+
 %% %%%%%%%%%%%%   SIMULATION PARAMETERS  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Simulation timeframe
@@ -102,17 +107,17 @@ par.WEC.nw = 1000; % num. of frequency components for harmonic superposition
 par.wave.rngSeedPhase = 3; % seed for the random number generator
 
 % load parameters
-par = parameters_refPTO(par,...
+par = parameters_parPTO(par,...
     'nemohResults_vantHoff2009_20180802.mat','vantHoffTFCoeff.mat');
 
 % Define initial conditions
-stateIndex_refPTO % load state indices, provides 'iy_...'
-initialConditionDefault_refPTO % default ICs, provides 'y0'
+stateIndex_parPTO % load state indices, provides 'iy_...'
+initialConditionDefault_parPTO % default ICs, provides 'y0'
 
 %% Special modifications to base parameters
-% par.Sro = 3000; % [m^3]
-% par.D_WEC = 0.3;         % [m^3/rad] flap pump displacement
-p_ro_nom = [4.28e6 6.11e6 8e6 6.07e6 8e6 8e6]; % [Pa]
+% par.Sro = 3700; % [m^3]
+% par.D_WEC = 0.23;         % [m^3/rad] flap pump displacement
+p_ro_nom = 1e6*[4.0000 4.9435 8.0000 5.2661 8.0000 7.1052]; % [Pa]
 par.control.p_ro_nom = p_ro_nom(SS);
 par.duty_sv = 0;
 
@@ -120,32 +125,46 @@ par.duty_sv = 0;
 par.ERUconfig.present = 1;
 par.ERUconfig.outlet = 1;
 
-par.rvConfig.included = 0; % RO inlet valve is 1 - present, 0 - absent
+par.rvConfig.included = 1; % RO inlet valve is 1 - present, 0 - absent
 par.rvConfig.active = (0)*par.rvConfig.included; % RO inlet valve is 1 - active, 0 - passive
-dp_rated = 1e5; % [Pa] 
-q_rated = 1000e-3; % [(lpm) -> m^3/s]
-par.kv_rv = q_rated/dp_rated;
+% dp_rated = 1e5; % [Pa] 
+% q_rated = (100)*60/1e3; % [(lpm) -> m^3/s]
+% par.kv_rv = q_rated/dp_rated;
 
 par.D_pm = (1000)*1e-6/(2*pi); % [(cc/rev) -> m^3/rad]  Motor displacement
 par.w_pm_max = (3600)/60*2*pi; % [(rpm) -> rad/s] maximum speed of motor
 
 %% %%%%%%%%%%%%   Study Variables  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % total accumulator volume
+% ditribution between motor inlet and RO inlet
+% max valve coefficient
 
-nVar = 30;
-Vtotal = 1e-3*logspace(log10(5e3),log10(30e3),nVar);% [L->m^3] total accumulator volume
+nVar1 = 15;
+Vtotal = 1e-3*logspace(log10(5e3),log10(20e3),nVar1);% [L->m^3] total accumulator volume
+nVar2 = 9;
+X = linspace(0.1,0.5,nVar2); % [-] accumulator volume distribution 1 - all at RO inlet, 0 - all at motor inlet
+nVar3 = 10;
+kv = 1/sqrt(1000)*logspace(log10(0.5e-3),log10(1.5e-2),nVar3);% [(l/s/kPa^0.5)->m^3/s/Pa^0.5] max valve coefficient for ripple control valve
+
+[meshVar.Vtotal, meshVar.X, meshVar.kv] = meshgrid(Vtotal,X,kv);
+Vtotal_mesh = meshVar.Vtotal(:);
+X_mesh = meshVar.X(:);
+kv_mesh = meshVar.kv(:);
+
+nVar = length(Vtotal_mesh);
 
 saveSimData = 1; % save simulation data (1) or just output variables (0)
 
 %% %%%%%%%%%%%%   COLLECT DATA  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % change design parameter
-par.Vc_h = 0.5*Vtotal(iVar);
-par.Vc_ro = 0.5*Vtotal(iVar);
+par.kv_rv = kv_mesh(iVar);
+par.Vc_h = (1 - X_mesh(iVar))*Vtotal_mesh(iVar);
+par.Vc_ro = X_mesh(iVar)*Vtotal_mesh(iVar);
 
 % run simulation
 ticSIM = tic;
-out = sim_refPTO(y0,par);
+out = sim_parPTO(y0,par);
 toc(ticSIM)
 
 % Calculate metrics
@@ -177,7 +196,7 @@ end
 timeStamp = datetime("now",'format','yyyy-MM-dd''T''HH:mm'); % time in ISO8601
 
 % Save data
-filename = ['data_refPTO_accum_woRV', ...
+filename = ['data_parPTO_accum_wPassiveRV', ...
             '_',char(datetime("now",'Format','yyyyMMdd')), ...
             '_',num2str(SS,leadingZeros(999)), ...
             '_',num2str(iVar,leadingZeros(nVar))];

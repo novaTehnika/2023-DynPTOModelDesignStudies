@@ -1,29 +1,34 @@
-% study_refPTO_checkValves.m script m-file
+% study_parPTO_checkValves.m script m-file
 % AUTHORS:
 % Jeremy Simmons (email: simmo536@umn.edu)
 % University of Minnesota
 % Department of Mechanical Engineering
 %
 % CREATION DATE:
-% 6/23/2023
+% 11/22/2023
 %
 % PURPOSE/DESCRIPTION:
 % TThis script performs parameter variation studies
-% using the model contained in sys_refPTO.m and solved by
-% sim_refPTO.m.
+% using the model contained in sys_parPTO.m and solved by
+% sim_parPTO.m.
 % The parameter initiallization functions are called within this
-% script before the sim_refPTO.m script is called.
+% script before the sim_parPTO.m script is called.
 %
 % This specific script studies the size of check valves at the WEC-driven
 % pump.
 %
+% This script is set up to be run as part of a SLURM job array. The
+% following lines are required before this script is called:
+%   iVar = ${SLURM_ARRAY_TASK_ID};
+%   SS=1;
+%
 % FILE DEPENDENCY:
-% ./Reference PTO/
-%   initialConditionDefault_refPTO
-%   parameters_refPTO.m
-%   sim_refPTO.m
-%   stateIndex_refPTO.m
-%   sys_refPTO.m
+% ./Parallel-type PTO/
+%   initialConditionDefault_parPTO
+%   parameters_parPTO.m
+%   sim_parPTO.m
+%   stateIndex_parPTO.m
+%   sys_parPTO.m
 % ./WEC model/
 %   flapModel.m
 %   hydroStaticTorque.m
@@ -41,10 +46,12 @@
 %   deadVCap.m
 %   flowCV.m
 %   flowPRV.m
+% ./Utilities/
+%   get_current_git_hash.m
+%   leadingZeros.m
 %
 % UPDATES:
-% 6/23/2023 - Created from study_coulombPTO_dampingStudy.m and 
-% run_refPTO.m.
+% 11/22/2023 - Created from study_refPTO_checkValves.m.
 %
 % Copyright (C) 2023  Jeremy W. Simmons II
 % 
@@ -72,6 +79,7 @@ addpath('Sea States')
 addpath('Solvers')
 addpath('Utilities')
 git_hash_string = get_current_git_hash();
+
 %% %%%%%%%%%%%%   SIMULATION PARAMETERS  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Simulation timeframe
@@ -89,32 +97,32 @@ if mod(par.downSampledStepSize,par.MaxStep)
 end
 
 % Sea State and Wave construction parameters
-% Hs = [2.34 2.64 5.36 2.05 5.84 3.25];
-% Tp = [7.31 9.86 11.52 12.71 15.23 16.5];
-par.wave.Hs = 2.64;
-par.wave.Tp = 9.86;
+Hs = [2.34 2.64 5.36 2.05 5.84 3.25];
+Tp = [7.31 9.86 11.52 12.71 15.23 16.5];
+par.wave.Hs = Hs(SS);
+par.wave.Tp = Tp(SS);
 par.WEC.nw = 1000; % num. of frequency components for harmonic superposition
 par.wave.rngSeedPhase = 3; % seed for the random number generator
 
 % load parameters
-par = parameters_refPTO(par,...
+par = parameters_parPTO(par,...
     'nemohResults_vantHoff2009_20180802.mat','vantHoffTFCoeff.mat');
 
 % Define initial conditions
-stateIndex_refPTO % load state indices, provides 'iy_...'
-initialConditionDefault_refPTO % default ICs, provides 'y0'
+stateIndex_parPTO % load state indices, provides 'iy_...'
+initialConditionDefault_parPTO % default ICs, provides 'y0'
 
 %% Special modifications to base parameters
-% par.Sro = 3000; % [m^3]
-% par.D_WEC = 0.3;         % [m^3/rad] flap pump displacement
-% p_ro_nom = [4.28e6 6.11e6 8e6 6.07e6 8e6 8e6]; % [Pa]
-par.control.p_ro_nom = 6.11e6; % [Pa]
+% par.Sro = 3700; % [m^3]
+% par.D_WEC = 0.23;         % [m^3/rad] flap pump displacement
+p_ro_nom = 1e6*[4.0000 4.9435 8.0000 5.2661 8.0000 7.1052]; % [Pa]
+par.control.p_ro_nom = p_ro_nom(SS); % [Pa]
 
-% par.ERUconfig.present = 1;
-% par.ERUconfig.outlet = 1;
+par.ERUconfig.present = 1;
+par.ERUconfig.outlet = 1;
 
-% par.rvIncluded = 1; % RO inlet valve is 1 - present, 0 - absent
-% par.rvConfig = (1)*par.rvIncluded; % RO inlet valve is 1 - active, 0 - passive
+par.rvIncluded = 0; % RO inlet valve is 1 - present, 0 - absent
+par.rvConfig = (0)*par.rvIncluded; % RO inlet valve is 1 - active, 0 - passive
 % dp_rated = 1e5; % [Pa] 
 % q_rated = (100)*60/1e3; % [(lpm) -> m^3/s]
 % par.kv_rv = q_rated/dp_rated;
@@ -137,7 +145,7 @@ parfor iVar = 1:nVar
     
     % run simulation
     ticSIM = tic;
-    out = sim_refPTO(y0,param);
+    out = sim_parPTO(y0,param);
     toc(ticSIM)
     
     % Calculate metrics
@@ -155,7 +163,7 @@ end
 %% %%%%%%%%%%%%   Save Data  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Save: time in ISO8601
-filename = ['data_refPTO_checkValves', ...
+filename = ['data_parPTO_checkValves', ...
             '-',datetime("now",'yyyymmdd')];
 save(filename,'-v7.3')
 
