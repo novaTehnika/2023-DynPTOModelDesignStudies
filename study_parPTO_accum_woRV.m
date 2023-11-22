@@ -163,7 +163,7 @@ q_permMean = mean(out.q_perm(it_vec));
 PP_WEC = mean(out.power.P_WEC(it_vec));
 PP_wp = mean(out.power.P_wp(it_vec));
 PP_rv = mean(out.power.P_rv(it_vec));
-PP_hPRV = mean(out.power.P_hPRV(it_vec));
+PP_hinPRV = mean(out.power.P_hinPRV(it_vec));
 PP_roPRV = mean(out.power.P_roPRV(it_vec));
 dpdt_max = max(abs(out.dydt(it_vec,iyp_ro)));
 

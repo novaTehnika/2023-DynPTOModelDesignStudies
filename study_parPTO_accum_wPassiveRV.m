@@ -144,7 +144,7 @@ Vtotal = 1e-3*logspace(log10(5e3),log10(20e3),nVar1);% [L->m^3] total accumulato
 nVar2 = 9;
 X = linspace(0.1,0.5,nVar2); % [-] accumulator volume distribution 1 - all at RO inlet, 0 - all at motor inlet
 nVar3 = 10;
-kv = 1/sqrt(1000)*logspace(log10(0.5e-3),log10(1.5e-2),nVar3);% [(l/s/kPa^0.5)->m^3/s/Pa^0.5] max valve coefficient for ripple control valve
+kv = 1/sqrt(1000)/1e3*logspace(log10(0.5e-3),log10(1.5e-2),nVar3);% [(L/s/kPa^0.5)->m^3/s/Pa^0.5] max valve coefficient for ripple control valve
 
 [meshVar.Vtotal, meshVar.X, meshVar.kv] = meshgrid(Vtotal,X,kv);
 Vtotal_mesh = meshVar.Vtotal(:);
@@ -179,7 +179,7 @@ q_permMean = mean(out.q_perm(it_vec));
 PP_WEC = mean(out.power.P_WEC(it_vec));
 PP_wp = mean(out.power.P_wp(it_vec));
 PP_rv = mean(out.power.P_rv(it_vec));
-PP_hPRV = mean(out.power.P_hPRV(it_vec));
+PP_hinPRV = mean(out.power.P_hinPRV(it_vec));
 PP_roPRV = mean(out.power.P_roPRV(it_vec));
 dpdt_max = max(abs(out.dydt(it_vec,iyp_ro)));
 
