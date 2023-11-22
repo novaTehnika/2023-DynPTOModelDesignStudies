@@ -128,43 +128,41 @@ par.rvConfig = (0)*par.rvIncluded; % RO inlet valve is 1 - active, 0 - passive
 % par.kv_rv = q_rated/dp_rated;
 
 %% %%%%%%%%%%%%   Study Variables  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-nVar = 10;
-kv = logspace(log10(1e-5),log10(1e-3),nVar);% [m^3/s/Pa] valve coefficient for high-pressure outlet check valve
+nVar = 50;
+kv = logspace(log10(1e-5),log10(1e-2),nVar);% [m^3/s/Pa] valve coefficient for high-pressure outlet check valve
 X = 1.5; % proportion between low and high-pressure check valves
 
 saveSimData = 1; % save simulation data (1) or just output variables (0)
 
 %% %%%%%%%%%%%%   COLLECT DATA  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-parfor iVar = 1:nVar
-    param = par; % store individual parameter strucs for parallel compute
+% change design parameter
+par.kvWECout = kv(iVar);
+par.kvWECin = X*kv(iVar);
 
-    % change design parameter
-    param.kvWECout = kv(iVar);
-    param.kvWECin = X*kv(iVar);
-    
-    % run simulation
-    ticSIM = tic;
-    out = sim_parPTO(y0,param);
-    toc(ticSIM)
-    
-    % Calculate metrics
-    it_vec = find(out.t>=par.tstart);
-    eff_wecPump(iVar) = mean(out.power.P_wp(it_vec)) ...
-                        /mean(out.power.P_WEC(it_vec));
-    p_min_wp(iVar) = min([out.p_a;out.p_b]);
+% run simulation
+ticSIM = tic;
+out = sim_parPTO(y0,param);
+toc(ticSIM)
 
-    if saveSimData
-        simOut(iVar) = out;
-    end
+% Calculate metrics
+it_vec = find(out.t>=par.tstart);
+eff_wecPump(iVar) = mean(out.power.P_wp(it_vec)) ...
+                    /mean(out.power.P_WEC(it_vec));
+p_min_wp(iVar) = min([out.p_a;out.p_b]);
 
+if saveSimData
+    simOut(iVar) = out;
 end
+
 
 %% %%%%%%%%%%%%   Save Data  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Save: time in ISO8601
 filename = ['data_parPTO_checkValves', ...
-            '-',datetime("now",'yyyymmdd')];
+            '_',char(datetime("now",'Format','yyyyMMdd')), ...
+            '_',num2str(SS,leadingZeros(999)), ...
+            '_',num2str(iVar,leadingZeros(nVar))];
 save(filename,'-v7.3')
 
 %% %%%%%%%%%%%%   End Computations  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -177,13 +175,13 @@ figure
 xlabel('flow coefficient, low-pressure (L/s/kPa^{1/2})')
 title('Check Valve Sizing Study')
 yyaxis left
-semilogx(X*kv*1000/sqrt(1000),eff_wecPump)
+semilogx(X*kv*1000*sqrt(1000),eff_wecPump)
 hold on
 ylabel('WEC-driven pump efficiency')
 ylim([0 1])
 
 yyaxis right
 hold on
-semilogx(X*kv*1000/sqrt(1000),1e-3*p_min_wp)
+semilogx(X*kv*1000*sqrt(1000),1e-3*p_min_wp)
 ylabel('minimum pressure in pump (kPA)')
 
