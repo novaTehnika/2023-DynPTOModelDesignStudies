@@ -17,6 +17,6 @@ SS = $SS; \
 study_parPTO_switchingValve"
 
 # Commands to use
-# sbatch --export=SS=1 --array=1-20 ~/2023-NSF_CPS-wavePoweredRO/study_parPTO_switchingValve.sh
+# sbatch --export=SS=1 --array=1-20 ~/2023-DynPTOModelDesignStudies/study_parPTO_switchingValve.sh
 # dos2unix  study_parPTO_switchingValve.sh
 

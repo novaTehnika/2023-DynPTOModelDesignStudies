@@ -17,6 +17,6 @@ SS = $SS; \
 study_parPTO_motorGen_wPassiveRV"
 
 # Commands to use
-# sbatch --export=SS=1 --array=1-15 ~/2023-NSF_CPS-wavePoweredRO/study_parPTO_motorGen_wPassiveRV.sh
+# sbatch --export=SS=1 --array=1-15 ~/2023-DynPTOModelDesignStudies/study_parPTO_motorGen_wPassiveRV.sh
 # dos2unix  study_parPTO_accum_woRV.sh
 
