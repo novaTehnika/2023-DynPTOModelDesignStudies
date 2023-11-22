@@ -13,7 +13,9 @@ cd ~/2023-DynPTOModelDesignStudies
 module load matlab
 matlab -nodisplay -r \
 "iVar = ${SLURM_ARRAY_TASK_ID}; \
-SS = $SS; \
+display(['iVar = ',num2str(iVar)]); \
+SS = ${SS}; \
+display(['SS = ',num2str(SS)]); \
 study_parPTO_chargePumpAccum_wPassiveRV"
 
 # Commands to use
