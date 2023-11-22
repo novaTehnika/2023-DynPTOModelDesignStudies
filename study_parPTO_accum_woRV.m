@@ -131,9 +131,6 @@ par.ERUconfig.outlet = 1;
 
 par.rvConfig.included = 0; % RO inlet valve is 1 - present, 0 - absent
 par.rvConfig.active = (0)*par.rvConfig.included; % RO inlet valve is 1 - active, 0 - passive
-dp_rated = 1e5; % [Pa] 
-q_rated = 1000e-3; % [(lpm) -> m^3/s]
-par.kv_rv = q_rated/dp_rated;
 
 par.D_pm = (1000)*1e-6/(2*pi); % [(cc/rev) -> m^3/rad]  Motor displacement
 par.w_pm_max = (3600)/60*2*pi; % [(rpm) -> rad/s] maximum speed of motor

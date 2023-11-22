@@ -132,9 +132,6 @@ par.ERUconfig.outlet = 1;
 
 par.rvConfig.included = 1; % RO inlet valve is 1 - present, 0 - absent
 par.rvConfig.active = (0)*par.rvConfig.included; % RO inlet valve is 1 - active, 0 - passive
-% dp_rated = 1e5; % [Pa] 
-% q_rated = 1000e-3; % [(lpm) -> m^3/s]
-% par.kv_rv = q_rated/dp_rated;
 par.kv_rv = (4.7)/sqrt(1e3)/1000; % [(L/s/kPa^0.5) -> m^3/s/Pa^0.5]
 
 par.Vc_h = (5000)*1e-3; % [(L) -> m^3] gas volume at charge pressure
