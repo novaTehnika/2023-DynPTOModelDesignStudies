@@ -13,7 +13,9 @@ cd ~/2023-DynPTOModelDesignStudies
 module load matlab
 matlab -nodisplay -r \
 "iVar = ${SLURM_ARRAY_TASK_ID}; \
-SS = $SS; \
+display(['iVar = ',iVar]); \
+SS = ${SS}; \
+display(['SS = ',SS]); \
 study_parPTO_checkValves"
 
 # Commands to use
