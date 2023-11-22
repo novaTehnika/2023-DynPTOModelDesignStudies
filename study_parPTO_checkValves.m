@@ -73,7 +73,7 @@
 %   along with this program. If not, see <https://www.gnu.org/licenses/>.
 %
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-clear
+% clear
 % clc
 addpath('WEC model') 
 addpath(['WEC model' filesep 'WECdata']) 
