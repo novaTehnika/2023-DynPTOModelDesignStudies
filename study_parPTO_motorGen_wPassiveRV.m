@@ -129,7 +129,7 @@ par.rvConfig.active = (0)*par.rvConfig.included; % RO inlet valve is 1 - active,
 % dp_rated = 1e5; % [Pa] 
 % q_rated = 1000e-3; % [(lpm) -> m^3/s]
 % par.kv_rv = q_rated/dp_rated;
-par.kv_rv = (0.0047)/sqrt(1e3); % [(L/s/kPa^0.5) -> m^3/s/Pa^0.5]
+par.kv_rv = (4.7)/sqrt(1e3)/1e3; % [(L/s/kPa^0.5) -> m^3/s/Pa^0.5]
 
 par.Vc_h = (5000)*1e-3; % [(L) -> m^3] gas volume at charge pressure
 par.Vc_ro = (5000)*1e-3; % [(L) -> m^3] gas volume at charge pressure
@@ -138,7 +138,7 @@ par.w_pm_max = (1750)/60*2*pi; % [(rpm) -> rad/s] maximum speed of motor
 
 %% %%%%%%%%%%%%   Study Variables  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % motor/pump displacement
-Dpm = [100 200 400 600 800 1000 1500 2000 2500 3000]*1e-6/(2*pi);% [L->m^3] total accumulator volume
+Dpm = [100 200 400 600 800 1000 1500 2000 2500 3000]*1e-6/(2*pi);% [(cc/rev) -> m^3/rad] total accumulator volume
 nVar = numel(Dpm);
 
 saveSimData = 1; % save simulation data (1) or just output variables (0)
