@@ -38,6 +38,9 @@
 %   deadVCap.m
 %   flowCV.m
 %   flowPRV.m
+% ./Utilities/
+%   statsTimeVar_cdf.m
+%   get_current_git_hash.m
 %
 % UPDATES:
 % 11/2/2023 - Created from run_refPTO.m.
@@ -69,6 +72,7 @@ addpath('Sea States')
 addpath('Solvers')
 addpath('Utilities')
 git_hash_string = get_current_git_hash();
+
 %% %%%%%%%%%%%%   SIMULATION PARAMETERS  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Simulation timeframe
@@ -86,10 +90,11 @@ if mod(par.downSampledStepSize,par.MaxStep)
 end
 
 % Sea State and Wave construction parameters
-% Hs = [2.34 2.64 5.36 2.05 5.84 3.25];
-% Tp = [7.31 9.86 11.52 12.71 15.23 16.5];
-par.wave.Hs = 2.64;
-par.wave.Tp = 9.86;
+iSS = 2;
+Hs = [2.34 2.64 5.36 2.05 5.84 3.25];
+Tp = [7.31 9.86 11.52 12.71 15.23 16.5];
+par.wave.Hs = Hs(SS);
+par.wave.Tp = Tp(SS);
 par.WEC.nw = 1000; % num. of frequency components for harmonic superposition 
 par.wave.rngSeedPhase = 3; % seed for the random number generator
 
@@ -104,7 +109,7 @@ initialConditionDefault_parPTO % default ICs, provides 'y0'
 %% Special modifications to base parameters
 % par.Sro = 3700; % [m^3]
 % par.D_WEC = 0.23;         % [m^3/rad] flap pump displacement
-% p_ro_nom = [4.0000 4.9435 8.0000 5.2661 8.0000 7.1052]; % [Pa]
+% p_ro_nom = 1e6*[4.0000 4.9435 8.0000 5.2661 8.0000 7.1052]; % [Pa]
 par.control.p_ro_nom = 6.11e6; % [Pa]
 par.duty_sv = 0.0;
 
