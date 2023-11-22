@@ -95,7 +95,7 @@ if mod(par.downSampledStepSize,par.MaxStep)
 end
 
 % Sea State and Wave construction parameters
-iSS = 2;
+SS = 2;
 Hs = [2.34 2.64 5.36 2.05 5.84 3.25];
 Tp = [7.31 9.86 11.52 12.71 15.23 16.5];
 par.wave.Hs = Hs(SS);
