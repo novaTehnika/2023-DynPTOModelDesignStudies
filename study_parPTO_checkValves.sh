@@ -1,22 +1,22 @@
 #!/bin/bash -l
 #SBATCH --nodes=1
-#SBATCH --ntasks=10
-#SBATCH --mem=32g
-#SBATCH -t 24:00:00
+#SBATCH --ntasks=1
+#SBATCH --mem=16gb
+#SBATCH -t 8:00:00
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=simmo536@umn.edu
-#SBATCH -p amdsmall
-#SBATCH -o %A.out
-#SBATCH -e %A.err
+#SBATCH -p small
+#SBATCH -o %A_%a.out
+#SBATCH -e %A_%a.err
 
-cd ~/2023-NSF_CPS-wavePoweredRO
+cd ~/2023-DynPTOModelDesignStudies
 module load matlab
 matlab -nodisplay -r \
-"addpath('Utilities'); \
-startParPool(${SLURM_JOB_CPUS_PER_NODE}); \
+"iVar = ${SLURM_ARRAY_TASK_ID}; \
+SS = $SS; \
 study_parPTO_checkValves"
 
 # Commands to use
-# sbatch ~/2023-NSF_CPS-wavePoweredRO/study_parPTO_checkValves.sh
+# sbatch --export=SS=1 --array=1-20 ~/2023-NSF_CPS-wavePoweredRO/study_parPTO_checkValves.sh
 # dos2unix  study_parPTO_checkValves.sh
 
