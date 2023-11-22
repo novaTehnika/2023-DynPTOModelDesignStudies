@@ -145,28 +145,23 @@ saveSimData = 1; % save simulation data (1) or just output variables (0)
 
 %% %%%%%%%%%%%%   COLLECT DATA  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-parfor iVar = 1:nVar
-    param = par; % store individual parameter strucs for parallel compute
+% change design parameter
+par.kv_sv = kv_mesh(iVar);
+par.T_sv = Tsw_mesh(iVar);
 
-    % change design parameter
-    param.kv_sv = kv_mesh(iVar);
-    param.T_sv = Tsw_mesh(iVar);
+% run simulation
+ticSIM = tic;
+out = sim_parPTO(y0,par);
+toc(ticSIM)
 
-    % run simulation
-    ticSIM = tic;
-    out = sim_parPTO(y0,param);
-    toc(ticSIM)
-    
-    % Calculate metrics
-    it_vec = find(out.t>=par.tstart);
-    PP_WEC(iVar) = mean(out.power.P_WEC(it_vec));
-    PP_wp(iVar) = mean(out.power.P_wp(it_vec));
-    eff_wecPump(iVar) = PP_wp(iVar)/PP_WEC(iVar);
+% Calculate metrics
+it_vec = find(out.t>=par.tstart);
+PP_WEC(iVar) = mean(out.power.P_WEC(it_vec));
+PP_wp(iVar) = mean(out.power.P_wp(it_vec));
+eff_wecPump(iVar) = PP_wp(iVar)/PP_WEC(iVar);
 
-    if saveSimData
-        simOut(iVar) = out;
-    end
-
+if saveSimData
+    simOut(iVar) = out;
 end
 
 %% %%%%%%%%%%%%   Post-process data  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -193,7 +188,9 @@ clearvars test
 
 % Save: time in ISO8601
 filename = ['data_parPTO_switchingValve', ...
-            '-',datetime("now",'yyyymmdd')];
+            '_',char(datetime("now",'Format','yyyyMMdd')), ...
+            '_',num2str(SS,leadingZeros(999)), ...
+            '_',num2str(iVar,leadingZeros(nVar))];
 save(filename,'-v7.3')
 
 %% %%%%%%%%%%%%   End Computations  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -203,7 +200,7 @@ return
 %% %%%%%%%%%%%%   PLOTTING  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % WEC pump efficiency
-X = kv*sqrt(1000);
+X = kv*sqrt(1000)*1e3;
 Y = Tsw;
 Z = eff_wecPump_2D; 
 inc = 250;
@@ -219,7 +216,7 @@ ylabel('switching period (s)');
 title('WEC-driven Pump Efficiency')
 
 % Absorbed power
-X = kv*sqrt(1000);
+X = kv*sqrt(1000)*1e3;
 Y = Tsw;
 Z = PP_WEC_2D*1e-3;
 
@@ -234,7 +231,7 @@ ylabel('switching period (s)');
 title('WEC Power Absorption (kW)')
 
 % Pump output power
-X = kv*sqrt(1000);
+X = kv*sqrt(1000)*1e3;
 Y = Tsw;
 Z = PP_wp_2D*1e-3;
 

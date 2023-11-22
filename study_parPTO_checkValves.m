@@ -142,7 +142,7 @@ par.kvWECin = X*kv(iVar);
 
 % run simulation
 ticSIM = tic;
-out = sim_parPTO(y0,param);
+out = sim_parPTO(y0,par);
 toc(ticSIM)
 
 % Calculate metrics
