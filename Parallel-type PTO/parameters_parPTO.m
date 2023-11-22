@@ -58,7 +58,7 @@ function par = parameters_parPTO(par,filenameCoeff,filenameRadSS)
     % WEC-pump
     par.theta_max = pi/2; % [rad] maximum stroke (plus and minus) from upright poistion
      % pumping chamber
-    par.D_WEC = 0.3;         % [m^3/rad] flap pump displacement
+    par.D_WEC = 0.23;         % [m^3/rad] flap pump displacement
     V_wecPumpTotal = 2*par.theta_max*par.D_WEC;
     par.V_wecDead = V_wecPumpTotal/2*(0.2); % [m^3] dead volume attached to each port (a and b) of the WEC-driven pump
     par.eta_v_WEC = 1;
@@ -93,7 +93,7 @@ function par = parameters_parPTO(par,filenameCoeff,filenameRadSS)
     % RO module parameters
     par.p_perm = par.p_o;
     par.p_osm = 2.7e6;
-    par.Sro = 3000; % [m^3]
+    par.Sro = 3700; % [m^3]
     par.Aperm = 2.57e-12; % [m^3/(N-s)] permeabiity coefficient (Yu and Jenne,2018)
     par.Y = 0.25;
 
@@ -195,15 +195,15 @@ function par = parameters_parPTO(par,filenameCoeff,filenameRadSS)
 
     % Pressure relief valves
      % inlet to low-pressure pipeline/outlet of charge pump
-    maxPressure = 10e6; % [Pa]
-    margin = 5e4; % [Pa]
+    maxPressure = 5e5; % [Pa]
+    margin = 1e4; % [Pa]
     maxFlow = 100e-3; % [m^3/s]
     par.lPRV.p_crack = maxPressure - margin;
     par.lPRV.C = (maxPressure^(3/2) ...
                  - (maxPressure-margin)*maxPressure^(1/2))/maxFlow;
 
      % high-pressure outlet of WEC-driven pump
-    maxPressure = 30e6; % [Pa]
+    maxPressure = 20e6; % [Pa]
     margin = 5e4; % [Pa]
     maxFlow = (100)*1e-3; % [(L/s) -> m^3/s]
     par.hPRV.p_crack = maxPressure - margin;
