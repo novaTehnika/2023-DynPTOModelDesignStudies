@@ -25,6 +25,10 @@ function [dydt, nonState, control] = sys_parPTO(t,y,par)
 %   deadVCap.m
 %   flowCV.m
 %   flowPRV.m
+% ../Components/Pipeline
+%   flowR.m
+%   lineCap.m
+%   pipelineNPi.m
 %
 % UPDATES:
 % 11/2/2023 - created from sys_refPTO.m.

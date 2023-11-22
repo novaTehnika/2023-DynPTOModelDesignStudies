@@ -45,6 +45,10 @@
 %   deadVCap.m
 %   flowCV.m
 %   flowPRV.m
+% ./Components/Pipeline
+%   flowR.m
+%   lineCap.m
+%   pipelineNPi.m
 % ./Utilities/
 %   startParPool.m
 %   statsTimeVar_cdf.m
@@ -76,6 +80,7 @@ addpath('WEC model')
 addpath(['WEC model' filesep 'WECdata']) 
 addpath('Parallel-type PTO')
 addpath('Components')
+addpath(['Components' filesep 'Pipeline'])
 addpath('Sea States')
 addpath('Solvers')
 addpath('Utilities')

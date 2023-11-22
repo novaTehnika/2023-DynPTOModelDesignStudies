@@ -38,6 +38,10 @@
 %   deadVCap.m
 %   flowCV.m
 %   flowPRV.m
+% ./Components/Pipeline
+%   flowR.m
+%   lineCap.m
+%   pipelineNPi.m
 % ./Utilities/
 %   startParPool.m
 %   statsTimeVar_cdf.m
