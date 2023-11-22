@@ -9,7 +9,7 @@
 #SBATCH -o %A_%a.out
 #SBATCH -e %A_%a.err
 
-cd ~/2023-NSF_CPS-wavePoweredRO
+cd ~/2023-DynPTOModelDesignStudies
 module load matlab
 matlab -nodisplay -r \
 "iVar = ${SLURM_ARRAY_TASK_ID}; \
