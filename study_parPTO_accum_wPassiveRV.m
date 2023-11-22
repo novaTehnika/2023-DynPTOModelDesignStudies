@@ -76,7 +76,7 @@
 % clc
 addpath('WEC model') 
 addpath(['WEC model' filesep 'WECdata']) 
-addpath('Reference PTO')
+addpath('Parallel-type PTO')
 addpath('Components')
 addpath('Sea States')
 addpath('Solvers')
