@@ -95,7 +95,7 @@ par.tend = 500; %[s] end time of simulation
 % Solver parameters
 % par.odeSolverRelTol = 1e-4; % Rel. error tolerance parameter for ODE solver
 % par.odeSolverAbsTol = 1e-4; % Abs. error tolerance parameter for ODE solver
-par.MaxStep = 5e-5;             % [s] for fixed time solver, this is the step size for solver
+par.MaxStep = 1e-5;             % [s] for fixed time solver, this is the step size for solver
 par.downSampledStepSize = 1e-2; % [s] specifies time step for data output
 if mod(par.downSampledStepSize,par.MaxStep)
     warning('down-sampled time step is not an integer multiple of the maximum step size')
@@ -114,7 +114,7 @@ par = parameters_parPTO(par,...
     'nemohResults_vantHoff2009_20180802.mat','vantHoffTFCoeff.mat');
 
 % Define initial conditions
-stateIndex_parPTO % load state indices, provides 'iy_...'
+% stateIndex_parPTO % load state indices, provides 'iy_...'
 initialConditionDefault_parPTO % default ICs, provides 'y0'
 
 %% Special modifications to base parameters
@@ -131,7 +131,7 @@ par.rvConfig.active = (0)*par.rvConfig.included; % RO inlet valve is 1 - active,
 
 %% %%%%%%%%%%%%   Study Variables  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 nVar = 50;
-kv = logspace(log10(1e-5),log10(1e-2),nVar);% [m^3/s/Pa] valve coefficient for high-pressure outlet check valve
+kv = logspace(log10(1e-4),log10(5e-3),nVar);% [m^3/s/Pa] valve coefficient for high-pressure outlet check valve
 X = 1.5; % proportion between low and high-pressure check valves
 
 saveSimData = 1; % save simulation data (1) or just output variables (0)
@@ -170,20 +170,3 @@ save(filename,'-v7.3')
 %% %%%%%%%%%%%%   End Computations  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 return
-
-%% %%%%%%%%%%%%   PLOTTING  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-figure
-xlabel('flow coefficient, low-pressure (L/s/kPa^{1/2})')
-title('Check Valve Sizing Study')
-yyaxis left
-semilogx(X*kv*1000*sqrt(1000),eff_wecPump)
-hold on
-ylabel('WEC-driven pump efficiency')
-ylim([0 1])
-
-yyaxis right
-hold on
-semilogx(X*kv*1000*sqrt(1000),1e-3*p_min_wp)
-ylabel('minimum pressure in pump (kPA)')
-
