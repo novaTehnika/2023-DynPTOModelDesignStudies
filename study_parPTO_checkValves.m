@@ -114,7 +114,7 @@ par = parameters_parPTO(par,...
     'nemohResults_vantHoff2009_20180802.mat','vantHoffTFCoeff.mat');
 
 % Define initial conditions
-% stateIndex_parPTO % load state indices, provides 'iy_...'
+stateIndex_parPTO % load state indices, provides 'iy_...'
 initialConditionDefault_parPTO % default ICs, provides 'y0'
 
 %% Special modifications to base parameters
