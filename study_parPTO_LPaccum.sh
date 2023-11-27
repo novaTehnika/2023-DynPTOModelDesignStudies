@@ -16,8 +16,8 @@ matlab -nodisplay -r \
 display(['iVar = ',num2str(iVar)]); \
 SS = ${SS}; \
 display(['SS = ',num2str(SS)]); \
-study_parPTO_chargePumpAccum"
+study_parPTO_LPaccum"
 
 # Commands to use
-# sbatch --export=SS=1 --array=1-280 ~/2023-DynPTOModelDesignStudies/study_parPTO_chargePumpAccum.sh
-# dos2unix  study_parPTO_chargePumpAccum.sh
+# sbatch --export=SS=1 --array=1-280 ~/2023-DynPTOModelDesignStudies/study_parPTO_LPaccum.sh
+# dos2unix  study_parPTO_LPaccum.sh

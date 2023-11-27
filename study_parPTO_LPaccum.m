@@ -1,4 +1,4 @@
-% study_parPTO_chargePumpAccum.m script m-file
+% study_parPTO_LPaccum.m script m-file
 % AUTHORS:
 % Jeremy Simmons (email: simmo536@umn.edu)
 % University of Minnesota
@@ -15,9 +15,7 @@
 % script before the sim_parPTO.m script is called.
 %
 % This specific script studies the size of the low-pressure accumulators 
-% and speed of the charge pump for an assumed pump curve. This assumes a
-% distibution og accumulator volume between the inlet and outlet of the
-% low-pressure pipeline.
+% and the size of the low-pressure pipeline.
 %
 % This script is set up to be run as part of a SLURM job array. The
 % following lines are required before this script is called:
@@ -59,8 +57,7 @@
 %   leadingZeros.m
 %
 % UPDATES:
-% 11/22/2023 - Created from study_refPTO_chargePumpAccum_wPassiveRV.m
-% 11/27/2023 - changed name to study_parPTO_chargePumpAccum.m
+% 11/27/2023 - Created from study_parPTO_chargePumpAccum.m
 %
 % Copyright (C) 2023  Jeremy W. Simmons II
 % 
@@ -126,6 +123,7 @@ initialConditionDefault_parPTO % default ICs, provides 'y0'
 % par.Sro = 3700; % [m^3]
 % par.D_WEC = 0.23;         % [m^3/rad] flap pump displacement
 p_ro_nom = 1e6*[4.0000 4.9435 8.0000 5.2661 8.0000 7.1052]; % [Pa]
+w_c = [3000 3000 3000 3000 3000 3000]*2*pi/60; % [(rpm) -> rad/s]
 par.control.p_ro_nom = p_ro_nom(SS);
 par.duty_sv = 0;
 
@@ -143,8 +141,6 @@ par.Vc_ro = (5000)*1e-3; % [(L) -> m^3] gas volume at charge pressure
 
 par.pc_l = 0.15e6; % [Pa] charge pressure
 
-par.d_line(1) = 0.2; % [m] low-pressure pipeline diameter
-
 par.D_pm = (1000)*1e-6/(2*pi); % [(cc/rev) -> m^3/rad]  Motor displacement
 par.w_pm_max = (1750)/60*2*pi; % [(rpm) -> rad/s] maximum speed of motor
 
@@ -153,31 +149,36 @@ par.cn = 5.5;
 par.cq = -6e6;
 
 %% %%%%%%%%%%%%   Study Variables  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% assumed proportion of accumulator volume at WEC-driven pump inlet
-X = 0.5;
-
-% charge pump speed
-w_c = (1700:100:3000)*2*pi/60; % [(rpm) -> rad/s]
-nVar1 = numel(w_c);
-
 % total low-pressure accumulator volume
-nVar2 = 20;
-Vc_l = 1e-3*logspace(log10(100),log10(5000),nVar2); % [(L) -> m^3]
+nVar1 = 20;
+Vc_l = 1e-3*logspace(log10(100),log10(5000),nVar1); % [(L) -> m^3]
 
-[meshVar.w_c, meshVar.Vc_l] = meshgrid(w_c,Vc_l);
-w_c_mesh = meshVar.w_c(:);
+% portion of low-pressure accumulator volume at WEC-driven pump inlet
+X = 0.1:0.1:0.9;
+nVar2 = numel(X);
+
+% Diameter of low-pressure pipeline
+nVar3 = 10;
+d_LPPL = logspace(log10(0.05),log10(0.4),nVar3); % [m]
+
+
+[meshVar.Vc_l, meshVar.X, meshVar.d_LPPL] = meshgrid(Vc_l,X,d_LPPL);
 Vc_l_mesh = meshVar.Vc_l(:);
+X_mesh = meshVar.X(:);
+d_LPPL_mesh = meshVar.d_LPPL(:);
 
-nVar = length(w_c_mesh);
+nVar = numel(Vc_l_mesh);
 
 saveSimData = 1; % save simulation data (1) or just output variables (0)
 
 %% %%%%%%%%%%%%   COLLECT DATA  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % change design parameters
-par.w_c = w_c_mesh(iVar);           % charge pump speed
-par.Vc_lin = (1-X)*Vc_l_mesh(iVar); % accumlator vol at LP pipeline inlet
-par.Vc_lout = X*Vc_l_mesh(iVar);    % accumlator vol at LP pipeline outlet
+ % accumulator volume
+par.Vc_lin = (1-X_mesh(iVar))*Vc_l_mesh(iVar);  % inlet of LP pipeline
+par.Vc_lout = X_mesh(iVar)*Vc_l_mesh(iVar);     % outlet of LP pipeline
+ % pipeline diameter
+par.d_line(1) = d_LPPL_mesh(iVar);
 
 % run simulation
 ticSIM = tic;
@@ -192,7 +193,7 @@ end
 timeStamp = datetime("now",'format','yyyy-MM-dd''T''HH:mm'); % time in ISO8601
 
 % Save data
-filename = ['data_parPTO_chargePumpAccum', ...
+filename = ['data_parPTO_LPaccum', ...
             '_',char(datetime("now",'Format','yyyyMMdd')), ...
             '_',num2str(SS,leadingZeros(999)), ...
             '_',num2str(iVar,leadingZeros(nVar))];
