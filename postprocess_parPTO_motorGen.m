@@ -3,7 +3,7 @@ files = dir;
 nfiles = size(files,1);
 for j = 1:nfiles
 display(['file ',num2str(j),' of ',num2str(nfiles)])
-    if strfind(files(j).name,"data_refPTO_motorGen")
+    if strfind(files(j).name,"data_parPTO_motorGen")
         load(files(j).name)
 
         % postprocess simulation data
@@ -34,7 +34,7 @@ display(['file ',num2str(j),' of ',num2str(nfiles)])
         q_perm(iVar) = mean(out.q_perm);
 
          % Power losses from pressure relief valves
-        P_prv(iVar) = mean(out.power.P_hPRV + out.power.P_roPRV);
+        P_prv(iVar) = mean(out.power.P_hinPRV + out.power.P_roPRV);
         L_prv(iVar) = P_prv(iVar)/mean(out.power.P_WEC);
 
 

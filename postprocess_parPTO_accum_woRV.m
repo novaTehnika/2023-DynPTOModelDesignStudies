@@ -3,14 +3,14 @@ files = dir;
 nfiles = size(files,1);
 for j = 1:nfiles
 display(['file ',num2str(j),' of ',num2str(nfiles)])
-    if strfind(files(j).name,"data_refPTO_accum_woRV")
+    if strfind(files(j).name,"data_parPTO_accum_woRV")
         load(files(j).name,'-regexp','^(?!out)\w')
 
         q_permMean_array(iVar) = q_permMean;
         PP_WEC_array(iVar) = PP_WEC;
         PP_wp_array(iVar) = PP_wp;
         PP_rv_array(iVar) = PP_rv;
-        PP_hPRV_array(iVar) = PP_hPRV;
+        PP_hinPRV_array(iVar) = PP_hinPRV;
         PP_roPRV_array(iVar) = PP_roPRV;
         dpdt_max_array(iVar) = dpdt_max;
         dpdt_97_array(iVar) = dpdt_97;
@@ -27,7 +27,7 @@ Done = [];
 notDone = 1:15;
 for j = 1:nfiles
 display(['file ',num2str(j),' of ',num2str(nfiles)])
-    if strfind(files(j).name,"data_refPTO_accum")
+    if strfind(files(j).name,"data_parPTO_accum")
         load(files(j).name,'-regexp','^(?!out)\w')
         [r,c,val] = find(notDone==iVar);
         notDone = [notDone(1:c-1), notDone(c+1:end)];
@@ -60,7 +60,7 @@ try
         PP_WEC_array(iVar) = nan;
         PP_wp_array(iVar) = nan;
         PP_rv_array(iVar) = nan;
-        PP_hPRV_array(iVar) = nan;
+        PP_hinPRV_array(iVar) = nan;
         PP_roPRV_array(iVar) = nan;
         dpdt_max_array(iVar) = nan;
         dpdt_97_array(iVar) = nan;

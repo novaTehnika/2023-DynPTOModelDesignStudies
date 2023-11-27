@@ -4,9 +4,9 @@ clear
 dpdt_ub = 70e3; % [Pa/s] upper limit to rate of change in pressure
 maxOr97 = 1;
 SS = 2; % Sea State to analyze
-fileName_wActiveRV = ['data_refPTO_accum_wActiveRV_20230714_',num2str(SS),'_all.mat'];
-fileName_wPassiveRV = ['data_refPTO_accum_wPassiveRV_20230712_',num2str(SS),'_all.mat'];
-fileName_woRV = ['data_refPTO_accum_woRV_20230713_',num2str(SS),'_all.mat'];
+fileName_wActiveRV = ['data_parPTO_accum_wActiveRV_20230714_',num2str(SS),'_all.mat'];
+fileName_wPassiveRV = ['data_parPTO_accum_wPassiveRV_20230712_',num2str(SS),'_all.mat'];
+fileName_woRV = ['data_parPTO_accum_woRV_20230713_',num2str(SS),'_all.mat'];
 
 % add data and utilities folders from the path
 dataFolders = genpath('Data');
@@ -215,7 +215,7 @@ ax(iax).FontName = 'times';
 ax(iax).FontSize = fontSize-1;
 
 i = 1;
-p(iax,i) = plot(Vtotal_wPassiveRV,kv_wPassiveRV*sqrt(1000));
+p(iax,i) = plot(Vtotal_wPassiveRV,kv_wPassiveRV*sqrt(1000)*1e3);
 p(iax,i).Color = black;
 p(iax,i).Marker = markerType(i);
 p(iax,i).MarkerSize = 5;
@@ -223,7 +223,7 @@ p(iax,i).LineWidth = 1.5;
 hold on
 
 i = 2;
-p(iax,i) = plot(Vtotal_wActiveRV,kv_wActiveRV*sqrt(1000));
+p(iax,i) = plot(Vtotal_wActiveRV,kv_wActiveRV*sqrt(1000)*1e3);
 p(iax,i).Color = maroon;
 p(iax,i).Marker = markerType(i);
 p(iax,i).MarkerSize = 5;

@@ -3,19 +3,19 @@ files = dir;
 nfiles = size(files,1);
 for j = 1:nfiles
 display(['file ',num2str(j),' of ',num2str(nfiles)])
-    if strfind(files(j).name,"data_refPTO_chargePumpAccum")
+    if strfind(files(j).name,"data_parPTO_chargePumpAccum")
         load(files(j).name)
 
         % postprocess simulation data
-        if sum(imag(out.p_l+out.p_a+out.p_b)) == 0
+        if sum(imag(out.p_lout+out.p_a+out.p_b)) == 0
 
              % Mean pressure at WEC-driven pump inlet
-            p_lMean(iVar) = mean(out.p_l);
+            p_loutMean(iVar) = mean(out.p_lout);
              % Variation in pressure at WEC-driven pump inlet
-            p_lMax(iVar) = max(out.p_l);
-            p_lMin(iVar) = min(out.p_l);
-            p_lVar(iVar) = var(out.p_l);
-            p_lStd(iVar) = std(out.p_l);
+            p_loutMax(iVar) = max(out.p_lout);
+            p_loutMin(iVar) = min(out.p_lout);
+            p_loutVar(iVar) = var(out.p_lout);
+            p_loutStd(iVar) = std(out.p_lout);
              % Minimum pressure in WEC-driven pump chambers
             p_wpMin(iVar) = min(min(out.p_a),min(out.p_b));
     
@@ -28,12 +28,12 @@ display(['file ',num2str(j),' of ',num2str(nfiles)])
 
         else
 
-            p_lMean(iVar) = nan;
+            p_loutMean(iVar) = nan;
              % Variation in pressure at WEC-driven pump inlet
-            p_lMax(iVar) = nan;
-            p_lMin(iVar) = nan;
-            p_lVar(iVar) = nan;
-            p_lStd(iVar) = nan;
+            p_loutMax(iVar) = nan;
+            p_loutMin(iVar) = nan;
+            p_loutVar(iVar) = nan;
+            p_loutStd(iVar) = nan;
              % Minimum pressure in WEC-driven pump chambers
             p_wpMin(iVar) = nan;
     
@@ -111,18 +111,18 @@ ax(iax).FontSize = fontSize-1;
 hold on
 
 ip = 1;
-p(ip,iax) = plot(Vc_l_opt,1e-5*p_lMean(iiPareto),'k','Marker','x');
+p(ip,iax) = plot(Vc_l_opt,1e-5*p_loutMean(iiPareto),'k','Marker','x');
 ip = ip+1;
 
-p(ip,iax) = plot(Vc_l_opt,1e-5*p_lMax(iiPareto),'r','Marker','x');
+p(ip,iax) = plot(Vc_l_opt,1e-5*p_loutMax(iiPareto),'r','Marker','x');
 ip = ip+1;
-p(ip,iax) = plot(Vc_l_opt,1e-5*p_lMin(iiPareto),'r','Marker','x');
+p(ip,iax) = plot(Vc_l_opt,1e-5*p_loutMin(iiPareto),'r','Marker','x');
 p(ip,iax).HandleVisibility='off';
 ip = ip+1;
 
-p(ip,iax) = plot(Vc_l_opt,1e-5*(p_lMean(iiPareto)+p_lStd(iiPareto)),':k','Marker','x');
+p(ip,iax) = plot(Vc_l_opt,1e-5*(p_loutMean(iiPareto)+p_loutStd(iiPareto)),':k','Marker','x');
 ip = ip+1;
-p(ip,iax) = plot(Vc_l_opt,1e-5*(p_lMean(iiPareto)-p_lStd(iiPareto)),':k','Marker','x');
+p(ip,iax) = plot(Vc_l_opt,1e-5*(p_loutMean(iiPareto)-p_loutStd(iiPareto)),':k','Marker','x');
 p(ip,iax).HandleVisibility='off';
 ip = ip+1;
 
@@ -304,18 +304,18 @@ ax(iax).FontSize = fontSize-1;
 hold on
 
 ip = 1;
-p(ip,iax) = scatter(Vc_l_mesh,1e-5*p_lMean,'xk');
+p(ip,iax) = scatter(Vc_l_mesh,1e-5*p_loutMean,'xk');
 ip = ip+1;
 
-p(ip,iax) = scatter(Vc_l_mesh,1e-5*p_lMax,'xr');
+p(ip,iax) = scatter(Vc_l_mesh,1e-5*p_loutMax,'xr');
 ip = ip+1;
-p(ip,iax) = scatter(Vc_l_mesh,1e-5*p_lMin,'xr');
+p(ip,iax) = scatter(Vc_l_mesh,1e-5*p_loutMin,'xr');
 p(ip,iax).HandleVisibility='off';
 ip = ip+1;
 
-p(ip,iax) = scatter(Vc_l_mesh,1e-5*(p_lMean+p_lStd),'.k');
+p(ip,iax) = scatter(Vc_l_mesh,1e-5*(p_loutMean+p_loutStd),'.k');
 ip = ip+1;
-p(ip,iax) = scatter(Vc_l_mesh,1e-5*(p_lMean-p_lStd),'.k');
+p(ip,iax) = scatter(Vc_l_mesh,1e-5*(p_loutMean-p_loutStd),'.k');
 p(ip,iax).HandleVisibility='off';
 ip = ip+1;
 

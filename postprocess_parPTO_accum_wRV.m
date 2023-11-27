@@ -3,14 +3,14 @@ files = dir;
 nfiles = size(files,1);
 for j = 1:nfiles
 display(['file ',num2str(j),' of ',num2str(nfiles)])
-    if strfind(files(j).name,"data_refPTO_accum")
+    if strfind(files(j).name,"data_parPTO_accum")
         load(files(j).name,'-regexp','^(?!out)\w')
 
         q_permMean_array(iVar) = q_permMean;
         PP_WEC_array(iVar) = PP_WEC;
         PP_wp_array(iVar) = PP_wp;
         PP_rv_array(iVar) = PP_rv;
-        PP_hPRV_array(iVar) = PP_hPRV;
+        PP_hinPRV_array(iVar) = PP_hinPRV;
         PP_roPRV_array(iVar) = PP_roPRV;
         dpdt_max_array(iVar) = dpdt_max;
         dpdt_97_array(iVar) = dpdt_97;
@@ -27,7 +27,7 @@ Done = [];
 notDone = 1:nVar;
 for j = 1:nfiles
 display(['file ',num2str(j),' of ',num2str(nfiles)])
-    if strfind(files(j).name,"data_refPTO_accum")
+    if strfind(files(j).name,"data_parPTO_accum")
         load(files(j).name,'iVar')
         [r,c,val] = find(notDone==iVar);
         notDone = [notDone(1:c-1), notDone(c+1:end)];
@@ -65,7 +65,7 @@ try
         PP_WEC_array(iVar) = nan;
         PP_wp_array(iVar) = nan;
         PP_rv_array(iVar) = nan;
-        PP_hPRV_array(iVar) = nan;
+        PP_hinPRV_array(iVar) = nan;
         PP_roPRV_array(iVar) = nan;
         dpdt_max_array(iVar) = nan;
         dpdt_97_array(iVar) = nan;
@@ -102,7 +102,7 @@ for i = 1:I
             PP_WEC_3D(i,j,k) = PP_WEC_array(m);
             PP_wp_3D(i,j,k) = PP_wp_array(m);
             PP_rv_3D(i,j,k) = PP_rv_array(m);
-            PP_hPRV_3D(i,j,k) = PP_hPRV_array(m);
+            PP_hPRV_3D(i,j,k) = PP_hinPRV_array(m);
             PP_roPRV_3D(i,j,k) = PP_roPRV_array(m);
             dpdt_max_3D(i,j,k) = dpdt_max_array(m);
             dpdt_97_3D(i,j,k) = dpdt_97_array(m);
@@ -200,7 +200,7 @@ for i = 1:nI
     plot(-99*[1, 0.5],-99*[1, 0.5],'k','LineStyle', linestyles{i});
     iLeg = iLeg+1;
     legLabels(iLeg) = convertCharsToStrings( ...
-        ['k_v = ',num2str(kv(iiI(i))*sqrt(1000),2),'(L/s/kPa^{1/2})']);
+        ['k_v = ',num2str(kv(iiI(i))*sqrt(1000)*1000,2),'(L/s/kPa^{1/2})']);
 end
 
 % plot real data
@@ -329,7 +329,7 @@ for i = 1:nI
     plot(-99*[1, 0.5],-99*[1, 0.5],'k','LineStyle', linestyles{i});
     iLeg = iLeg+1;
     legLabels(iLeg) = convertCharsToStrings( ...
-        ['k_v = ',num2str(kv(iiI(i))*sqrt(1000),2),'(L/s/kPa^{1/2})']);
+        ['k_v = ',num2str(kv(iiI(i))*sqrt(1000)*1000,2),'(L/s/kPa^{1/2})']);
 end
 
 % plot real data
@@ -569,7 +569,7 @@ ax(iax).FontSize = fontSize-1;
 
 for i = 1:N
     iVar = iDom(iDomStart(i):iDomStart(i+1)-1);
-    p(iax,i) = plot(XaxisVar(iVar),sqrt(1e3)*kv_mesh(iVar));
+    p(iax,i) = plot(XaxisVar(iVar),sqrt(1e3)*1000*kv_mesh(iVar));
     p(iax,i).Color = [color(i,:)];
     p(iax,i).Marker = markerType(i);
     p(iax,i).MarkerSize = 5;
