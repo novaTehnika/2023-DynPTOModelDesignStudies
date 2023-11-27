@@ -134,7 +134,8 @@ par.rvConfig.included = 1; % RO inlet valve is 1 - present, 0 - absent
 par.rvConfig.active = (0)*par.rvConfig.included; % RO inlet valve is 1 - active, 0 - passive
 par.kv_rv = (4.7)/sqrt(1e3)/1000; % [(L/s/kPa^0.5) -> m^3/s/Pa^0.5]
 
-par.Vc_h = (5000)*1e-3; % [(L) -> m^3] gas volume at charge pressure
+par.Vc_hin = (2500)*1e-3; % [(L) -> m^3] gas volume at charge pressure
+par.Vc_hout = (2500)*1e-3; % [(L) -> m^3] gas volume at charge pressure
 par.Vc_ro = (5000)*1e-3; % [(L) -> m^3] gas volume at charge pressure
 
 par.pc_l = 0.15e6; % [Pa] charge pressure
@@ -146,7 +147,7 @@ par.cn = 5.5;
 par.cq = -6e6;
 
 %% %%%%%%%%%%%%   Study Variables  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% motor/pump displacement
+% charge pump speed
 w_c = (1700:100:3000)*2*pi/60; % [(rpm) -> rad/s]
 nVar1 = numel(w_c);
 

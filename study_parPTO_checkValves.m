@@ -157,7 +157,6 @@ if ~saveSimData
      clearvars out
 end
 
-
 %% %%%%%%%%%%%%   Save Data  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Save: time in ISO8601
