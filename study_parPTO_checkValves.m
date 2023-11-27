@@ -169,4 +169,6 @@ save(filename,'-v7.3')
 
 %% %%%%%%%%%%%%   End Computations  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+poolobj = gcp('nocreate'); delete(poolobj);
+
 return
