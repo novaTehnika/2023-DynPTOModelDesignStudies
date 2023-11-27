@@ -6,8 +6,8 @@ display(['file ',num2str(j),' of ',num2str(nfiles)])
     if strfind(files(j).name,"data_parPTO_checkValves")
         load(files(j).name,'-regexp','^(?!out)\w')
 
-        eff_wecPump_array(iVar,SS) = eff_wecPump(iVar);
-        p_min_wp_array(iVar,SS) = p_min_wp(iVar);
+        eff_wecPump_array(iVar,SS) = eff_wecPump;
+        p_min_wp_array(iVar,SS) = p_min_wp;
 
     end
 

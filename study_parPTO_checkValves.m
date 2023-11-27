@@ -149,12 +149,12 @@ toc(ticSIM)
 
 % Calculate metrics
 it_vec = find(out.t>=par.tstart);
-eff_wecPump(iVar) = mean(out.power.P_wp(it_vec)) ...
+eff_wecPump = mean(out.power.P_wp(it_vec)) ...
                     /mean(out.power.P_WEC(it_vec));
-p_min_wp(iVar) = min([out.p_a;out.p_b]);
+p_min_wp = min([out.p_a;out.p_b]);
 
-if saveSimData
-    simOut(iVar) = out;
+if ~saveSimData
+     clearvars out
 end
 
 
