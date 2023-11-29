@@ -151,7 +151,7 @@ par.cq = -6e6;
 %% %%%%%%%%%%%%   Study Variables  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % total low-pressure accumulator volume
 nVar1 = 20;
-Vc_l = 1e-3*logspace(log10(100),log10(5000),nVar1); % [(L) -> m^3]
+Vc_l = 1e-3*logspace(log10(500),log10(5000),nVar1); % [(L) -> m^3]
 
 % portion of low-pressure accumulator volume at WEC-driven pump inlet
 X = 0.1:0.1:0.9;
@@ -161,15 +161,18 @@ nVar2 = numel(X);
 nVar3 = 10;
 d_LPPL = logspace(log10(0.05),log10(0.4),nVar3); % [m]
 
+% charge pump speed
+w_c = (1700:100:3500)*2*pi/60; % [(rpm) -> rad/s]
+nVar4 = numel(w_c);
 
-[meshVar.Vc_l, meshVar.X, meshVar.d_LPPL] = meshgrid(Vc_l,X,d_LPPL);
-Vc_l_mesh = meshVar.Vc_l(:);
-X_mesh = meshVar.X(:);
-d_LPPL_mesh = meshVar.d_LPPL(:);
+[meshVar3D.Vc_l, meshVar3D.X, meshVar3D.d_LPPL] = meshgrid(Vc_l,X,d_LPPL);
+Vc_l_mesh = meshVar3D.Vc_l(:);
+X_mesh = meshVar3D.X(:);
+d_LPPL_mesh = meshVar3D.d_LPPL(:);
 
 nVar = numel(Vc_l_mesh);
 
-saveSimData = 1; % save simulation data (1) or just output variables (0)
+saveSimData = 0; % save simulation data (1) or just output variables (0)
 
 %% %%%%%%%%%%%%   COLLECT DATA  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -180,14 +183,74 @@ par.Vc_lout = X_mesh(iVar)*Vc_l_mesh(iVar);     % outlet of LP pipeline
  % pipeline diameter
 par.d_line(1) = d_LPPL_mesh(iVar);
 
-% run simulation
-ticSIM = tic;
-out = sim_parPTO(y0,par);
-toc(ticSIM)
+parBase = par; clearvars par
+for iw_c = 1:nVar4
 
-if ~saveSimData
-    clear out
+    par = parBase;
+    par.w_c = w_c(iw_c);
+
+    % run simulation
+    ticSIM = tic;
+    out = sim_parPTO(y0,par);
+    toc(ticSIM)
+
+    % postprocess simulation data
+    if sum(imag(abs(out.p_lout) ...
+            + abs(out.p_a) ...
+            + abs(out.p_b))) == 0
+
+         % Mean pressure at WEC-driven pump inlet
+        p_loutMean(iw_c) = mean(out.p_lout);
+         % Variation in pressure at WEC-driven pump inlet
+        p_loutMax(iw_c) = max(out.p_lout);
+        p_loutMin(iw_c) = min(out.p_lout);
+        p_loutVar(iw_c) = var(out.p_lout);
+        p_loutStd(iw_c) = std(out.p_lout);
+         % Minimum pressure in WEC-driven pump chambers
+        p_wpMin(iw_c) = min(min(out.p_a),min(out.p_b));
+
+         % Electric power consumption of charge pump
+        P_cElec(iw_c) = mean(out.power.P_cElec);
+        P_cElec_norm(iw_c) = P_cElec(iw_c)/mean(out.power.P_WEC);
+         % Power losses from charge pump
+        P_cLoss(iw_c) = mean(out.power.P_cLoss);
+        L_c(iw_c) = P_cLoss(iw_c)/mean(out.power.P_WEC);
+
+         % power loss from pipeline
+        P_LPPL(iw_c) = out.power.P_LPPL;
+        L_LPPL(iw_c) = P_LPPL(iw_c)/mean(out.power.P_WEC);
+
+    else
+
+        p_loutMean(iw_c) = nan;
+         % Variation in pressure at WEC-driven pump inlet
+        p_loutMax(iw_c) = nan;
+        p_loutMin(iw_c) = nan;
+        p_loutVar(iw_c) = nan;
+        p_loutStd(iw_c) = nan;
+         % Minimum pressure in WEC-driven pump chambers
+        p_wpMin(iw_c) = nan;
+
+         % Electric power consumption of charge pump
+        P_cElec(iw_c) = nan;
+        P_cElec_norm(iw_c) = nan;
+         % Power losses from charge pump
+        P_cLoss(iw_c) = nan;
+        L_c(iw_c) = nan;
+
+         % power loss from pipeline
+        P_LPPL(iw_c) = nan;
+        L_LPPL(iw_c) = nan;
+
+    end
+
+    if saveSimData
+        outSave(iw_c) = out; %#ok<UNRCH>
+    end
+
 end
+par = parBase; clearvars parBase
+
 
 %% %%%%%%%%%%%%   Save Data  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 timeStamp = datetime("now",'format','yyyy-MM-dd''T''HH:mm'); % time in ISO8601

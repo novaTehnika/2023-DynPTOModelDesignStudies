@@ -1,8 +1,8 @@
 #!/bin/bash -l
 #SBATCH --nodes=1
-#SBATCH --ntasks=1
-#SBATCH --mem=16gb
-#SBATCH -t 12:00:00
+#SBATCH --ntasks=5
+#SBATCH --mem=12500M
+#SBATCH -t 16:00:00
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=simmo536@umn.edu
 #SBATCH -p small
@@ -19,5 +19,5 @@ display(['SS = ',num2str(SS)]); \
 study_parPTO_LPaccum"
 
 # Commands to use
-# sbatch --export=SS=1 --array=1-280 ~/2023-DynPTOModelDesignStudies/study_parPTO_LPaccum.sh
+# sbatch --export=SS=1 --array=1-1800 ~/2023-DynPTOModelDesignStudies/study_parPTO_LPaccum.sh
 # dos2unix  study_parPTO_LPaccum.sh
