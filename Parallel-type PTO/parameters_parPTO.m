@@ -77,16 +77,12 @@ function par = parameters_parPTO(par,filenameCoeff,filenameRadSS)
 
      % check valves
       % inlet check valves (low-pressure)
-    % dp_rated = 1e6; % [Pa] 
-    % q_rated = 1.5*600e-3; % [m^3/s]
-    par.kvWECin = 1.5*0.36e-3; % q_rated/sqrt(dp_rated);
+    par.kvWECin = 1.5*0.32e-3;
     par.pc_WECin = 1e5; % [Pa] Cracking pressure
     par.dp_WECin = 1e5; % [Pa] margin between cracking pressure and fully open condition
     
      % outlet check valves (high-pressure)
-    % dp_rated = 1e6; % [Pa] 
-    % q_rated = 300e-3; % [m^3/s]
-    par.kvWECout = 0.36e-3; % q_rated/sqrt(dp_rated);
+    par.kvWECout = 0.32e-3;
     par.pc_WECout = 1e5; % [Pa] Cracking pressure
     par.dp_WECout = 1e5; % [Pa] margin between cracking pressure and fully open condition
 
@@ -150,14 +146,14 @@ function par = parameters_parPTO(par,filenameCoeff,filenameRadSS)
     par.L_line(LineID) = 500; % [m] length of LP pipeline
     par.d_line(LineID) = 0.2; % [m] diameter of LP pipeline
     par.A_line(LineID) = pi/4*par.d_line(LineID); % crosssectional flow area
-    par.n_seg(LineID) = 2; % minimum of 2
+    par.n_seg(LineID) = 3; % minimum of 2
     par.I(LineID) = par.rho*(par.L_line(LineID)/par.n_seg(LineID))/par.A_line(LineID);
      % HP pipeline
     LineID = 2;
     par.L_line(LineID) = 500; % [m] length of HP pipeline
     par.d_line(LineID) = 0.1; % [m] diameter of HP pipeline
     par.A_line(LineID) = pi/4*par.d_line(2); % crosssectional flow area
-    par.n_seg(LineID) = 2; % minimum of 2
+    par.n_seg(LineID) = 3; % minimum of 2
     par.I(LineID) = par.rho*(par.L_line(LineID)/par.n_seg(LineID))/par.A_line(LineID);
 
     % Contoller Parameters
