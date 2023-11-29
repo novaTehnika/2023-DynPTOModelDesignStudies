@@ -94,9 +94,9 @@ nonState = nonStateVars(t,y,control,par);
 
 % Calculate states of the pipelines
 [q_lin, q_lout, dydt_LPPL, ~] = ...
-         pipelineNPi(t,y(iyLPPL),y(iyp_lin),y(iyp_lout),par,1,0);
+         pipelineNPi(t,y(iyLPPL)',y(iyp_lin),y(iyp_lout),par,1,0);
 [q_hin, q_hout, dydt_HPPL, ~] = ...
-         pipelineNPi(t,y(iyHPPL),y(iyp_hin),y(iyp_hout),par,2,0);
+         pipelineNPi(t,y(iyHPPL)',y(iyp_hin),y(iyp_hout),par,2,0);
 
 % State derivatives
 dydt = zeros(ny,1);
