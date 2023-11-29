@@ -146,8 +146,10 @@ stateIndex_parPTO % load state indices
     syspost = @(t,y,par) sysPost(t,y,par);
 
     nt_ramp = itVec(1)-1;
-    startParPool
-    parfor it = 1:length(itVec)
+    % startParPool
+    ntVec = numel(itVec);
+    dydt = zeros(ntVec,ny);
+    for it = ntVec:-1:1
         it_star = it+nt_ramp;
         t_star = t(it_star);
         y_star = y(it_star,:);
