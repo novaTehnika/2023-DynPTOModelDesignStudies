@@ -1,5 +1,4 @@
-%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% parSafeStartSlurm.m function m-file
+% parSafeStartSlurm.m script m-file
 % AUTHORS:
 % Jeremy Simmons (email: simmo536@umn.edu)
 % University of Minnesota
@@ -43,7 +42,7 @@ cl = parcluster(); %create a cluster object
 
 slurmid = getenv('SLURM_JOB_ID'); %get the unique job ID as seen by Hydra
 
-storage_folder = strcat('~',filesep,'matlabtemp',filesep,slurmid);
+storage_folder = strcat('.',filesep,'matlabtemp',filesep,slurmid);
 
 mkdir(storage_folder); %make a temporary folder for this session
 

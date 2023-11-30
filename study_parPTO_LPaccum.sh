@@ -17,7 +17,7 @@ display(['iVar = ',num2str(iVar)]); \
 SS = ${SS}; \
 display(['SS = ',num2str(SS)]); \
 addpath('Utilities'); \
-parSafeStartSlurm \
+parSafeStartSlurm; \
 study_parPTO_LPaccum"
 
 # Commands to use
