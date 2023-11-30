@@ -182,9 +182,9 @@ function par = parameters_parPTO(par,filenameCoeff,filenameRadSS)
     par.control.dpdt_ROmax = (10)*6894.76;
     
     % Charging system (Intake & Boost pump)
-    par.cn = 7;
-    par.cq = -1e6;
-    par.w_c = (2000)*2*pi/60; % [(rpm) -> rad/s]
+    par.cn = 5.5;
+    par.cq = -5e6;
+    par.w_c = (2500)*2*pi/60; % [(rpm) -> rad/s]
     par.eta_c = 0.7;  % pumping efficiency of pressure boost pump
     par.eta_m = 0.9;  % efficiency of charge pump motor
     % par.p_c = .65e6;
