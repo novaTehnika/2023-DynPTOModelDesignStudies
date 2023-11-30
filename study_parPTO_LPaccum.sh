@@ -16,6 +16,7 @@ matlab -nodisplay -r \
 display(['iVar = ',num2str(iVar)]); \
 SS = ${SS}; \
 display(['SS = ',num2str(SS)]); \
+addpath('Utilities'); \
 parSafeStartSlurm \
 study_parPTO_LPaccum"
 
