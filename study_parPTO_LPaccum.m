@@ -184,7 +184,7 @@ par.Vc_lout = X_mesh(iVar)*Vc_l_mesh(iVar);     % outlet of LP pipeline
 par.d_line(1) = d_LPPL_mesh(iVar);
 
 parBase = par; clearvars par
-for iw_c = 1:nVar4
+parfor iw_c = 1:nVar4
 
     par = parBase;
     par.w_c = w_c(iw_c);
