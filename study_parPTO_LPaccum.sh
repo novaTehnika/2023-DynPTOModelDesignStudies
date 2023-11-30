@@ -18,7 +18,8 @@ SS = ${SS}; \
 display(['SS = ',num2str(SS)]); \
 addpath('Utilities'); \
 parSafeStartSlurm; \
-study_parPTO_LPaccum"
+study_parPTO_LPaccum; \
+rmdir(storage_folder)"
 
 # Commands to use
 # sbatch --export=SS=1 --array=1-1800 ~/2023-DynPTOModelDesignStudies/study_parPTO_LPaccum.sh
