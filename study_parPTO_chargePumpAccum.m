@@ -133,24 +133,14 @@ par.duty_sv = 0;
 par.ERUconfig.present = 1;
 par.ERUconfig.outlet = 1;
 
-par.rvConfig.included = 1; % RO inlet valve is 1 - present, 0 - absent
+par.rvConfig.included = 0; % RO inlet valve is 1 - present, 0 - absent
 par.rvConfig.active = (0)*par.rvConfig.included; % RO inlet valve is 1 - active, 0 - passive
-par.kv_rv = (4.7)/sqrt(1e3)/1000; % [(L/s/kPa^0.5) -> m^3/s/Pa^0.5]
 
-par.Vc_hin = (2500)*1e-3; % [(L) -> m^3] gas volume at charge pressure
-par.Vc_hout = (2500)*1e-3; % [(L) -> m^3] gas volume at charge pressure
-par.Vc_ro = (5000)*1e-3; % [(L) -> m^3] gas volume at charge pressure
-
-par.pc_l = 0.15e6; % [Pa] charge pressure
+par.pc_lin = 0.15e6; % [Pa] charge pressure
+par.pc_lout = 0.15e6; % [Pa] charge pressure
 
 par.d_line(1) = 0.2; % [m] low-pressure pipeline diameter
 
-par.D_pm = (1000)*1e-6/(2*pi); % [(cc/rev) -> m^3/rad]  Motor displacement
-par.w_pm_max = (1750)/60*2*pi; % [(rpm) -> rad/s] maximum speed of motor
-
-% charge pump pump curve parameters
-par.cn = 5.5;
-par.cq = -6e6;
 
 %% %%%%%%%%%%%%   Study Variables  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % assumed proportion of accumulator volume at WEC-driven pump inlet
