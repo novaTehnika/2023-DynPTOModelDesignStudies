@@ -98,14 +98,14 @@ xlabel('time step (s)', ...
 title(['Normalized Energy and Volume Balance Study: Sea State',num2str(SS)],...
 'Interpreter','latex','FontSize',fontSize,'fontname','Times')
 yyaxis left
-semilogx(MaxStep,Ebal_error_array(:,SS))
+semilogx(MaxStep,abs(Ebal_error_array(:,SS)))
 hold on
 ylabel('energy balance error, normalized', ...
 'Interpreter','latex','FontSize',fontSize-1,'fontname','Times')
-ylim([0 1])
+
 
 yyaxis right
 hold on
-semilogx(MaxStep,Vbal_error_array(:,SS))
+semilogx(MaxStep,abs(Vbal_error_array(:,SS)))
 ylabel('volume balance error, normalized', ...
 'Interpreter','latex','FontSize',fontSize-1,'fontname','Times')
