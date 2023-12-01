@@ -332,7 +332,7 @@ stateIndex_parPTO % load state indices
      % Low-pressure pipeline
     cap = @(p) lineCap(p,1,par);
     pPL = out.pLP;
-    deltaE_PL = zeros(size(pPL,2));
+    deltaE_PL = zeros(size(pPL(1,:)));
     for iyp = 1:size(pPL,2)
         deltaE_PL(iyp) = deltaE_NI(pPL(1,iyp),pPL(end,iyp),cap,dp);
     end
@@ -340,7 +340,7 @@ stateIndex_parPTO % load state indices
      % High-pressure pipeline
     cap = @(p) lineCap(p,2,par);
     pPL = out.pHP;
-    deltaE_PL = zeros(size(pPL,2));
+    deltaE_PL = zeros(size(pPL(1,:)));
     for iyp = 1:size(pPL,2)
         deltaE_PL(iyp) = deltaE_NI(pPL(1,iyp),pPL(end,iyp),cap,dp);
     end
@@ -425,7 +425,7 @@ stateIndex_parPTO % load state indices
      % Low-pressure pipeline
     cap = @(p) lineCap(p,1,par);
     pPL = out.pLP;
-    deltaV_PL = zeros(size(pPL,2));
+    deltaV_PL = zeros(size(pPL(1,:)));
     for iyp = 1:size(pPL,2)
         deltaV_PL(iyp) = deltaV_NI(pPL(1,iyp),pPL(end,iyp),cap,dp);
     end
@@ -433,7 +433,7 @@ stateIndex_parPTO % load state indices
      % High-pressure pipeline
     cap = @(p) lineCap(p,2,par);
     pPL = out.pHP;
-    deltaV_PL = zeros(size(pPL,2));
+    deltaV_PL = zeros(size(pPL(1,:)));
     for iyp = 1:size(pPL,2)
         deltaV_PL(iyp) = deltaV_NI(pPL(1,iyp),pPL(end,iyp),cap,dp);
     end
