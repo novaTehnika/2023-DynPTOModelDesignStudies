@@ -19,6 +19,6 @@ display(['SS = ',num2str(SS)]); \
 study_parPTO_checkValves"
 
 # Commands to use
-# sbatch --export=SS=1 --array=1-20 ~/2023-DynPTOModelDesignStudies/study_parPTO_checkValves.sh
+# sbatch --export=SS=2 --array=1-50 ~/2023-DynPTOModelDesignStudies/study_parPTO_checkValves.sh
 # dos2unix  study_parPTO_checkValves.sh
 
