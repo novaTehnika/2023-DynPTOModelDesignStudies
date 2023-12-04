@@ -278,8 +278,8 @@ stateIndex_parPTO % load state indices
     out.power.P_roPRV = out.q_roPRV.*(out.p_ro-out.p_lin);
 
     % Pipeline losses
-    out.power.P_LPPL = pLsoln_LP(:).PPfric;
-    out.power.P_HPPL = pLsoln_HP(:).PPfric;
+    out.power.P_LPPL = [pLsoln_LP(:).PPfric]';
+    out.power.P_HPPL = [pLsoln_HP(:).PPfric]';
 
     % Electrical Energy Storage
     out.power.P_battery = out.power.P_gen ...
@@ -291,7 +291,7 @@ stateIndex_parPTO % load state indices
     dp = 1e2;
     cap = @(p,V) deadVCap(p,V,par);
     Va = @(theta) par.V_wecDead + par.D_WEC*(par.theta_max - theta);
-    Vb = @(theta) par.V_wecDead + par.D_WEC*(par.theta_max - theta);
+    Vb = @(theta) par.V_wecDead + par.D_WEC*(par.theta_max + theta);
 
      % Chamber 'a'
     cap1 = @(p) cap(p,Va(out.theta(1)));
@@ -302,8 +302,8 @@ stateIndex_parPTO % load state indices
      % Chamber 'b'
     cap1 = @(p) cap(p,Vb(out.theta(1)));
     capend = @(p) cap(p,Vb(out.theta(end)));
-    deltaE_b = deltaE_NI(out.par.p_o,out.p_a(end),capend,dp) ...
-                - deltaE_NI(out.par.p_o,out.p_a(1),cap1,dp);
+    deltaE_b = deltaE_NI(out.par.p_o,out.p_b(end),capend,dp) ...
+                - deltaE_NI(out.par.p_o,out.p_b(1),cap1,dp);
 
     % Change in available potential energy in accumulators
     dp = 1e2;
@@ -333,7 +333,7 @@ stateIndex_parPTO % load state indices
     cap = @(p) lineCap(p,1,par);
     pPL = out.pLP;
     deltaE_PL = zeros(size(pPL(1,:)));
-    for iyp = 1:size(pPL,2)
+    for iyp = 1:numel(deltaE_PL)
         deltaE_PL(iyp) = deltaE_NI(pPL(1,iyp),pPL(end,iyp),cap,dp);
     end
     deltaPE_LPPL = sum(deltaE_PL);
@@ -341,16 +341,22 @@ stateIndex_parPTO % load state indices
     cap = @(p) lineCap(p,2,par);
     pPL = out.pHP;
     deltaE_PL = zeros(size(pPL(1,:)));
-    for iyp = 1:size(pPL,2)
+    for iyp = 1:numel(deltaE_PL)
         deltaE_PL(iyp) = deltaE_NI(pPL(1,iyp),pPL(end,iyp),cap,dp);
     end
     deltaPE_HPPL = sum(deltaE_PL);
 
     % Change in kinetic energy in pipelines
      % Low-pressure pipeline
-    deltaKE_LPPL = sum(par.I(1)/2*(out.qLP(end,:).^2 - out.qLP(1,:).^2));
+    LineID = 1;
+    deltaKE_LPPL = 1/2*par.I(LineID)/par.A_line(LineID)^2* ...
+                    sum((signed_sq(out.qLP(end,:)) ...
+                       - signed_sq(out.qLP(1,:))));
      % High-pressure pipeline
-    deltaKE_HPPL = sum(par.I(2)/2*(out.qHP(end,:).^2 - out.qHP(1,:).^2));
+    LineID = 2;
+    deltaKE_HPPL = 1/2*par.I(LineID)/par.A_line(LineID)^2* ...
+                    sum((signed_sq(out.qHP(end,:)) ...
+                       - signed_sq(out.qHP(1,:))));
 
     % Total change in stored energy in the system
     deltaE_sys = deltaE_a + deltaE_b ...
@@ -364,13 +370,13 @@ stateIndex_parPTO % load state indices
     % Power flow at boundaries
     P_in = out.power.P_WEC;
     P_out = out.q_perm.*(out.p_ro - out.par.p_o);
-    P_loss = out.power.P_wpLoss + out.power.P_sv...
+    P_loss = out.power.P_wpLoss + out.power.P_sv ...
             + out.power.P_ain + out.power.P_aout ...
             + out.power.P_bin + out.power.P_bout ...
             + out.power.P_pmLoss + out.power.P_genLoss ...
             + out.power.P_rv ...
             + out.power.P_cLoss ...
-            + out.power.P_ERULoss + out.power.P_ERUelecLoss...
+            + out.power.P_ERULoss + out.power.P_ERUelecLoss ...
             + out.power.P_linPRV + out.power.P_hinPRV + out.power.P_roPRV ...
             + out.power.P_LPPL + out.power.P_HPPL;
     P_bnds = P_in - P_out - P_loss;
