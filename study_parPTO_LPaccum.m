@@ -206,7 +206,7 @@ parfor iw_c = 1:nVar4
         L_c(iw_c) = P_cLoss(iw_c)/mean(out.power.P_WEC);
 
          % power loss from pipeline
-        P_LPPL(iw_c) = out.power.P_LPPL;
+        P_LPPL(iw_c) = mean(out.power.P_LPPL);
         L_LPPL(iw_c) = P_LPPL(iw_c)/mean(out.power.P_WEC);
 
     else
