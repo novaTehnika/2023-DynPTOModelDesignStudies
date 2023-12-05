@@ -132,7 +132,7 @@ fig.Position = [leftEdge bottomEdge width height ];
 
 n_plots = 1;
 iax = 1;
-ax(iax) = subplot(n_plots,iax,1);
+ax(iax) = subplot(n_plots,1,iax);
 ax(iax).FontName = 'times';
 ax(iax).FontSize = fontSize-1;
 
@@ -143,19 +143,29 @@ plot(tspan,studyData.deltaE_battery(:,SS));
 
 
 
-% for LPaccum
+%% for LPaccum
  % Variation in pressure at WEC-driven pump inlet
+
+bottomEdge = 1;
+leftEdge = 3;
+width = 7.5; % one column: 3+9/16, two column: 7.5
+height = 8;
+fontSize = 9;
+lineWidth = 1;
+
 fig = figure;
 fig.Units = 'inches';
 fig.Position = [leftEdge bottomEdge width height ];
 
-n_plots = 1;
+n_plots = 5;
 iax = 1;
-ax(iax) = subplot(n_plots,iax,1);
+ax(iax) = subplot(n_plots,1,iax);
 ax(iax).FontName = 'times';
 ax(iax).FontSize = fontSize-1;
 xlabel('time span (s)', ...
 'Interpreter','latex','FontSize',fontSize-1,'fontname','Times')
+
+hold on
 
 plot(tspan,err_endNorm(studyData.p_loutMean(:,SS)));
 plot(tspan,err_endNorm(studyData.p_loutMax(:,SS)));
@@ -164,11 +174,13 @@ plot(tspan,err_endNorm(studyData.p_loutMin(:,SS)));
 legend('mean(p_{lout})','max(p_{lout})','min(p_{lout})')
 
 iax = iax + 1;
-ax(iax) = subplot(n_plots,iax,1);
+ax(iax) = subplot(n_plots,1,iax);
 ax(iax).FontName = 'times';
 ax(iax).FontSize = fontSize-1;
 xlabel('time span (s)', ...
 'Interpreter','latex','FontSize',fontSize-1,'fontname','Times')
+
+hold on
 
 plot(tspan,err_endNorm(studyData.p_loutVar(:,SS)));
 plot(tspan,err_endNorm(studyData.p_loutStd(:,SS)));
@@ -177,11 +189,13 @@ legend('var(p_{lout})','(stddev(p_{lout})')
 
  % Minimum pressure in WEC-driven pump chambers
 iax = iax + 1;
-ax(iax) = subplot(n_plots,iax,1);
+ax(iax) = subplot(n_plots,1,iax);
 ax(iax).FontName = 'times';
 ax(iax).FontSize = fontSize-1;
 xlabel('time span (s)', ...
 'Interpreter','latex','FontSize',fontSize-1,'fontname','Times')
+
+hold on
 
 plot(tspan,err_endNorm(studyData.p_wpMin(:,SS)));
 
@@ -190,11 +204,13 @@ legend('min(p_{wp})')
  % Electric power consumption of charge pump &
  % Power losses from charge pump
 iax = iax + 1;
-ax(iax) = subplot(n_plots,iax,1);
+ax(iax) = subplot(n_plots,1,iax);
 ax(iax).FontName = 'times';
 ax(iax).FontSize = fontSize-1;
 xlabel('time span (s)', ...
 'Interpreter','latex','FontSize',fontSize-1,'fontname','Times')
+
+hold on
 
 plot(tspan,err_endNorm(studyData.P_cElec(:,SS)));
 plot(tspan,err_endNorm(studyData.P_cElec_norm(:,SS)));
@@ -205,40 +221,53 @@ legend('P_cElec','P_cElec_norm','P_cLoss','L_c')
 
  % power loss from pipeline
 iax = iax + 1;
-ax(iax) = subplot(n_plots,iax,1);
+ax(iax) = subplot(n_plots,1,iax);
 ax(iax).FontName = 'times';
 ax(iax).FontSize = fontSize-1;
 xlabel('time span (s)', ...
 'Interpreter','latex','FontSize',fontSize-1,'fontname','Times')
+
+hold on
 
 plot(tspan,err_endNorm(studyData.P_LPPL(:,SS)));
 plot(tspan,err_endNorm(studyData.L_LPPL(:,SS)));
 
 legend('P_LPPL','L_LPPL')
 
-% for accum_woRV and accum_wRV
+%% for accum_woRV and accum_wRV
+bottomEdge = 1;
+leftEdge = 3;
+width = 7.5; % one column: 3+9/16, two column: 7.5
+height = 8;
+fontSize = 9;
+lineWidth = 1;
+
 fig = figure;
 fig.Units = 'inches';
 fig.Position = [leftEdge bottomEdge width height ];
 
-n_plots = 1;
+n_plots = 4;
 iax = 1;
-ax(iax) = subplot(n_plots,iax,1);
+ax(iax) = subplot(n_plots,1,iax);
 ax(iax).FontName = 'times';
 ax(iax).FontSize = fontSize-1;
 xlabel('time span (s)', ...
 'Interpreter','latex','FontSize',fontSize-1,'fontname','Times')
+
+hold on
 
 plot(tspan,err_endNorm(studyData.q_permMean(:,SS)));
 
 legend('q\_permMean')
 
 iax = iax + 1;
-ax(iax) = subplot(n_plots,iax,1);
+ax(iax) = subplot(n_plots,1,iax);
 ax(iax).FontName = 'times';
 ax(iax).FontSize = fontSize-1;
 xlabel('time span (s)', ...
 'Interpreter','latex','FontSize',fontSize-1,'fontname','Times')
+
+hold on
 
 plot(tspan,err_endNorm(studyData.PP_WEC(:,SS)));
 plot(tspan,err_endNorm(studyData.PP_wp(:,SS)));
@@ -249,11 +278,13 @@ plot(tspan,err_endNorm(studyData.PP_roPRV(:,SS)));
 legend('PP_WEC','PP_wp','PP_rv','PP_hinPRV','PP_roPRV')
 
 iax = iax + 1;
-ax(iax) = subplot(n_plots,iax,1);
+ax(iax) = subplot(n_plots,1,iax);
 ax(iax).FontName = 'times';
 ax(iax).FontSize = fontSize-1;
 xlabel('time span (s)', ...
 'Interpreter','latex','FontSize',fontSize-1,'fontname','Times')
+
+hold on
 
 plot(tspan,err_endNorm(studyData.dpdt_max(:,SS)));
 plot(tspan,err_endNorm(studyData.dpdt_97(:,SS)));
@@ -262,11 +293,13 @@ legend('dpdt_max','dpdt_97')
 
  % power loss from pipeline
 iax = iax + 1;
-ax(iax) = subplot(n_plots,iax,1);
+ax(iax) = subplot(n_plots,1,iax);
 ax(iax).FontName = 'times';
 ax(iax).FontSize = fontSize-1;
 xlabel('time span (s)', ...
 'Interpreter','latex','FontSize',fontSize-1,'fontname','Times')
+
+hold on
 
 plot(tspan,err_endNorm(studyData.P_HPPL(:,SS)));
 plot(tspan,err_endNorm(studyData.L_HPPL(:,SS)));
