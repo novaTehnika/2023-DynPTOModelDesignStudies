@@ -95,7 +95,6 @@ function par = parameters_parPTO(par,filenameCoeff,filenameRadSS)
 
     % ERU
     par.ERUconfig.present = 1;
-    par.ERUconfig.outlet = 1; % ERU feed outlet connects: 1 - directly RO feed, 0 - upstream of Ripple valve
     par.eta_ERUv = 0.95;
     par.eta_ERUm = 0.95;
     

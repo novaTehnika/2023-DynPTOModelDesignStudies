@@ -129,7 +129,6 @@ p_ro_nom = 1e6*[4.0000 4.9435 8.0000 5.2661 8.0000 7.1052]; % [Pa]
 par.control.p_ro_nom = p_ro_nom(SS); % [Pa]
 
 par.ERUconfig.present = 1;
-par.ERUconfig.outlet = 1;
 
 par.rvConfig.included = 0; % RO inlet valve is 1 - present, 0 - absent
 par.rvConfig.active = (0)*par.rvConfig.included; % RO inlet valve is 1 - active, 0 - passive

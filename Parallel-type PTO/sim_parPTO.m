@@ -258,9 +258,7 @@ stateIndex_parPTO % load state indices
     out.power.P_cLoss = out.power.P_cElec - out.q_c.*(out.p_lin-out.par.p_o);
 
     % ERU
-    dp_ERUfeed = par.ERUconfig.outlet*out.p_ro ...
-                + (~par.ERUconfig.outlet)*out.p_hout ...
-                - out.p_lin;
+    dp_ERUfeed = out.p_ro - out.p_lin;
     P_ERUfeed = out.q_ERUfeed.*dp_ERUfeed;
     P_ERUbrine = out.q_brine.*(out.p_ro - out.par.p_o);
     PbalERU = par.ERUconfig.present ...

@@ -120,9 +120,8 @@ par.duty_sv = 0.0;
 
 % Configuration
 par.ERUconfig.present = 1;
-par.ERUconfig.outlet = 1;
 
-par.rvConfig.included = 1; % RO inlet valve is 1 - present, 0 - absent
+par.rvConfig.included = 0; % RO inlet valve is 1 - present, 0 - absent
 par.rvConfig.active = (0)*par.rvConfig.included; % RO inlet valve is 1 - active, 0 - passive
 % dp_rated = 1e5; % [Pa] 
 % q_rated = (100)*60/1e3; % [(lpm) -> m^3/s]

@@ -128,7 +128,6 @@ par.duty_sv = 0;
 
 % Configuration
 par.ERUconfig.present = 1;
-par.ERUconfig.outlet = 1;
 
 par.rvConfig.included = 1; % RO inlet valve is 1 - present, 0 - absent
 par.rvConfig.active = (0)*par.rvConfig.included; % RO inlet valve is 1 - active, 0 - passive
