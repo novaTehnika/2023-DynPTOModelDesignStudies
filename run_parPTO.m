@@ -81,17 +81,29 @@ git_hash_string = get_current_git_hash();
 %% %%%%%%%%%%%%   SIMULATION PARAMETERS  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Simulation timeframe
-par.Tramp = 250; % [s] excitation force ramp period
 par.tstart = 0; %[s] start time of simulation
 par.tend = 2000; %[s] end time of simulation
+par.Tramp = 250; % [s] time given for system to settle
+par.TrampWEC = 25; % [s] excitation force ramp period
 
 % Solver parameters
-% par.odeSolverRelTol = 1e-4; % Rel. error tolerance parameter for ODE solver
-% par.odeSolverAbsTol = 1e-4; % Abs. error tolerance parameter for ODE solver
-par.MaxStep = 5e-5;             % [s] for fixed time solver, this is the step size for solver
-par.downSampledStepSize = 1e-2; % [s] specifies time step for data output
-if mod(par.downSampledStepSize,par.MaxStep)
-    warning('down-sampled time step is not an integer multiple of the maximum step size')
+par.solver = 'variable time'; % 'variable time' OR 'fixed time'
+switch par.solver
+    case 'fixed time'
+        par.MaxStep = 5e-5;             % [s] time step size
+        par.downSampledStepSize = 1e-2; % [s] specifies time step for data output
+        if mod(par.downSampledStepSize,par.MaxStep)
+            warning('down-sampled time step is not an integer multiple of the maximum step size')
+        end
+    case 'variable time'
+        par.odeSolverRelTol = 1e-4; % Rel. error tolerance parameter for ODE solver
+        par.odeSolverAbsTol = 1e-4; % Abs. error tolerance parameter for ODE solver
+        par.MaxStep = 5e-2;             % [s] max step size for variable timestep solver
+        par.stepSizeWECramp = 1e-4;     % [s] step size for solver during WEC ramp
+        par.downSampledStepSize = 1e-2; % [s] specifies time step for data output
+        if mod(par.downSampledStepSize,par.MaxStep)
+            warning('down-sampled time step is not an integer multiple of the maximum step size')
+        end
 end
 
 % Sea State and Wave construction parameters

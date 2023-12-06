@@ -32,21 +32,21 @@
 %
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-y0(1,iytheta) = 0.1*pi/2; % [rad]
-y0(1,iytheta_dot) = 0; % [rad/s]
-y0(1,iyrad) = zeros(1,length(iyrad));
+y0(iytheta,1) = 0.1*pi/2; % [rad]
+y0(iytheta_dot,1) = 0; % [rad/s]
+y0(iyrad,1) = zeros(numel(iyrad),1);
 
-y0(1,iyp_a) = 1e6; % [Pa]
-y0(1,iyp_b) = 1e6; % [Pa]
+y0(iyp_a,1) = 1e6; % [Pa]
+y0(iyp_b,1) = 1e6; % [Pa]
 
-y0(1,iyp_lin) = par.control.p_l_nom; % [Pa]
-y0(1,iyp_lout) = par.control.p_l_nom; % [Pa]
-y0(1,iyp_hin) = par.control.p_h_nom; % [Pa]
-y0(1,iyp_hout) = par.control.p_h_nom; % [Pa]
-y0(1,iyp_ro) = par.control.p_h_nom; % [Pa]
+y0(iyp_lin,1) = par.control.p_l_nom; % [Pa]
+y0(iyp_lout,1) = par.control.p_l_nom; % [Pa]
+y0(iyp_hin,1) = par.control.p_h_nom; % [Pa]
+y0(iyp_hout,1) = par.control.p_h_nom; % [Pa]
+y0(iyp_ro,1) = par.control.p_h_nom; % [Pa]
 
-y0(1,iyp_filt) = par.control.p_h_nom;
-y0(1,iy_errInt_p_filt) = 0;
+y0(iyp_filt,1) = par.control.p_h_nom;
+y0(iy_errInt_p_filt,1) = 0;
 
-y0(iyLPPL) = y0(iyp_lout)*mod(2:2*par.n_seg(1),2)';
-y0(iyHPPL) = y0(iyp_hin)*mod(2:2*par.n_seg(2),2)';
+y0(iyLPPL,1) = y0(iyp_lout)*mod(2:2*par.n_seg(1),2)';
+y0(iyHPPL,1) = y0(iyp_hin)*mod(2:2*par.n_seg(2),2)';

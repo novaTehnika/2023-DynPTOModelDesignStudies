@@ -95,8 +95,7 @@ par.tstart = 0; %[s] start time of simulation
 par.tend = 2000; %[s] end time of simulation
 
 % Solver parameters
-% par.odeSolverRelTol = 1e-4; % Rel. error tolerance parameter for ODE solver
-% par.odeSolverAbsTol = 1e-4; % Abs. error tolerance parameter for ODE solver
+par.solver = 'fixed time'; % 'variable time' OR 'fixed time'
 par.MaxStep = 5e-5;             % [s] for fixed time solver, this is the step size for solver
 par.downSampledStepSize = 1e-2; % [s] specifies time step for data output
 if mod(par.downSampledStepSize,par.MaxStep)

@@ -52,7 +52,7 @@ waveElev = waveElevation(t,par);
     
 % Excitation Torque
 t0 = par.tstart-par.Tramp;
-torqueFlap.wave = ramp(t-t0,par.Tramp)*excitationTorque(t,par);
+torqueFlap.wave = ramp(t-t0,par.TrampWEC)*excitationTorque(t,par);
     
 % Hydrostatic torque
 torqueFlap.hydroStatic = -hydroStaticTorque(y(1), waveElev, par);

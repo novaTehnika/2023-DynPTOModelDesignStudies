@@ -87,22 +87,44 @@ stateIndex_parPTO % load state indices
 
 %% %%%%%%%%%%%%   SOLUTION   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% Solve for states of the dynamic system
- % Set-up solver
-    tspan = [par.tstart-par.Tramp par.tend];   % time interval
-    
+
+switch par.solver
+    case 'fixed time'
+        dt = par.MaxStep;
+        downSampleRate = floor(par.downSampledStepSize/dt);
+
+     % Run solver
+        tspan = [par.tstart-par.Tramp par.tend];   % time interval
+        ticODE = tic;
+        [t, y] = ode1(@(t,y) sys(t,y,par), ...
+                                  tspan(1),dt,tspan(2),y0,downSampleRate);
+        toc(ticODE)
+
+    case 'variable time'
  % Solver options
-%     options = odeset('RelTol',par.odeSolverRelTol,...
-%                      'AbsTol',par.odeSolverAbsTol,...
-%                      'MaxOrder',3);
-%     options.MaxStep = par.MaxStep;
-    dt = par.MaxStep;
+    options = odeset('RelTol',1e-4,...
+                     'AbsTol',1e-4,...
+                     'MaxOrder',3);
+    options.MaxStep = par.MaxStep;
+    options.InitialStep = par.stepSizeWECramp;
+    dt = par.stepSizeWECramp;
     downSampleRate = floor(par.downSampledStepSize/dt);
 
- % Run solver
+ % Run 1st order solver through ramp period for WEC
+    tspan = [par.tstart-par.Tramp ...
+             par.tstart-(par.Tramp-par.TrampWEC)];   % time interval
     ticODE = tic;
-    [t, y] = ode1(@(t,y) sys(t,y,par)', ...
+    [t, y] = ode1(@(t,y) sys(t,y,par), ...
                                 tspan(1),dt,tspan(2),y0,downSampleRate);
     toc(ticODE)
+
+ % Run variable order solver for time after ramp period for WEC
+    tspan = [tspan(2) par.tend];   % time interval
+    ticODE = tic;
+    [t, y] = ode15s(@(t,y) sys(t,y,par), ...
+                                tspan,y(end-1,:)',options);
+    toc(ticODE)
+end
 
 %% %%%%%%%%%%%%   POST-PROCESS   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Parameters
@@ -152,7 +174,7 @@ stateIndex_parPTO % load state indices
     for it = ntVec:-1:1
         it_star = it+nt_ramp;
         t_star = t(it_star);
-        y_star = y(it_star,:);
+        y_star = y(it_star,:)';
 
         [dydt(it,:), nonState(it), control(it)] = ...
                             syspost(t_star,y_star,par);
@@ -164,10 +186,10 @@ stateIndex_parPTO % load state indices
         temp(it).T_rad = nonState(it).torqueWEC.radiation;
 
         [~ ,~, ~, pLsoln_LP(it)] = ...
-                        pipelineNPi([],y_star(iyLPPL)', ...
+                        pipelineNPi([],y_star(iyLPPL), ...
                         y_star(iyp_lin),y_star(iyp_lout),par,1,1);
         [~ ,~, ~, pLsoln_HP(it)] = ...
-                        pipelineNPi([],y_star(iyHPPL)', ...
+                        pipelineNPi([],y_star(iyHPPL), ...
                         y_star(iyp_hin),y_star(iyp_hout),par,1,1);
     end
     
