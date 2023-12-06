@@ -2,7 +2,7 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks=5
 #SBATCH --mem=12500M
-#SBATCH -t 16:00:00
+#SBATCH -t 72:00:00
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=simmo536@umn.edu
 #SBATCH -p small
@@ -18,6 +18,7 @@ SS = ${SS}; \
 display(['SS = ',num2str(SS)]); \
 addpath('Utilities'); \
 parSafeStartSlurm; \
+parpool('local',${SLURM_NTASKS}-1);
 study_parPTO_LPaccum; \
 rmdir(storage_folder)"
 
