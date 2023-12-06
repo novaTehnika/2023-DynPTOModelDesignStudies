@@ -43,16 +43,13 @@ function [dydt, torqueFlap, waveElev] = flapModel(t,y, ptoTorque, par)
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 iyrad = 3:2+par.WEC.ny_rad; % state vector indices for radiation damping states for WEC model
-[~,n] = size(y);
-if n>1
-    y = y';
-end
+
 % Wave excitation force
-waveElev = waveElevation(t,par);
+waveElev = waveElevation(t,par);%par.WEC.waveElevation(t);
     
 % Excitation Torque
 t0 = par.tstart-par.Tramp;
-torqueFlap.wave = ramp(t-t0,par.TrampWEC)*excitationTorque(t,par);
+torqueFlap.wave = ramp(t-t0,par.TrampWEC)*excitationTorque(t,par);%par.WEC.excitationTorque(t);
     
 % Hydrostatic torque
 torqueFlap.hydroStatic = -hydroStaticTorque(y(1), waveElev, par);
@@ -70,22 +67,5 @@ dydt(2) = 1/(par.WEC.I + par.WEC.I_inf) ...
                 + torqueFlap.hydroStatic + ptoTorque - endDamping*y(2)* ...
                 ( (y(1)>thetaLim)*(y(2)>0) ... 
                 + (y(1)<-thetaLim)*(y(2)<0)));
-
-%% %%%%%%%%%%%%   FUNCTIONS  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-    function T_e = excitationTorque(t,par)
-        T_e = sum( par.WEC.F_amp.*sqrt(2*par.wave.S_w.*par.WEC.dw) ...
-                       .*sin(par.WEC.w*t + par.wave.phi + par.WEC.phi_e ));
-    end
-
-    function waveElev = waveElevation(t,par)
-        waveElev = sum( sqrt(2*par.wave.S_w(:).*par.WEC.dw) ...
-                            .*sin(par.WEC.w(:)*t + par.wave.phi(:)) );
-    end
-    
-    function f = ramp(t,Tr)
-        f = (t<Tr)*0.5.*(1+cos(pi+pi*t/max(Tr,eps))) + ...
-            (t>=Tr);
-    end
 
 end
