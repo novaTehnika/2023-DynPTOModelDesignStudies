@@ -93,9 +93,11 @@ saveSimData = 1; % save simulation data (1) or just output variables (0)
 %% %%%%%%%%%%%%   SIMULATION PARAMETERS  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Simulation timeframe
-par.Tramp = 250; % [s] excitation force ramp period
 par.tstart = 0; %[s] start time of simulation
 par.tend = tspan(iVar) + par.tstart; %[s] end time of simulation
+
+par.Tramp = 250; % [s] excitation force ramp period
+par.TrampWEC = min(25,par.Tramp); % [s] excitation force ramp period
 
 % Solver parameters
 par.solver = 'fixed time'; % 'variable time' OR 'fixed time'
