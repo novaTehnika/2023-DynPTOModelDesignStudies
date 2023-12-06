@@ -56,34 +56,7 @@ function out = sim_parPTO(y0,par)
 %   along with this program. If not, see <https://www.gnu.org/licenses/>.
 %
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Define indicies of state vector
-iyp_a = [];
-iyp_b = [];
 
-iyp_lin = [];
-iyp_lout = [];
-iyp_hin = [];
-iyp_hout = [];
-iyp_ro = [];
-
-iyp_filt = [];
-iy_errInt_p_filt = [];
-iycontrol = [];
-
-iytheta = [];
-iytheta_dot = [];
-iyrad = [];
-
-iyLPPL = [];
-iyqLP = [];
-iypLP = [];
-iyHPPL = [];
-iyqHP = [];
-iypHP = [];
-
-ny = [];
-
-stateIndex_parPTO % load state indices
 
 %% %%%%%%%%%%%%   SOLUTION   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% Solve for states of the dynamic system
@@ -137,30 +110,30 @@ end
     out.t = t(itVec);
     out.y = y(itVec,:);
     
-    out.p_a = y(itVec,iyp_a);
-    out.p_b = y(itVec,iyp_b);
+    out.p_a = y(itVec,par.iy.p_a);
+    out.p_b = y(itVec,par.iy.p_b);
     
-    out.p_lin = y(itVec,iyp_lin);
-    out.p_lout = y(itVec,iyp_lout);
-    out.p_hin = y(itVec,iyp_hin);
-    out.p_hout = y(itVec,iyp_hout);
-    out.p_ro = y(itVec,iyp_ro);
+    out.p_lin = y(itVec,par.iy.p_lin);
+    out.p_lout = y(itVec,par.iy.p_lout);
+    out.p_hin = y(itVec,par.iy.p_hin);
+    out.p_hout = y(itVec,par.iy.p_hout);
+    out.p_ro = y(itVec,par.iy.p_ro);
     
-    out.control.p_filt = y(itVec,iyp_filt);
-    out.control.errInt_p_filt = y(itVec,iy_errInt_p_filt);
+    out.control.p_filt = y(itVec,par.iy.p_filt);
+    out.control.errInt_p_filt = y(itVec,par.iy.errInt_p_filt);
     
-    out.theta = y(itVec,iytheta); % [rad] position of the WEC
-    out.theta_dot = y(itVec,iytheta_dot); % [rad/s] angular velocity of the WEC
+    out.theta = y(itVec,par.iy.theta); % [rad] position of the WEC
+    out.theta_dot = y(itVec,par.iy.theta_dot); % [rad/s] angular velocity of the WEC
 
-    out.yLP = y(itVec,iyLPPL);
-    out.qLP = y(itVec,iyqLP);
-    out.pLP = y(itVec,iypLP);
+    out.yLP = y(itVec,par.iy.LPPL);
+    out.qLP = y(itVec,par.iy.qLP);
+    out.pLP = y(itVec,par.iy.pLP);
     out.q_lin = out.qLP(:,1);
     out.q_lout = out.qLP(:,end);
     
-    out.yHP = y(itVec,iyHPPL);
-    out.qHP = y(itVec,iyqHP);
-    out.pHP = y(itVec,iypHP);
+    out.yHP = y(itVec,par.iy.HPPL);
+    out.qHP = y(itVec,par.iy.qHP);
+    out.pHP = y(itVec,par.iy.pHP);
     out.q_hin = out.qHP(:,1);
     out.q_hout = out.qHP(:,end);
             
@@ -170,7 +143,7 @@ end
     nt_ramp = itVec(1)-1;
     % startParPool
     ntVec = numel(itVec);
-    dydt = zeros(ntVec,ny);
+    dydt = zeros(ntVec,par.iy.ny);
     for it = ntVec:-1:1
         it_star = it+nt_ramp;
         t_star = t(it_star);
@@ -186,11 +159,11 @@ end
         temp(it).T_rad = nonState(it).torqueWEC.radiation;
 
         [~ ,~, ~, pLsoln_LP(it)] = ...
-                        pipelineNPi([],y_star(iyLPPL), ...
-                        y_star(iyp_lin),y_star(iyp_lout),par,1,1);
+                        pipelineNPi([],y_star(par.iy.LPPL), ...
+                        y_star(par.iy.p_lin),y_star(par.iy.p_lout),par,1,1);
         [~ ,~, ~, pLsoln_HP(it)] = ...
-                        pipelineNPi([],y_star(iyHPPL), ...
-                        y_star(iyp_hin),y_star(iyp_hout),par,1,1);
+                        pipelineNPi([],y_star(par.iy.HPPL), ...
+                        y_star(par.iy.p_hin),y_star(par.iy.p_hout),par,1,1);
     end
     
     % State derivatives

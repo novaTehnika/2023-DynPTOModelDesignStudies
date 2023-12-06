@@ -121,8 +121,8 @@ par = parameters_parPTO(par,...
     'nemohResults_vantHoff2009_20180802.mat','vantHoffTFCoeff.mat');
 
 % Define initial conditions
-stateIndex_parPTO % load state indices, provides 'iy_...'
-initialConditionDefault_parPTO % default ICs, provides 'y0'
+par.iy = stateIndex_parPTO(par); % load state indices % load state indices, provides 'iy_...'
+y0 = initialConditionDefault_parPTO(par); % default ICs, provides 'y0'
 
 %% Special modifications to base parameters
 % par.Sro = 3700; % [m^3]
@@ -229,17 +229,17 @@ ylabel('Pressure (MPa)')
 legend('p_{lin}','p_{lout}')
 
 ax(3) = subplot(3,1,3);
-plot(out.t,1e-5*out.dydt(:,iyp_ro))
+plot(out.t,1e-5*out.dydt(:,par.iy.p_ro))
 hold on
 
 addpath('Utilities')
-dist_dpdt = statsTimeVar_cdf(out.t,abs(out.dydt(:,iyp_ro)));
+dist_dpdt = statsTimeVar_cdf(out.t,abs(out.dydt(:,par.iy.p_ro)));
 dpdt_97 = dist_dpdt.xi(find(dist_dpdt.f > 0.97,1,'first'));
 plot(out.t([1 end]),1e-5*dpdt_97*[1 1],'-.k')
 p(1) = plot(out.t([1 end]),1e-5*dpdt_97*[-1 -1],'-.k');
 p(1).HandleVisibility='off';
 
-dist_dpdt = statsTimeVar_cdf(out.t,abs(out.dydt(:,iyp_ro)));
+dist_dpdt = statsTimeVar_cdf(out.t,abs(out.dydt(:,par.iy.p_ro)));
 dpdt_99 = dist_dpdt.xi(find(dist_dpdt.f > 0.99,1,'first'));
 plot(out.t([1 end]),1e-5*dpdt_99*[1 1],'-.k')
 p(2) = plot(out.t([1 end]),1e-5*dpdt_99*[-1 -1],'--k');

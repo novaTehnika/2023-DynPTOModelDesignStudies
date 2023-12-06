@@ -49,37 +49,6 @@ function [dydt, nonState, control] = sys_parPTO(t,y,par)
 %   along with this program. If not, see <https://www.gnu.org/licenses/>.
 %
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Define indicies of state vector
-iyp_a = [];
-iyp_b = [];
-
-iyp_lin = [];
-iyp_lout = [];
-iyp_hin = [];
-iyp_hout = [];
-iyp_ro = [];
-
-iyp_filt = [];
-iy_errInt_p_filt = [];
-iycontrol = [];
-
-iytheta = [];
-iytheta_dot = [];
-iyrad = [];
-
-iyLPPL = [];
-iyqLP = [];
-iypLP = [];
-iyHPPL = [];
-iyqHP = [];
-iypHP = [];
-
-ny = [];
-
-stateIndex_parPTO
-
-iWEC = [iytheta iytheta_dot iyrad];
-
 
 % Calculate control input and the change in controller states (if any)
 [dydt_control, control] = controller(t,y,par);
@@ -90,29 +59,29 @@ nonState = nonStateVars(t,y,control,par);
 % Calculate the hydrodynamics WEC state derivatives and output nonstate
 % variables like forces and wave elevation
 [dydt_WEC, nonState.torqueWEC, nonState.waveElev] = ...
-                    flapModel(t,y(iWEC),nonState.T_pto,par);
+                    flapModel(t,y(par.iy.WEC),nonState.T_pto,par);
 
 % Calculate states of the pipelines
 [q_lin, q_lout, dydt_LPPL, ~] = ...
-         pipelineNPi(t,y(iyLPPL),y(iyp_lin),y(iyp_lout),par,1,0);
+         pipelineNPi(t,y(par.iy.LPPL),y(par.iy.p_lin),y(par.iy.p_lout),par,1,0);
 [q_hin, q_hout, dydt_HPPL, ~] = ...
-         pipelineNPi(t,y(iyHPPL),y(iyp_hin),y(iyp_hout),par,2,0);
+         pipelineNPi(t,y(par.iy.HPPL),y(par.iy.p_hin),y(par.iy.p_hout),par,2,0);
 
 % State derivatives
-dydt = zeros(ny,1);
+dydt = zeros(par.iy.ny,1);
 
-dydt(iyp_a) = 1/nonState.C_a*(par.D_WEC*y(iytheta_dot) - nonState.q_sv ...
+dydt(par.iy.p_a) = 1/nonState.C_a*(par.D_WEC*y(par.iy.theta_dot) - nonState.q_sv ...
                 + nonState.q_ain - nonState.q_aout);
-dydt(iyp_b) = 1/nonState.C_b*(-par.D_WEC*y(iytheta_dot) + nonState.q_sv ...
+dydt(par.iy.p_b) = 1/nonState.C_b*(-par.D_WEC*y(par.iy.theta_dot) + nonState.q_sv ...
                 + nonState.q_bin - nonState.q_bout);
 
-dydt(iyp_lin) = 1/nonState.C_lin*(nonState.q_c - q_lin ...
+dydt(par.iy.p_lin) = 1/nonState.C_lin*(nonState.q_c - q_lin ...
                 + nonState.q_pm - nonState.q_ERUfeed ...
                 - nonState.q_linPRV + nonState.q_roPRV);
-dydt(iyp_lout) = 1/nonState.C_lout*(q_lout ...
+dydt(par.iy.p_lout) = 1/nonState.C_lout*(q_lout ...
                 - nonState.q_ain - nonState.q_bin ...
                 + nonState.q_hinPRV);
-dydt(iyp_hin) = 1/nonState.C_hin*(nonState.q_aout + nonState.q_bout ...
+dydt(par.iy.p_hin) = 1/nonState.C_hin*(nonState.q_aout + nonState.q_bout ...
                 - q_hin ...
                 - nonState.q_hinPRV);
 dydt_p_hout = 1/(nonState.C_hout ...
@@ -122,33 +91,33 @@ dydt_p_ro = 1/(nonState.C_ro ...
                     + ~par.rvConfig.included*nonState.C_hout) ...
                 *(nonState.q_rv - nonState.q_feed + nonState.q_ERUfeed ...
                 - nonState.q_roPRV);
-dydt(iyp_hout) = dydt_p_hout + ~par.rvConfig.included*dydt_p_ro;
-dydt(iyp_ro) = dydt_p_ro + ~par.rvConfig.included*dydt_p_hout;
+dydt(par.iy.p_hout) = dydt_p_hout + ~par.rvConfig.included*dydt_p_ro;
+dydt(par.iy.p_ro) = dydt_p_ro + ~par.rvConfig.included*dydt_p_hout;
 
-dydt(iycontrol) = dydt_control;
+dydt(par.iy.control) = dydt_control;
 
-dydt(iytheta) = dydt_WEC(1); % angular velocity
-dydt(iytheta_dot) = dydt_WEC(2); % angular acceleration
-dydt(iyrad) = dydt_WEC(3:end); % radiation damping states for WEC model
+dydt(par.iy.theta) = dydt_WEC(1); % angular velocity
+dydt(par.iy.theta_dot) = dydt_WEC(2); % angular acceleration
+dydt(par.iy.rad) = dydt_WEC(3:end); % radiation damping states for WEC model
 
-dydt(iyLPPL) = dydt_LPPL;
-dydt(iyHPPL) = dydt_HPPL;
+dydt(par.iy.LPPL) = dydt_LPPL;
+dydt(par.iy.HPPL) = dydt_HPPL;
 
 %% %%%%%%%%%%%%   FUNCTIONS  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
     function [dydt_control, control] = controller(t,y,par)
         %% PI control of p_hout using w_pm
          % Error
-        err_p = y(iyp_filt) - par.control.p_ro_nom;
+        err_p = y(par.iy.p_filt) - par.control.p_ro_nom;
          % Feedforward
         w_ff = 0*par.control.w_pm_ctrl.min;
          % Control signal
         w_pm_nom = w_ff ...
             + (par.control.w_pm_ctrl.kp*err_p ...
-            + par.control.w_pm_ctrl.ki*y(iy_errInt_p_filt));
+            + par.control.w_pm_ctrl.ki*y(par.iy.errInt_p_filt));
         nomAboveMax = w_pm_nom > par.control.w_pm_ctrl.max;
         nomBelowMin = w_pm_nom < par.control.w_pm_ctrl.min;
-        p_hAbovep_ro = par.rvConfig.included*(y(iyp_hout) > y(iyp_ro)) ...
+        p_hAbovep_ro = par.rvConfig.included*(y(par.iy.p_hout) > y(par.iy.p_ro)) ...
                     + ~par.rvConfig.included;
         control.w_pm = p_hAbovep_ro*(w_pm_nom ...
                   + nomAboveMax*(par.control.w_pm_ctrl.max - w_pm_nom) ...
@@ -157,16 +126,16 @@ dydt(iyHPPL) = dydt_HPPL;
 
         %% Feedforward control of active RO inlet valve
         % determine ideal valve coefficient to satisfy dpdt limit
-        C_ro = capAccum(y(iyp_ro),par.pc_ro,par.Vc_ro,par.f,par);
-        q_perm = par.Sro*par.Aperm*(y(iyp_ro) - par.p_perm - par.p_osm);
+        C_ro = capAccum(y(par.iy.p_ro),par.pc_ro,par.Vc_ro,par.f,par);
+        q_perm = par.Sro*par.Aperm*(y(par.iy.p_ro) - par.p_perm - par.p_osm);
         q_ro = q_perm/par.Y ...
                     *(1-par.ERUconfig.present*par.eta_ERUv^2*(1-par.Y));
-        dp = y(iyp_hout) - y(iyp_ro);
+        dp = y(par.iy.p_hout) - y(par.iy.p_ro);
         control.kv_ideal = (sign(dp)*C_ro*par.control.dpdt_ROmax + q_ro) ...
                 /sqrt(abs(dp));
         % satisfy conditions related to limitations, control objectives, 
         % and configuration
-        p_roAbovepc_ro = y(iyp_ro) > par.pc_ro;
+        p_roAbovepc_ro = y(par.iy.p_ro) > par.pc_ro;
         rvOpen = ~p_roAbovepc_ro | ~par.rvConfig.active; % cond.s for valve full open
         control.kv_rv = ~rvOpen*max(0,min(par.kv_rv,control.kv_ideal)) ...
                        + rvOpen*par.kv_rv;
@@ -174,50 +143,50 @@ dydt(iyHPPL) = dydt_HPPL;
         %% deriviatives for filtered signal and error integrals (w/
          % anti-wind-up)
         dydt_control = [    % filtered signal
-                        (y(iyp_ro) - y(iyp_filt))...
+                        (y(par.iy.p_ro) - y(par.iy.p_filt))...
                         /par.control.tau_pfilt;
 
                             % error integral for pressure control
-                        (y(iy_errInt_p_filt) < 1e12 ...
-                        & y(iy_errInt_p_filt) > -1e12) ...
+                        (y(par.iy.errInt_p_filt) < 1e12 ...
+                        & y(par.iy.errInt_p_filt) > -1e12) ...
                         *err_p];
                         
     end
 
     function nonState = nonStateVars(t,y,control,par)
         % Accumulator capacitance
-        nonState.C_lin = capAccum(y(iyp_lin),par.pc_lin,par.Vc_lin,par.f,par);
-        nonState.C_lout = capAccum(y(iyp_lout),par.pc_lout,par.Vc_lout,par.f,par);
-        nonState.C_hin = capAccum(y(iyp_hin),par.pc_hin,par.Vc_hin,par.f,par);
-        nonState.C_hout = capAccum(y(iyp_hout),par.pc_hout,par.Vc_hout,par.f,par);
-        nonState.C_ro = capAccum(y(iyp_ro),par.pc_ro,par.Vc_ro,par.f,par);
+        nonState.C_lin = capAccum(y(par.iy.p_lin),par.pc_lin,par.Vc_lin,par.f,par);
+        nonState.C_lout = capAccum(y(par.iy.p_lout),par.pc_lout,par.Vc_lout,par.f,par);
+        nonState.C_hin = capAccum(y(par.iy.p_hin),par.pc_hin,par.Vc_hin,par.f,par);
+        nonState.C_hout = capAccum(y(par.iy.p_hout),par.pc_hout,par.Vc_hout,par.f,par);
+        nonState.C_ro = capAccum(y(par.iy.p_ro),par.pc_ro,par.Vc_ro,par.f,par);
 
         % WEC-driven pump
          % pumping chamber capacitance
-        V_a = par.V_wecDead + par.D_WEC*(par.theta_max - y(iytheta));
-        nonState.C_a = deadVCap(y(iyp_a),V_a,par);
-        V_b = par.V_wecDead + par.D_WEC*(par.theta_max + y(iytheta));
-        nonState.C_b = deadVCap(y(iyp_b),V_b,par);
+        V_a = par.V_wecDead + par.D_WEC*(par.theta_max - y(par.iy.theta));
+        nonState.C_a = deadVCap(y(par.iy.p_a),V_a,par);
+        V_b = par.V_wecDead + par.D_WEC*(par.theta_max + y(par.iy.theta));
+        nonState.C_b = deadVCap(y(par.iy.p_b),V_b,par);
 
          % Switching valve flow
-        dp = y(iyp_a) - y(iyp_b);
+        dp = y(par.iy.p_a) - y(par.iy.p_b);
         lin_lowdp = (abs(dp) < par.dp_svlin);
         nonState.q_sv = areaFracPWM(t,par.duty_sv,par.T_sv,par.tr_sv) ...
                         *(lin_lowdp*par.kv_svlin*dp ...
                         + ~lin_lowdp*sign(dp)*par.kv_sv*sqrt(abs(dp)));
          % check valves
-        nonState.q_ain = flowCV(y(iyp_lout) - y(iyp_a), ...
+        nonState.q_ain = flowCV(y(par.iy.p_lout) - y(par.iy.p_a), ...
                          par.kvWECin,par.pc_WECin,par.dp_WECin);
-        nonState.q_aout = flowCV(y(iyp_a) - y(iyp_hin), ...
+        nonState.q_aout = flowCV(y(par.iy.p_a) - y(par.iy.p_hin), ...
                          par.kvWECout,par.pc_WECout,par.dp_WECout);
-        nonState.q_bin = flowCV(y(iyp_lout) - y(iyp_b), ...
+        nonState.q_bin = flowCV(y(par.iy.p_lout) - y(par.iy.p_b), ...
                          par.kvWECin,par.pc_WECin,par.dp_WECin);
-        nonState.q_bout = flowCV(y(iyp_b) - y(iyp_hin), ...
+        nonState.q_bout = flowCV(y(par.iy.p_b) - y(par.iy.p_hin), ...
                          par.kvWECout,par.pc_WECout,par.dp_WECout);
         
          % Reaction torque on WEC
-        delta_p_wp = y(iyp_b)-y(iyp_a);
-        WECpumpPumping = y(iytheta_dot)*delta_p_wp < 0;
+        delta_p_wp = y(par.iy.p_b)-y(par.iy.p_a);
+        WECpumpPumping = y(par.iy.theta_dot)*delta_p_wp < 0;
         WECpumpMotoring = ~WECpumpPumping;
 
         nonState.T_pto = par.D_WEC*delta_p_wp...
@@ -225,7 +194,7 @@ dydt(iyHPPL) = dydt_HPPL;
                     + WECpumpMotoring*par.eta_m_WEC);
 
         % House power pump/motor
-        delta_p_pm = y(iyp_lin) - y(iyp_hout);
+        delta_p_pm = y(par.iy.p_lin) - y(par.iy.p_hout);
         nonState.pmPumping = control.w_pm*(delta_p_pm) >= 0;
         nonState.pmMotoring = control.w_pm*(delta_p_pm) < 0;
 
@@ -245,11 +214,11 @@ dydt(iyHPPL) = dydt_HPPL;
                         *par.D_pm*delta_p_pm;
 
         % Reverse osmosis module
-        nonState.q_perm = par.Sro*par.Aperm*(y(iyp_ro) - par.p_perm - par.p_osm);
+        nonState.q_perm = par.Sro*par.Aperm*(y(par.iy.p_ro) - par.p_perm - par.p_osm);
         nonState.q_feed = nonState.q_perm/par.Y;
 
          % RO inlet valve/"ripple filter"
-        dp = y(iyp_hout) - y(iyp_ro);
+        dp = y(par.iy.p_hout) - y(par.iy.p_ro);
         nonState.q_rv = par.rvConfig.included ...
                        * control.kv_rv*sqrt(abs(dp))*sign(dp);
 
@@ -259,13 +228,13 @@ dydt(iyHPPL) = dydt_HPPL;
                              *(par.eta_ERUv)^2*nonState.q_brine;
 
         % Charge Pump
-        dP_SO = (y(iyp_lin) - par.p_o) - par.cn*par.w_c^2; % difference between shut-off pressure and current pressure differential
+        dP_SO = (y(par.iy.p_lin) - par.p_o) - par.cn*par.w_c^2; % difference between shut-off pressure and current pressure differential
         nonState.q_c = (dP_SO < 0)* sqrt(dP_SO/par.cq);
 
         % Pressure relief valves
-        nonState.q_linPRV = flowPRV(y(iyp_lin),par.lPRV.p_crack,par.lPRV.C);
-        nonState.q_hinPRV = flowPRV(y(iyp_hin),par.hPRV.p_crack,par.hPRV.C);
-        nonState.q_roPRV = flowPRV(y(iyp_ro),par.roPRV.p_crack,par.roPRV.C);
+        nonState.q_linPRV = flowPRV(y(par.iy.p_lin),par.lPRV.p_crack,par.lPRV.C);
+        nonState.q_hinPRV = flowPRV(y(par.iy.p_hin),par.hPRV.p_crack,par.hPRV.C);
+        nonState.q_roPRV = flowPRV(y(par.iy.p_ro),par.roPRV.p_crack,par.roPRV.C);
 
     end
 

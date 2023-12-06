@@ -1,4 +1,5 @@
-% stateIndex_parPTO.m script m-file
+function iy = stateIndex_parPTO(par)
+% stateIndex_parPTO.m function m-file
 % AUTHORS:
 % Jeremy Simmons (email: simmo536@umn.edu)
 % University of Minnesota
@@ -14,6 +15,7 @@
 %
 % UPDATES:
 % 11/2/2023 - Created from stateIndex_refPTO.m.
+% 12/6/2023 - Changed from script to function
 %
 % Copyright (C) 2023  Jeremy W. Simmons II
 % 
@@ -32,29 +34,31 @@
 %
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-iyp_a = 1;
-iyp_b = 2;
+iy.p_a = 1;
+iy.p_b = 2;
 
-iyp_lin = 3;
-iyp_lout = 4;
-iyp_hin = 5;
-iyp_hout = 6;
-iyp_ro = 7;
+iy.p_lin = 3;
+iy.p_lout = 4;
+iy.p_hin = 5;
+iy.p_hout = 6;
+iy.p_ro = 7;
 
-iyp_filt = 8;
-iy_errInt_p_filt = 9;
-iycontrol = [iyp_filt; iy_errInt_p_filt];
+iy.p_filt = 8;
+iy.errInt_p_filt = 9;
+iy.control = [iy.p_filt; iy.errInt_p_filt];
 
-iytheta = 10;
-iytheta_dot = 11;
-iyrad = (1:par.WEC.ny_rad) + iytheta_dot; % state vector indices for radiation damping states for WEC model
+iy.theta = 10;
+iy.theta_dot = 11;
+iy.rad = (1:par.WEC.ny_rad) + iy.theta_dot; % state vector indices for radiation damping states for WEC model
+iy.WEC = [iy.theta iy.theta_dot iy.rad];
+iy.LPPL = (1:2*par.n_seg(1)-1) + iy.rad(end);
+iy.qLP = (1:2:2*par.n_seg(1)-1) + (iy.LPPL(1)-1);
+iy.pLP = (2:2:2*par.n_seg(1)-1) + (iy.LPPL(1)-1);
 
-iyLPPL = (1:2*par.n_seg(1)-1) + iyrad(end);
-iyqLP = (1:2:2*par.n_seg(1)-1) + (iyLPPL(1)-1);
-iypLP = (2:2:2*par.n_seg(1)-1) + (iyLPPL(1)-1);
+iy.HPPL = (1:2*par.n_seg(2)-1) + iy.LPPL(end);
+iy.qHP = (1:2:2*par.n_seg(2)-1) + (iy.HPPL(1)-1);
+iy.pHP = (2:2:2*par.n_seg(2)-1) + (iy.HPPL(1)-1);
 
-iyHPPL = (1:2*par.n_seg(2)-1) + iyLPPL(end);
-iyqHP = (1:2:2*par.n_seg(2)-1) + (iyHPPL(1)-1);
-iypHP = (2:2:2*par.n_seg(2)-1) + (iyHPPL(1)-1);
+iy.ny = iy.HPPL(end);
 
-ny = iyHPPL(end);
+end
