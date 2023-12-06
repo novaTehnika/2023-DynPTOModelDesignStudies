@@ -48,4 +48,4 @@ mkdir(storage_folder); %make a temporary folder for this session
 
 cl.JobStorageLocation = storage_folder; %and tell the cluster to use it
 
-parpool(cl); %create the parallel pool for this cluster
+parpool(cl,nWorkers); %create the parallel pool for this cluster

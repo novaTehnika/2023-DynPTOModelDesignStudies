@@ -17,8 +17,8 @@ display(['iVar = ',num2str(iVar)]); \
 SS = ${SS}; \
 display(['SS = ',num2str(SS)]); \
 addpath('Utilities'); \
+nWorkers = ${SLURM_NTASKS}-1; \
 parSafeStartSlurm; \
-parpool('local',${SLURM_NTASKS}-1);
 study_parPTO_LPaccum; \
 rmdir(storage_folder)"
 
