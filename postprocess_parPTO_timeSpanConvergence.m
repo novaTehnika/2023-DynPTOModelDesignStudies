@@ -31,8 +31,8 @@ display(['file ',num2str(j),' of ',num2str(nfiles)])
         studyData.L_c(iVar,SS) = L_c;
         
          % power loss from pipeline
-        studyData.P_LPPL(iVar,SS) = P_LPPL;
-        studyData.L_LPPL(iVar,SS) = L_LPPL;
+        studyData.P_LPPL(iVar,SS) = mean(P_LPPL);
+        studyData.L_LPPL(iVar,SS) = mean(L_LPPL);
         
         % for accum_woRV and accum_wRV
         studyData.q_permMean(iVar,SS) = q_permMean;
@@ -44,6 +44,10 @@ display(['file ',num2str(j),' of ',num2str(nfiles)])
         studyData.dpdt_max(iVar,SS) = dpdt_max;
         studyData.dpdt_97(iVar,SS) = dpdt_97;
 
+         % power loss from pipeline
+        studyData.P_HPPL(iVar,SS) = mean(P_HPPL);
+        studyData.L_HPPL(iVar,SS) = mean(L_HPPL);
+
     end
 
 end
@@ -52,8 +56,9 @@ end
 
 % ...
 
-%% Plot energy and volume balance error as a function of timestep
+%% Plotting
 SS = 2;
+err_endNorm = @(x) x./x(end); 
 
 black = [0 0 0];
 maroon = [122 0 25]/256;
@@ -65,6 +70,7 @@ color = [maroon; gold; blue; orange; green];
 
 linestyles = {'-', '--', ':', '-.'};
 
+%% Plot energy and volume balance error as a function of timestep
 bottomEdge = 1;
 leftEdge = 3;
 width = 7.5; % one column: 3+9/16, two column: 7.5
@@ -103,20 +109,6 @@ ylabel('volume balance error, normalized', ...
 'Interpreter','latex','FontSize',fontSize-1,'fontname','Times')
 
 %% 
-err_endNorm = @(x) x./x(end); 
-
-SS = 3;
-
-black = [0 0 0];
-maroon = [122 0 25]/256;
-gold = [255 204 51]/256;
-blue = [0 75 135]/256;
-orange = [226 100 55]/256;
-green = [63 150 87]/256;
-color = [maroon; gold; blue; orange; green];
-
-linestyles = {'-', '--', ':', '-.'};
-
 bottomEdge = 1;
 leftEdge = 3;
 width = 7.5; % one column: 3+9/16, two column: 7.5
@@ -145,7 +137,6 @@ plot(tspan,studyData.deltaE_battery(:,SS));
 
 %% for LPaccum
  % Variation in pressure at WEC-driven pump inlet
-
 bottomEdge = 1;
 leftEdge = 3;
 width = 7.5; % one column: 3+9/16, two column: 7.5
