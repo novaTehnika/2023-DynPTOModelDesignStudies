@@ -88,7 +88,7 @@ par.Tramp = 250; % [s] excitation force ramp period
 par.TrampWEC = min(25,par.Tramp); % [s] excitation force ramp period
 
 % Solver parameters
-par.solver = 'variable time'; % 'variable time' OR 'fixed time'
+par.solver = 'fixed time'; % 'variable time' OR 'fixed time'
 switch par.solver
     case 'fixed time'
         par.MaxStep = 5e-5;             % [s] time step size
