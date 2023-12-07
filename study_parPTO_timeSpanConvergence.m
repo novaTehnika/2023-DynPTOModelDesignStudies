@@ -168,7 +168,7 @@ P_cLoss = mean(out.power.P_cLoss);
 L_c = P_cLoss/mean(out.power.P_WEC);
 
  % power loss from pipeline
-P_LPPL = out.power.P_LPPL;
+P_LPPL = mean(out.power.P_LPPL);
 L_LPPL = P_LPPL/mean(out.power.P_WEC);
 
 % for accum_woRV and accum_wRV
@@ -184,7 +184,7 @@ dist_dpdt = statsTimeVar_cdf(out.t,abs(out.dydt(:,iyp_ro)));
 dpdt_97 = dist_dpdt.xi(find(dist_dpdt.f > 0.97,1,'first'));
 
  % power loss from pipeline
-P_HPPL = out.power.P_HPPL;
+P_HPPL = mean(out.power.P_HPPL);
 L_HPPL = P_HPPL/mean(out.power.P_WEC);
 
 if ~saveSimData
