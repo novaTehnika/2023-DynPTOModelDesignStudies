@@ -5,7 +5,7 @@
 #SBATCH -t 24:00:00 #48:00:00 # 4 workers, 8hs per sim, 14 sims per job, 1.5 S.F.
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=simmo536@umn.edu
-#SBATCH -p small
+#SBATCH -p msismall
 #SBATCH -o %A_%a.out
 #SBATCH -e %A_%a.err
 
