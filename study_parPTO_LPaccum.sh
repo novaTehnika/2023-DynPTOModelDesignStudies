@@ -23,5 +23,5 @@ study_parPTO_LPaccum; \
 rmdir(storage_folder)"
 
 # Commands to use
-# sbatch --export=SS=1 --array=1-1800 ~/2023-DynPTOModelDesignStudies/study_parPTO_LPaccum.sh
+# sbatch --export=SS=2 --array=1-1000 ~/2023-DynPTOModelDesignStudies/study_parPTO_LPaccum.sh
 # dos2unix  study_parPTO_LPaccum.sh
