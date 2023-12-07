@@ -90,7 +90,7 @@ git_hash_string = get_current_git_hash();
 
 % Simulation timeframe
 par.tstart = 0; %[s] start time of simulation
-par.tend = 2000; %[s] end time of simulation
+par.tend = 1000;%2000; %[s] end time of simulation
 
 par.Tramp = 250; % [s] excitation force ramp period
 par.TrampWEC = min(25,par.Tramp); % [s] excitation force ramp period
@@ -135,63 +135,70 @@ par.rvConfig.active = (0)*par.rvConfig.included; % RO inlet valve is 1 - active,
 
 %% %%%%%%%%%%%%   Study Variables  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % total accumulator volume
-nVar1 = 30;
-Vc_h = 1e-3*logspace(log10(5e3),log10(30e3),nVar1);% [L->m^3] total accumulator volume
-
-% proportion of accumulator volume at RO inlet
-X = 0.1:0.1:0.9;
-nVar2 = numel(X);
+nVar1 = 5;%25;
+Vc_h = 1e-3*logspace(log10(2e3),log10(30e3),nVar1);% [L->m^3] total accumulator volume
 
 % Diameter of high-pressure pipeline
-nVar3 = 10;
-d_HPPL = logspace(log10(0.05),log10(0.4),nVar3); % [m]
+nVar2 = 5;%20;
+d_HPPL = logspace(log10(0.11),log10(0.18),nVar2); % [m]
 
-[meshVar3D.Vc_h, meshVar3D.X, meshVar3D.d_HPPL] = meshgrid(Vc_h,X,d_HPPL);
+% proportion of accumulator volume at RO inlet
+nVar3 = 14; % make even
+X = 1 - logspace(log10(1-0.25),log10(1-0.5),nVar3/2);
+X = [X logspace(log10(X(end)+diff(X([end-1 end]))),log10(0.75),nVar3/2)];
+
+
+[meshVar3D.Vc_h, meshVar3D.d_HPPL] = meshgrid(Vc_h,d_HPPL);
 Vc_h_mesh = meshVar3D.Vc_h(:);
-X_mesh = meshVar3D.X(:);
 d_HPPL_mesh = meshVar3D.d_HPPL(:);
-nVar = numel(X_mesh);
+
+nVar = numel(Vc_h_mesh);
 
 saveSimData = 0; % save simulation data (1) or just output variables (0)
 
 %% %%%%%%%%%%%%   COLLECT DATA  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% change design parameter
-par.Vc_hin = (1-X_mesh(iVar))*Vc_h_mesh(iVar);
-par.Vc_hout = 0;
-par.Vc_ro = X_mesh(iVar)*Vc_h_mesh(iVar);
+% change design parameters
 par.d_HPPL = d_HPPL_mesh(iVar);
 
-% run simulation
-ticSIM = tic;
-out = sim_parPTO(y0,par);
-toc(ticSIM)
+parBase = par; clearvars par
+parfor iX = 1:nVar3
 
-% Calculate metrics
- % permeate production
-q_permMean = mean(out.q_perm);
- % power captured by WEC-driven pump
-PP_WEC = mean(out.power.P_WEC);
-PP_wp = mean(out.power.P_wp);
- % power loss through PRVs
-PP_hinPRV = mean(out.power.P_hinPRV);
-PP_roPRV = mean(out.power.P_roPRV);
- % power loss from valve
-PP_rv = mean(out.power.P_rv);
- % max rate of change in pressure
-dpdt_max = max(abs(out.dydt(:,iyp_ro)));
- % 97th percentile ratof change
-dist_dpdt = statsTimeVar_cdf(out.t,abs(out.dydt(:,iyp_ro)));
-dpdt_97 = dist_dpdt.xi(find(dist_dpdt.f > 0.97,1,'first'));
- % power loss from pipeline
-P_HPPL = mean(out.power.P_HPPL);
-L_HPPL = P_HPPL/mean(out.power.P_WEC);
+    par = parBase;
+    par.Vc_hin = (1-X(iX))*Vc_h_mesh(iVar);
+    par.Vc_hout = 0;
+    par.Vc_ro = X(iX)*Vc_h_mesh(iVar);
 
-if ~saveSimData
-    clear out
+    % run simulation
+    ticSIM = tic;
+    out = sim_parPTO(y0,par);
+    toc(ticSIM)
+
+    % Calculate metrics
+     % permeate production
+    q_permMean(iX) = mean(out.q_perm);
+     % power captured by WEC-driven pump
+    PP_WEC(iX) = mean(out.power.P_WEC);
+    PP_wp(iX) = mean(out.power.P_wp);
+     % power loss through PRVs
+    PP_hinPRV(iX) = mean(out.power.P_hinPRV);
+    PP_roPRV(iX) = mean(out.power.P_roPRV);
+     % power loss from valve
+    PP_rv(iX) = mean(out.power.P_rv);
+     % max rate of change in pressure
+    dpdt_max(iX) = max(abs(out.dydt(:,iyp_ro)));
+     % 97th percentile ratof change
+    dist_dpdt = statsTimeVar_cdf(out.t,abs(out.dydt(:,iyp_ro)));
+    dpdt_97(iX) = dist_dpdt.xi(find(dist_dpdt.f > 0.97,1,'first'));
+     % power loss from pipeline
+    P_HPPL(iX) = mean(out.power.P_HPPL);
+    L_HPPL(iX) = P_HPPL(iX)/mean(out.power.P_WEC);
+
+    if saveSimData
+        outSave(iX) = out; %#ok<UNRCH>
+    end
+
 end
-
-
 
 %% %%%%%%%%%%%%   Save Data  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 timeStamp = datetime("now",'format','yyyy-MM-dd''T''HH:mm'); % time in ISO8601

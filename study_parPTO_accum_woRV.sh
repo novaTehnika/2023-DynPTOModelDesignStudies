@@ -1,8 +1,8 @@
 #!/bin/bash -l
 #SBATCH --nodes=1
-#SBATCH --ntasks=1
-#SBATCH --mem=16gb
-#SBATCH -t 8:00:00
+#SBATCH --ntasks=5
+#SBATCH --mem=12500M
+#SBATCH -t 24:00:00 #48:00:00 # 4 workers, 8hs per sim, 14 sims per job, 1.5 S.F.
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=simmo536@umn.edu
 #SBATCH -p small
@@ -16,9 +16,13 @@ matlab -nodisplay -r \
 display(['iVar = ',num2str(iVar)]); \
 SS = ${SS}; \
 display(['SS = ',num2str(SS)]); \
-study_parPTO_accum_woRV"
+addpath('Utilities'); \
+nWorkers = ${SLURM_NTASKS}-1; \
+parSafeStartSlurm; \
+study_parPTO_accum_woRV; \
+rmdir(storage_folder)"
 
 # Commands to use
-# sbatch --export=SS=1 --array=1-15 ~/2023-DynPTOModelDesignStudies/study_parPTO_accum_woRV.sh
+# sbatch --export=SS=2 --array=1-500 ~/2023-DynPTOModelDesignStudies/study_parPTO_accum_woRV.sh
 # dos2unix  study_parPTO_accum_woRV.sh
 
