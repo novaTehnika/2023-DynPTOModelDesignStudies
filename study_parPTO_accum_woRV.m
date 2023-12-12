@@ -188,8 +188,13 @@ parfor iX = 1:nVar3
      % max rate of change in pressure
     dpdt_max(iX) = max(abs(out.dydt(:,par.iy.p_ro)));
      % 97th percentile ratof change
-    dist_dpdt = statsTimeVar_cdf(out.t,abs(out.dydt(:,par.iy.p_ro)));
-    dpdt_97(iX) = dist_dpdt.xi(find(dist_dpdt.f > 0.97,1,'first'));
+    try
+        dist_dpdt = statsTimeVar_cdf(out.t,abs(out.dydt(:,par.iy.p_ro)));
+        dpdt_97(iX) = dist_dpdt.xi(find(dist_dpdt.f > 0.97,1,'first'));
+    catch
+        dist_dpdt = nan;
+        dpdt_97(iX) = nan;
+    end
      % power loss from pipeline
     P_HPPL(iX) = mean(out.power.P_HPPL);
     L_HPPL(iX) = P_HPPL(iX)/mean(out.power.P_WEC);
