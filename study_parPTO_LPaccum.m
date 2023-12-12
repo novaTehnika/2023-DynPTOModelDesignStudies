@@ -91,7 +91,7 @@ git_hash_string = get_current_git_hash();
 
 % Simulation timeframe
 par.tstart = 0; %[s] start time of simulation
-par.tend = 2000; %[s] end time of simulation
+par.tend = 1000;%2000; %[s] end time of simulation
 
 par.Tramp = 250; % [s] excitation force ramp period
 par.TrampWEC = min(25,par.Tramp); % [s] excitation force ramp period
@@ -140,15 +140,15 @@ par.pc_lout = 0.15e6; % [Pa] charge pressure
 
 %% %%%%%%%%%%%%   Study Variables  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % total low-pressure accumulator volume
-nVar1 = 10;
+nVar1 = 5;%10;
 Vc_l = 1e-3*logspace(log10(200),log10(3000),nVar1); % [(L) -> m^3]
 
 % portion of low-pressure accumulator volume at WEC-driven pump inlet
-X = 1 - logspace (log10(1-0.3),log10(1-0.95),10);
+X = 1 - logspace (log10(1-0.3),log10(1-0.95),5);%10);
 nVar2 = numel(X);
 
 % Diameter of low-pressure pipeline
-nVar3 = 10;
+nVar3 = 5;%10;
 d_LPPL = logspace(log10(0.11),log10(0.18),nVar3); % [m]
 
 % charge pump speed
