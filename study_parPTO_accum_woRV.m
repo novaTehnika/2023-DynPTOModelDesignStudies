@@ -90,9 +90,9 @@ git_hash_string = get_current_git_hash();
 
 % Simulation timeframe
 par.tstart = 0; %[s] start time of simulation
-par.tend = 1000;%2000; %[s] end time of simulation
+par.tend = 1.000;%2000; %[s] end time of simulation
 
-par.Tramp = 250; % [s] excitation force ramp period
+par.Tramp = 2.50; % [s] excitation force ramp period
 par.TrampWEC = min(25,par.Tramp); % [s] excitation force ramp period
 
 % Solver parameters
@@ -186,9 +186,9 @@ parfor iX = 1:nVar3
      % power loss from valve
     PP_rv(iX) = mean(out.power.P_rv);
      % max rate of change in pressure
-    dpdt_max(iX) = max(abs(out.dydt(:,iyp_ro)));
+    dpdt_max(iX) = max(abs(out.dydt(:,par.iy.p_ro)));
      % 97th percentile ratof change
-    dist_dpdt = statsTimeVar_cdf(out.t,abs(out.dydt(:,iyp_ro)));
+    dist_dpdt = statsTimeVar_cdf(out.t,abs(out.dydt(:,par.iy.p_ro)));
     dpdt_97(iX) = dist_dpdt.xi(find(dist_dpdt.f > 0.97,1,'first'));
      % power loss from pipeline
     P_HPPL(iX) = mean(out.power.P_HPPL);
