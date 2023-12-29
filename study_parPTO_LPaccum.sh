@@ -2,7 +2,7 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks=5
 #SBATCH --mem=12500M
-#SBATCH -t 40:00:00 #60:00:00
+#SBATCH -t 30:00:00 # max expected time on Agate is 20hrs
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=simmo536@umn.edu
 #SBATCH -p msismall
@@ -23,5 +23,5 @@ study_parPTO_LPaccum; \
 rmdir(storage_folder)"
 
 # Commands to use
-# sbatch --export=SS=2 --array=1-1000 ~/2023-DynPTOModelDesignStudies/study_parPTO_LPaccum.sh
+# sbatch --export=SS=2 --array=1-500 ~/2023-DynPTOModelDesignStudies/study_parPTO_LPaccum.sh
 # dos2unix  study_parPTO_LPaccum.sh
