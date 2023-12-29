@@ -10,32 +10,32 @@ display(['file ',num2str(j),' of ',num2str(nfiles)])
         for iw_c = 1:nVar4
 
             % study variables
-            studyVar.Vc_l(iVar,iw_c) = Vc_l_mesh(iVar);
-            studyVar.X(iVar,iw_c) = X_mesh(iVar);
-            studyVar.d_line(iVar,iw_c) = d_LPPL_mesh(iVar);
-            studyVar.w_c(iVar,iw_c) = w_c(iw_c);
+            studyVar(SS).Vc_l(iVar,iw_c) = Vc_l_mesh(iVar);
+            studyVar(SS).X(iVar,iw_c) = X_mesh(iVar);
+            studyVar(SS).d_line(iVar,iw_c) = d_LPPL_mesh(iVar);
+            studyVar(SS).w_c(iVar,iw_c) = w_c(iw_c);
 
             % metrics
              % Mean pressure at WEC-driven pump inlet
-            studyData.p_loutMean(iVar,iw_c) = p_loutMean(iw_c);
+            studyData(SS).p_loutMean(iVar,iw_c) = p_loutMean(iw_c);
              % Variation in pressure at WEC-driven pump inlet
-            studyData.p_loutMax(iVar,iw_c) = p_loutMax(iw_c);
-            studyData.p_loutMin(iVar,iw_c) = p_loutMin(iw_c);
-            studyData.p_loutVar(iVar,iw_c) = p_loutVar(iw_c);
-            studyData.p_loutStd(iVar,iw_c) = p_loutStd(iw_c);
+            studyData(SS).p_loutMax(iVar,iw_c) = p_loutMax(iw_c);
+            studyData(SS).p_loutMin(iVar,iw_c) = p_loutMin(iw_c);
+            studyData(SS).p_loutVar(iVar,iw_c) = p_loutVar(iw_c);
+            studyData(SS).p_loutStd(iVar,iw_c) = p_loutStd(iw_c);
              % Minimum pressure in WEC-driven pump chambers
-            studyData.p_wpMin(iVar,iw_c) = p_wpMin(iw_c);
+            studyData(SS).p_wpMin(iVar,iw_c) = p_wpMin(iw_c);
     
              % Electric power consumption of charge pump
-            studyData.P_cElec(iVar,iw_c) = P_cElec(iw_c);
-            studyData.P_cElec_norm(iVar,iw_c) = P_cElec_norm(iw_c);
+            studyData(SS).P_cElec(iVar,iw_c) = P_cElec(iw_c);
+            studyData(SS).P_cElec_norm(iVar,iw_c) = P_cElec_norm(iw_c);
              % Power losses from charge pump
-            studyData.P_cLoss(iVar,iw_c) = P_cLoss(iw_c);
-            studyData.L_c(iVar,iw_c) = L_c(iw_c);
+            studyData(SS).P_cLoss(iVar,iw_c) = P_cLoss(iw_c);
+            studyData(SS).L_c(iVar,iw_c) = L_c(iw_c);
 
              % power loss from pipeline
-            studyData.P_LPPL(iVar,iw_c) = P_LPPL(iw_c);
-            studyData.L_LPPL(iVar,iw_c) = L_LPPL(iw_c);
+            studyData(SS).P_LPPL(iVar,iw_c) = P_LPPL(iw_c);
+            studyData(SS).L_LPPL(iVar,iw_c) = L_LPPL(iw_c);
 
         end
 
@@ -87,25 +87,25 @@ try
         for j = 1:length(notDone)
             iVar = notDone(j);
              % Mean pressure at WEC-driven pump inlet
-            studyData.p_loutMean(iVar,:) = nanArray;
+            studyData(SS).p_loutMean(iVar,:) = nanArray;
              % Variation in pressure at WEC-driven pump inlet
-            studyData.p_loutMax(iVar,:) = nanArray;
-            studyData.p_loutMin(iVar,:) = nanArray;
-            studyData.p_loutVar(iVar,:) = nanArray;
-            studyData.p_loutStd(iVar,:) = nanArray;
+            studyData(SS).p_loutMax(iVar,:) = nanArray;
+            studyData(SS).p_loutMin(iVar,:) = nanArray;
+            studyData(SS).p_loutVar(iVar,:) = nanArray;
+            studyData(SS).p_loutStd(iVar,:) = nanArray;
              % Minimum pressure in WEC-driven pump chambers
-            studyData.p_wpMin(iVar,:) = nanArray;
+            studyData(SS).p_wpMin(iVar,:) = nanArray;
 
              % Electric power consumption of charge pump
-            studyData.P_cElec(iVar,:) = nanArray;
-            studyData.P_cElec_norm(iVar,:) = nanArray;
+            studyData(SS).P_cElec(iVar,:) = nanArray;
+            studyData(SS).P_cElec_norm(iVar,:) = nanArray;
              % Power losses from charge pump
-            studyData.P_cLoss(iVar,:) = nanArray;
-            studyData.L_c(iVar,:) = nanArray;
+            studyData(SS).P_cLoss(iVar,:) = nanArray;
+            studyData(SS).L_c(iVar,:) = nanArray;
 
              % power loss from pipeline
-            studyData.P_LPPL(iVar,:) = nanArray;
-            studyData.L_LPPL(iVar,:) = nanArray;
+            studyData(SS).P_LPPL(iVar,:) = nanArray;
+            studyData(SS).L_LPPL(iVar,:) = nanArray;
 
         end
     end
@@ -115,20 +115,26 @@ catch
 end
 
 %% Find optimal distribution of accumulator volume for each total 
+SS = 2;
+
 % accumulator volume and pipeline diameter
  % find individuals meeting cavitation constraints
-p_cavLimit = 0.5e4; % [Pa] prescribed limit on pressure in WEC-driven pump
-meetsConstraints = find(studyData.p_wpMin(:) >= p_cavLimit);
+p_cavLimit = 0.003e4; % [Pa] prescribed limit on pressure in WEC-driven pump
+id_line = 1;
+d_line_nom = d_LPPL(id_line);
+meetsConstraints = find(studyData(SS).p_wpMin(:) >= p_cavLimit ...
+                        & studyVar(SS).d_line(:) == d_line_nom);
 
  % find non-dominated individuals from set meeting cavitation constraints
-non_dominated = paretoFront2D(studyVar.Vc_l(meetsConstraints),'min', ...
-               studyData.P_LPPL(meetsConstraints) ...
-               + studyData.P_cElec(meetsConstraints),'min');
-[~, ii_sort] = sort(studyVar.Vc_l(meetsConstraints(non_dominated)));
+non_dominated = paretoFront2D(studyVar(SS).Vc_l(meetsConstraints),'min', ...
+               studyData(SS).P_LPPL(meetsConstraints) ...
+               + studyData(SS).P_cElec(meetsConstraints),'min');
+[~, ii_sort] = sort(studyVar(SS).Vc_l(meetsConstraints(non_dominated)));
 iiPareto = meetsConstraints(non_dominated(ii_sort));
-Vc_l_opt = studyVar.Vc_l(iiPareto);
-X_opt = studyVar.X(iiPareto);
-d_LPPL_opt = studyVar.d_line(iiPareto);
+Vc_l_opt = studyVar(SS).Vc_l(iiPareto);
+X_opt = studyVar(SS).X(iiPareto);
+d_LPPL_opt = studyVar(SS).d_line(iiPareto);
+w_c_opt = studyVar(SS).w_c(iiPareto);
 clearvars meetsConstraints non_dominated ii_sort
 
 
@@ -163,11 +169,12 @@ fig.Position = [leftEdge bottomEdge width height ];
 
 titleString = ['Performance of Low-Pressure Circuit Branch',newline,...
                 'as a Function of Installed Low-Pressure Accumulator Volume',newline,...
-                'Sea State ',num2str(SS)];
+                'Sea State ',num2str(SS),newline,...
+                'Pipeline Diameter of ',num2str(100*d_line_nom),' cm'];
 sgtitle(titleString,...
 'Interpreter','latex','FontSize',fontSize+2,'fontname','Times')
 
-n_plots = 5;
+n_plots = 6;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Pressure WEC-driven pump inlet
 iax = 1;
@@ -178,18 +185,18 @@ ax(iax).FontSize = fontSize-1;
 hold on
 
 ip = 1;
-p(ip,iax) = plot(Vc_l_opt,1e-5*studyData.p_loutMean(iiPareto),'k','Marker','x');
+p(ip,iax) = plot(Vc_l_opt,1e-5*studyData(SS).p_loutMean(iiPareto),'k','Marker','x');
 ip = ip+1;
 
-p(ip,iax) = plot(Vc_l_opt,1e-5*studyData.p_loutMax(iiPareto),'r','Marker','x');
+p(ip,iax) = plot(Vc_l_opt,1e-5*studyData(SS).p_loutMax(iiPareto),'r','Marker','x');
 ip = ip+1;
-p(ip,iax) = plot(Vc_l_opt,1e-5*studyData.p_loutMin(iiPareto),'r','Marker','x');
+p(ip,iax) = plot(Vc_l_opt,1e-5*studyData(SS).p_loutMin(iiPareto),'r','Marker','x');
 p(ip,iax).HandleVisibility='off';
 ip = ip+1;
 
-p(ip,iax) = plot(Vc_l_opt,1e-5*(studyData.p_loutMean(iiPareto)+studyData.p_loutStd(iiPareto)),':k','Marker','x');
+p(ip,iax) = plot(Vc_l_opt,1e-5*(studyData(SS).p_loutMean(iiPareto)+studyData(SS).p_loutStd(iiPareto)),':k','Marker','x');
 ip = ip+1;
-p(ip,iax) = plot(Vc_l_opt,1e-5*(studyData.p_loutMean(iiPareto)-studyData.p_loutStd(iiPareto)),':k','Marker','x');
+p(ip,iax) = plot(Vc_l_opt,1e-5*(studyData(SS).p_loutMean(iiPareto)-studyData(SS).p_loutStd(iiPareto)),':k','Marker','x');
 p(ip,iax).HandleVisibility='off';
 ip = ip+1;
 
@@ -223,7 +230,7 @@ hold on
 ip = 1;
 p(ip,iax) = plot(Vc_l_opt([1 end]),1e-5*p_cavLimit*[1 1],'r');
 ip = ip+1;
-p(ip,iax) = plot(Vc_l_opt,1e-5*studyData.p_wpMin(iiPareto),'k','Marker','x');
+p(ip,iax) = plot(Vc_l_opt,1e-5*studyData(SS).p_wpMin(iiPareto),'k','Marker','x');
 ip = ip+1;
 
 xlabel('volume (1000L) ', ...
@@ -256,7 +263,7 @@ ax(iax).FontSize = fontSize-1;
 hold on
 
 ip = 1;
-p(ip,iax) = plot(Vc_l_opt,1e-3*studyData.P_cElec(iiPareto),'k','Marker','x');
+p(ip,iax) = plot(Vc_l_opt,1e-3*studyData(SS).P_cElec(iiPareto),'k','Marker','x');
 ip = ip+1;
 
 xlabel('volume (1000L) ', ...
@@ -282,12 +289,12 @@ ax(iax).FontSize = fontSize-1;
 hold on
 
 ip = 1;
-p(ip,iax) = plot(Vc_l_opt,100*studyData.L_c(iiPareto),'r','Marker','^');
+p(ip,iax) = plot(Vc_l_opt,100*studyData(SS).L_c(iiPareto),'r','Marker','^');
 ip = ip+1;
-p(ip,iax) = plot(Vc_l_opt,100*studyData.L_LPPL(iiPareto),'b','Marker','o');
+p(ip,iax) = plot(Vc_l_opt,100*studyData(SS).L_LPPL(iiPareto),'b','Marker','o');
 ip = ip+1;
 p(ip,iax) = plot(Vc_l_opt, ...
-                100*(studyData.L_c(iiPareto)+studyData.L_LPPL(iiPareto)),'k','Marker','x');
+                100*(studyData(SS).L_c(iiPareto)+studyData(SS).L_LPPL(iiPareto)),'k','Marker','x');
 ip = ip+1;
 
 xlabel('volume (1000L) ', ...
@@ -312,7 +319,7 @@ yLim = ylim;
 ylim([0 yLim(2)])
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% LP pipeline diameter
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% charge pump shaft speed
 iax = 5;
 ax(iax) = subplot(n_plots,1,iax);
 ax(iax).FontName = 'times';
@@ -321,15 +328,41 @@ ax(iax).FontSize = fontSize-1;
 hold on
 
 ip = 1;
-p(ip,iax) = plot(Vc_l_opt,100*d_LPPL_opt,'k','Marker','x');
+p(ip,iax) = plot(Vc_l_opt,w_c_opt/2/pi*60,'k','Marker','x');
 ip = ip+1;
 
 xlabel('volume (1000L) ', ...
 'Interpreter','latex','FontSize',fontSize-1,'fontname','Times')
-ylabel('diameter (cm)', ...
+ylabel('speed (rpm)', ...
 'Interpreter','latex','FontSize',fontSize-1,'fontname','Times')
 
-titleString = ['Internal Diameter of the Low-Pressure Pipeline'];
+titleString = ['Charge Pump Shaft Speed'];
+title(titleString,...
+'Interpreter','latex','FontSize',fontSize,'fontname','Times')
+
+xLim = xlim;
+xlim([0 xLim(2)])
+yLim = ylim;
+ylim([0 yLim(2)])
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% distibution of volume
+iax = 6;
+ax(iax) = subplot(n_plots,1,iax);
+ax(iax).FontName = 'times';
+ax(iax).FontSize = fontSize-1;
+
+hold on
+
+ip = 1;
+p(ip,iax) = plot(Vc_l_opt,X_opt,'k','Marker','x');
+ip = ip+1;
+
+xlabel('volume (1000L) ', ...
+'Interpreter','latex','FontSize',fontSize-1,'fontname','Times')
+ylabel('portion', ...
+'Interpreter','latex','FontSize',fontSize-1,'fontname','Times')
+
+titleString = ['Portion of Volume at WEC-driven Pump Inlet'];
 title(titleString,...
 'Interpreter','latex','FontSize',fontSize,'fontname','Times')
 
@@ -383,18 +416,18 @@ ax(iax).FontSize = fontSize-1;
 hold on
 
 ip = 1;
-p(ip,iax) = scatter(Vc_l_mesh,1e-5*studyData.p_loutMean,'xk');
+p(ip,iax) = scatter(Vc_l_mesh,1e-5*studyData(SS).p_loutMean,'xk');
 ip = ip+1;
 
-p(ip,iax) = scatter(Vc_l_mesh,1e-5*studyData.p_loutMax,'xr');
+p(ip,iax) = scatter(Vc_l_mesh,1e-5*studyData(SS).p_loutMax,'xr');
 ip = ip+1;
-p(ip,iax) = scatter(Vc_l_mesh,1e-5*studyData.p_loutMin,'xr');
+p(ip,iax) = scatter(Vc_l_mesh,1e-5*studyData(SS).p_loutMin,'xr');
 p(ip,iax).HandleVisibility='off';
 ip = ip+1;
 
-p(ip,iax) = scatter(Vc_l_mesh,1e-5*(studyData.p_loutMean+studyData.p_loutStd),'.k');
+p(ip,iax) = scatter(Vc_l_mesh,1e-5*(studyData(SS).p_loutMean+studyData(SS).p_loutStd),'.k');
 ip = ip+1;
-p(ip,iax) = scatter(Vc_l_mesh,1e-5*(studyData.p_loutMean-studyData.p_loutStd),'.k');
+p(ip,iax) = scatter(Vc_l_mesh,1e-5*(studyData(SS).p_loutMean-studyData(SS).p_loutStd),'.k');
 p(ip,iax).HandleVisibility='off';
 ip = ip+1;
 
@@ -428,7 +461,7 @@ hold on
 ip = 1;
 p(ip,iax) = plot(Vc_l([1 end]),1e-5*p_cavLimit*[1 1],'r');
 ip = ip+1;
-p(ip,iax) = scatter(Vc_l_mesh,1e-5*studyData.p_wpMin,'xk');
+p(ip,iax) = scatter(Vc_l_mesh,1e-5*studyData(SS).p_wpMin,'xk');
 ip = ip+1;
 
 xlabel('volume (1000L) ', ...
@@ -461,7 +494,7 @@ ax(iax).FontSize = fontSize-1;
 hold on
 
 ip = 1;
-p(ip,iax) = scatter(Vc_l_mesh,1e-3*studyData.P_cElec,'xk');
+p(ip,iax) = scatter(Vc_l_mesh,1e-3*studyData(SS).P_cElec,'xk');
 ip = ip+1;
 
 xlabel('volume (1000L) ', ...
@@ -487,7 +520,7 @@ ax(iax).FontSize = fontSize-1;
 hold on
 
 ip = 1;
-p(ip,iax) = scatter(Vc_l_mesh,100*studyData.L_c,'xk');
+p(ip,iax) = scatter(Vc_l_mesh,100*studyData(SS).L_c,'xk');
 ip = ip+1;
 
 xlabel('volume (1000L) ', ...
@@ -514,7 +547,7 @@ ax(iax).FontSize = fontSize-1;
 hold on
 
 ip = 1;
-p(ip,iax) = scatter(studyVar.Vc_l(:,1),60/2/pi*w_c_min,'xk');
+p(ip,iax) = scatter(studyVar(SS).Vc_l(:,1),60/2/pi*w_c_min,'xk');
 ip = ip+1;
 
 xlabel('volume (1000L) ', ...
