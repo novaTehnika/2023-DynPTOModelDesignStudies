@@ -5,18 +5,26 @@ for j = 1:nfiles
 display(['file ',num2str(j),' of ',num2str(nfiles)])
     if strfind(files(j).name,"data_parPTO_accum")
         load(files(j).name,'-regexp','^(?!out)\w')
+        for iX = 1:nVar3
+            % study variables
+            studyVar(SS).Vc_h(iVar,iX) = Vc_h_mesh(iVar);
+            studyVar(SS).X(iVar,iX) = X(iX);
+            studyVar(SS).d_line(iVar,iX) = d_HPPL_mesh(iVar);
+            studyVar(SS).k_rv(iVar,iX) = k_rv_mesh(iVar);
 
-        q_permMean_array(iVar) = q_permMean;
-        PP_WEC_array(iVar) = PP_WEC;
-        PP_wp_array(iVar) = PP_wp;
-        PP_rv_array(iVar) = PP_rv;
-        PP_hinPRV_array(iVar) = PP_hinPRV;
-        PP_roPRV_array(iVar) = PP_roPRV;
-        dpdt_max_array(iVar) = dpdt_max;
-        dpdt_97_array(iVar) = dpdt_97;
-
+            % metrics
+            studyData(SS).q_permMean_array(iVar,iX) = q_permMean(iX);
+            studyData(SS).PP_WEC_array(iVar,iX) = PP_WEC(iX);
+            studyData(SS).PP_wp_array(iVar,iX) = PP_wp(iX);
+            studyData(SS).PP_rv_array(iVar,iX) = PP_rv(iX);
+            studyData(SS).PP_hinPRV_array(iVar,iX) = PP_hinPRV(iX);
+            studyData(SS).PP_roPRV_array(iVar,iX) = PP_roPRV(iX);
+            studyData(SS).dpdt_max_array(iVar,iX) = dpdt_max(iX);
+            studyData(SS).dpdt_97_array(iVar,iX) = dpdt_97(iX);
+            studyData(SS).P_HPPL(iVar,iX) = P_HPPL(iX);
+            studyData(SS).L_HPPL(iVar,iX) = L_HPPL(iX);
+        end
     end
-
 end
 
 %% Find indices for missing data files
@@ -59,27 +67,22 @@ try
     end    
     
     if 1
-    for j = 1:length(notDone)
-        iVar = notDone(j);
-        q_permMean_array(iVar) = nan;
-        PP_WEC_array(iVar) = nan;
-        PP_wp_array(iVar) = nan;
-        PP_rv_array(iVar) = nan;
-        PP_hinPRV_array(iVar) = nan;
-        PP_roPRV_array(iVar) = nan;
-        dpdt_max_array(iVar) = nan;
-        dpdt_97_array(iVar) = nan;
-    
-        Vtotal_missing(j) = Vtotal_mesh(iVar);
-        X_missing(j) = X_mesh(iVar);
-        kv_missing(j) = kv_mesh(iVar);
+        nanArray = nan*ones(numel(X),1);
+        for j = 1:length(notDone)
+            iVar = notDone(j);
+            studyData(SS).q_permMean_array(iVar,:) = nanArray;
+            studyData(SS).PP_WEC_array(iVar,:) = nanArray;
+            studyData(SS).PP_wp_array(iVar,:) = nanArray;
+            studyData(SS).PP_rv_array(iVar,:) = nanArray;
+            studyData(SS).PP_hinPRV_array(iVar,:) = nanArray;
+            studyData(SS).PP_roPRV_array(iVar,:) = nanArray;
+            studyData(SS).dpdt_max_array(iVar,:) = nanArray;
+            studyData(SS).dpdt_97_array(iVar,:) = nanArray;
         
-    end
+            
+        end
     end
 
-    % Display study variable values with missing data
-    tbl = table(notDone',1e3*Vtotal_missing',X_missing',kv_missing','VariableNames', {'iVar', 'Total Volume (L)','portion at RO inlet', 'kv'});
-    disp(tbl);
 
 catch
     % just move on
@@ -98,14 +101,14 @@ for i = 1:I
         for k = 1:K
             m = J*K*(i-1) + K*(j-1) + k;
 
-            q_permMean_3D(i,j,k) = q_permMean;
-            PP_WEC_3D(i,j,k) = PP_WEC_array(m);
-            PP_wp_3D(i,j,k) = PP_wp_array(m);
-            PP_rv_3D(i,j,k) = PP_rv_array(m);
-            PP_hPRV_3D(i,j,k) = PP_hinPRV_array(m);
-            PP_roPRV_3D(i,j,k) = PP_roPRV_array(m);
-            dpdt_max_3D(i,j,k) = dpdt_max_array(m);
-            dpdt_97_3D(i,j,k) = dpdt_97_array(m);
+            studyData(SS).q_permMean_3D(i,j,k) = q_permMean;
+            studyData(SS).PP_WEC_3D(i,j,k) = PP_WEC_array(m);
+            studyData(SS).PP_wp_3D(i,j,k) = PP_wp_array(m);
+            studyData(SS).PP_rv_3D(i,j,k) = PP_rv_array(m);
+            studyData(SS).PP_hPRV_3D(i,j,k) = PP_hinPRV_array(m);
+            studyData(SS).PP_roPRV_3D(i,j,k) = PP_roPRV_array(m);
+            studyData(SS).dpdt_max_3D(i,j,k) = dpdt_max_array(m);
+            studyData(SS).dpdt_97_3D(i,j,k) = dpdt_97_array(m);
 
             Vtotal_3D(i,j,k) = Vtotal_mesh(m);
             X_3D(i,j,k) = X_mesh(m);

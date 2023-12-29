@@ -5,20 +5,25 @@ for j = 1:nfiles
 display(['file ',num2str(j),' of ',num2str(nfiles)])
     if strfind(files(j).name,"data_parPTO_accum_woRV")
         load(files(j).name,'-regexp','^(?!out)\w')
+        for iX = 1:nVar3
+            % study variables
+            studyVar(SS).Vc_h(iVar,iX) = Vc_h_mesh(iVar);
+            studyVar(SS).X(iVar,iX) = X(iX);
+            studyVar(SS).d_line(iVar,iX) = d_HPPL_mesh(iVar);
 
-        studyData.q_permMean(iVar) = q_permMean;
-        studyData.PP_WEC(iVar) = PP_WEC;
-        studyData.PP_wp(iVar) = PP_wp;
-        studyData.PP_rv(iVar) = PP_rv;
-        studyData.PP_hinPRV(iVar) = PP_hinPRV;
-        studyData.PP_roPRV(iVar) = PP_roPRV;
-        studyData.dpdt_max(iVar) = dpdt_max;
-        studyData.dpdt_97(iVar) = dpdt_97;
-        studyData.P_HPPL(iVar) = P_HPPL;
-        studyData.L_HPPL(iVar) = L_HPPL;
-
+            % metrics
+            studyData(SS).q_permMean(iVar,iX) = q_permMean(iX);
+            studyData(SS).PP_WEC(iVar,iX) = PP_WEC(iX);
+            studyData(SS).PP_wp(iVar,iX) = PP_wp(iX);
+            studyData(SS).PP_rv(iVar,iX) = PP_rv(iX);
+            studyData(SS).PP_hinPRV(iVar,iX) = PP_hinPRV(iX);
+            studyData(SS).PP_roPRV(iVar,iX) = PP_roPRV(iX);
+            studyData(SS).dpdt_max(iVar,iX) = dpdt_max(iX);
+            studyData(SS).dpdt_97(iVar,iX) = dpdt_97(iX);
+            studyData(SS).P_HPPL(iVar,iX) = P_HPPL(iX);
+            studyData(SS).L_HPPL(iVar,iX) = L_HPPL(iX);
+        end
     end
-
 end
 
 %% Find indices for missing data files
@@ -34,9 +39,7 @@ display(['file ',num2str(j),' of ',num2str(nfiles)])
         [r,c,val] = find(notDone==iVar);
         notDone = [notDone(1:c-1), notDone(c+1:end)];
         Done = [Done, iVar];
-
     end
-
 end
 
 try 
@@ -54,31 +57,164 @@ try
         jobArrayStr = append(jobArrayStr,[',',num2str(notDone(j))]);
     end
     
-    
     if 1
-    for j = 1:length(notDone)
-        iVar = notDone(j);
-        studyData.q_permMean(iVar) = nan;
-        studyData.PP_WEC(iVar) = nan;
-        studyData.PP_wp(iVar) = nan;
-        studyData.PP_rv(iVar) = nan;
-        studyData.PP_hinPRV(iVar) = nan;
-        studyData.PP_roPRV(iVar) = nan;
-        studyData.dpdt_max(iVar) = nan;
-        studyData.dpdt_97(iVar) = nan;
-        studyData.P_HPPL(iVar) = nan;
-        studyData.L_HPPL(iVar) = nan;
-
-        Vc_h_missing(j) = Vc_h_mesh(iVar);
-        X_missing(j) = X_mesh(iVar);
-        d_HPPL_missing(j) = d_HPPL_mesh(iVar);
-
-    end
+        nanArray = nan*ones(numel(X),1);
+        for j = 1:length(notDone)
+            iVar = notDone(j);
+            studyData.q_permMean(iVar,:) = nanArray;
+            studyData.PP_WEC(iVar,:) = nanArray;
+            studyData.PP_wp(iVar,:) = nanArray;
+            studyData.PP_rv(iVar,:) = nanArray;
+            studyData.PP_hinPRV(iVar,:) = nanArray;
+            studyData.PP_roPRV(iVar,:) = nanArray;
+            studyData.dpdt_max(iVar,:) = nanArray;
+            studyData.dpdt_97(iVar,:) = nanArray;
+            studyData.P_HPPL(iVar,:) = nanArray;
+            studyData.L_HPPL(iVar,:) = nanArray;
+        end
     end
 
 catch
     % just move on
 end
+
+%% Find optimal distribution of accumulator volume for each total 
+SS = 2;
+
+V_metric = studyVar(SS).Vc_h(:);
+PP_metric = 100*(studyData(SS).PP_rv(:) ...
+                + studyData(SS).PP_roPRV(:) ...
+                + studyData(SS).PP_hinPRV(:) ...
+                + studyData(SS).P_HPPL(:)) ...
+                ./studyData(SS).PP_WEC(:);
+dpdt_ub = 0.7e5; % [Pa/s]
+maxOr97 = 1;
+switch maxOr97
+    case 1
+        dpdt_metric = studyData(SS).dpdt_max(:);
+        varLegLabel = 'max';
+        varLabel = 'Maximum';
+    case 2
+        dpdt_metric = studyData(SS).dpdt_97(:);
+        varLegLabel = '97';
+        varLabel = '97th Percentile';
+end
+
+
+% Find individuals meeting dpdt bounds
+meetsConstraints = find(dpdt_metric <= dpdt_ub);
+
+ % find non-dominated individuals from set meeting dpdt criterion
+non_dominated = paretoFront2D(V_metric(meetsConstraints),'min', ...
+                              PP_metric(meetsConstraints),'min');
+[~, ii_sort] = sort(V_metric(meetsConstraints(non_dominated)));
+ii = meetsConstraints(non_dominated(ii_sort));
+V_metric_opt = V_metric(ii);
+PP_metric_opt = PP_metric(ii);
+X_opt = studyVar(SS).X(ii);
+d_HPPL_opt = studyVar(SS).d_line(ii);
+
+clearvars meetsConstraints non_dominated ii ii_sort
+
+%% Plot Pereto optimal results
+% Plot power loss versus total accumulator volume for pareto optimal
+% designs meeting threshhold on rate of pressure change
+
+
+
+black = [0 0 0];
+maroon = [122 0 25]/256;
+gold = [255 204 51]/256;
+blue = [0 75 135]/256;
+orange = [226 100 55]/256;
+green = [63 150 87]/256;
+color = [maroon; gold; blue; orange; green];
+markerType = '.ox*^s';
+
+bottomEdge = 1;
+leftEdge = 3;
+width = 7.5; % one column: 3+9/16, two column: 7.5
+height = 6;
+fontSize = 9;
+lineWidth = 1;
+
+clearvars leg
+
+fig = figure;
+fig.Units = 'inches';
+fig.Position = [leftEdge bottomEdge width height ];
+
+n_plots = 3;
+
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% metrics
+iax = 1;
+ax(iax) = subplot(n_plots,1,iax);
+ax(iax).FontName = 'times';
+ax(iax).FontSize = fontSize-1;
+
+p(iax) = plot(V_metric_opt,PP_metric_opt);
+
+
+
+xlabel('volume (1000L) ', ...
+'Interpreter','latex','FontSize',fontSize-1,'fontname','Times')
+ylabel('power loss (x100\%)', ...
+'Interpreter','latex','FontSize',fontSize-1,'fontname','Times')
+
+switch par.rvConfig.active
+    case 0
+        rvStr = 'Passive Ripple Control';
+    case 1
+        rvStr = 'Active Ripple Control';
+end
+
+titleString = ['Power Loss Normalized to Mean Power Capture With ',rvStr,':',newline,...
+            varLabel,' Rate of Pressure Change Compared to Limit',newline,...
+            'Sea State ',num2str(SS)];
+title(titleString,...
+'Interpreter','latex','FontSize',fontSize,'fontname','Times')
+
+xLim = xlim;
+xlim([0 xLim(2)])
+yLim = ylim;
+ylim([0 yLim(2)])
+
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% distribution of accumulators versus total volume
+iax = 2;
+ax(iax) = subplot(n_plots,1,iax);
+ax(iax).FontName = 'times';
+ax(iax).FontSize = fontSize-1;
+
+p(iax) = plot(V_metric_opt,100*X_opt);
+
+xlabel('volume (1000L) ', ...
+'Interpreter','latex','FontSize',fontSize-1,'fontname','Times')
+ylabel('portion of volume at RO inlet (x100\%)', ...
+'Interpreter','latex','FontSize',fontSize-1,'fontname','Times')
+xLim = xlim;
+xlim([0 xLim(2)])
+yLim = ylim;
+ylim([0 yLim(2)])
+
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% pipeline diam. versus total volume
+iax = 3;
+ax(iax) = subplot(n_plots,1,iax);
+ax(iax).FontName = 'times';
+ax(iax).FontSize = fontSize-1;
+
+p(iax) = plot(V_metric_opt,100*d_HPPL_opt);
+
+xlabel('volume (1000L) ', ...
+'Interpreter','latex','FontSize',fontSize-1,'fontname','Times')
+ylabel('pipe diameter (cm)', ...
+'Interpreter','latex','FontSize',fontSize-1,'fontname','Times')
+xLim = xlim;
+xlim([0 xLim(2)])
+yLim = ylim;
+ylim([0 yLim(2)])
 
 
 %% Transform data to 3D variable mesh
@@ -371,186 +507,3 @@ xlim([0 xLim(2)])
 yLim = ylim;
 ylim([0 yLim(2)])
 % ylim([0 1e-3*1.5*par.control.dpdt_ROmax])
-
-
-%% Plot power loss versus total accumulator volume for pareto optimal
-% designs meeting threshhold on rate of pressure change
-
-V_metric = Vc_h_mesh';
-PP_metric = 100*(studyData.PP_rv ...
-                + studyData.PP_roPRV ...
-                + studyData.PP_hinPRV ...
-                + studyData.P_HPPL) ...
-                /PP_WEC_array;
-bounds = [1.001 1 0.90 0.75 0.5 0];
-N = numel(bounds)-1; % Number of bins with bounds
-dpdt_ub = par.control.dpdt_ROmax*bounds;
-maxOr97 = 1;
-switch maxOr97
-    case 1
-        dpdt_metric = dpdt_max_array;
-        varLegLabel = 'max';
-        varLabel = 'Maximum';
-    case 2
-        dpdt_metric = dpdt_97_array;
-        varLegLabel = '97';
-        varLabel = '97th Percentile';
-end
-
-
-
-iDomStart = ones(1,N+1);
-iDom = [];
-% Loop through bounds
-for k = 1:N
-    % Find individuals meeting dpdt bounds
-    ub = dpdt_ub(k);
-    lb = dpdt_ub(k+1);
-    [~,meetsConstraints] = find(dpdt_metric <= ub);
-
-     % find non-dominated individuals from set meeting dpdt criterion
-    non_dominated = paretoFront2D(V_metric(meetsConstraints),'min', ...
-                                  PP_metric(meetsConstraints),'min');
-    [~, ii_sort] = sort(V_metric_mesh(meetsConstraints(non_dominated)));
-    ii = meetsConstraints(non_dominated(ii_sort));
-    V_metric_woRV(k) = V_metric_mesh(ii);
-    PP_metric_woRV(k) = PP_metric(ii);
-    X_woRV(k) = X_mesh(ii);
-    d_HPPL_woRV(k) = d_HPPL_mesh(ii);
-
-    Ndom = numel(ii);
-
-    iDomStart(k+1) = iDomStart(k) + Ndom;
-    iDom = [iDom ii];
-end
-iDomStart(k+1) = numel(iDom)+1;
-clearvars meetsConstraints non_dominated ii ii_sort
-
-black = [0 0 0];
-maroon = [122 0 25]/256;
-gold = [255 204 51]/256;
-blue = [0 75 135]/256;
-orange = [226 100 55]/256;
-green = [63 150 87]/256;
-color = [maroon; gold; blue; orange; green];
-markerType = '.ox*^s';
-
-bottomEdge = 1;
-leftEdge = 3;
-width = 7.5; % one column: 3+9/16, two column: 7.5
-height = 6;
-fontSize = 9;
-lineWidth = 1;
-
-clearvars leg
-
-fig = figure;
-fig.Units = 'inches';
-fig.Position = [leftEdge bottomEdge width height ];
-
-n_plots = 3;
-
-% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-iax = 1;
-ax(iax) = subplot(n_plots,1,iax);
-ax(iax).FontName = 'times';
-ax(iax).FontSize = fontSize-1;
-
-
-iLeg = 0;
-for i = 1:N
-    iVar = iDom(iDomStart(i):iDomStart(i+1)-1);
-    p(iax,i) = plot(V_metric(iVar),PP_metric(iVar));
-    p(iax,i).Color = [color(i,:)];
-    p(iax,i).Marker = markerType(i);
-    p(iax,i).MarkerSize = 5;
-    p(iax,i).LineWidth = 1.5;
-    hold on
-
-    iLeg = iLeg+1;
-    legLabels(iLeg) = convertCharsToStrings( ...
-        ['dp/dt|_{',varLegLabel,'} <= ',num2str(1e-3*dpdt_ub(i),3),' kPa/s']);
-end
-
-xlabel('volume (1000L) ', ...
-'Interpreter','latex','FontSize',fontSize-1,'fontname','Times')
-ylabel('power loss (x100\%)', ...
-'Interpreter','latex','FontSize',fontSize-1,'fontname','Times')
-
-switch par.rvConfig.active
-    case 0
-        rvStr = 'Passive Ripple Control';
-    case 1
-        rvStr = 'Active Ripple Control';
-end
-
-titleString = ['Power Loss Normalized to Mean Power Capture With ',rvStr,':',newline,...
-            varLabel,' Rate of Pressure Change Compared to Limit',newline,...
-            'Sea State ',num2str(SS)];
-title(titleString,...
-'Interpreter','latex','FontSize',fontSize,'fontname','Times')
-
-leg = legend(legLabels);
-leg.FontSize = fontSize-1;
-leg.FontName = 'Times';
-rect = [0.5, -0.2, 0.25, 0.15];
-% set(leg, 'Position', rect)
-set(leg, 'Location', 'best')
-xLim = xlim;
-xlim([0 xLim(2)])
-yLim = ylim;
-ylim([0 yLim(2)])
-
-% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% distribution of accumulators versus total volume
-iax = 2;
-ax(iax) = subplot(n_plots,1,iax);
-ax(iax).FontName = 'times';
-ax(iax).FontSize = fontSize-1;
-
-for i = 1:N
-    iVar = iDom(iDomStart(i):iDomStart(i+1)-1);
-    p(iax,i) = plot(V_metric(iVar),100*X_mesh(iVar));
-    p(iax,i).Color = [color(i,:)];
-    p(iax,i).Marker = markerType(i);
-    p(iax,i).MarkerSize = 5;
-    p(iax,i).LineWidth = 1.5;
-    hold on
-
-end
-
-xlabel('volume (1000L) ', ...
-'Interpreter','latex','FontSize',fontSize-1,'fontname','Times')
-ylabel('portion of volume at RO inlet (x100\%)', ...
-'Interpreter','latex','FontSize',fontSize-1,'fontname','Times')
-xLim = xlim;
-xlim([0 xLim(2)])
-yLim = ylim;
-ylim([0 yLim(2)])
-
-% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% pipeline diam. versus total volume
-iax = 3;
-ax(iax) = subplot(n_plots,1,iax);
-ax(iax).FontName = 'times';
-ax(iax).FontSize = fontSize-1;
-
-for i = 1:N
-    iVar = iDom(iDomStart(i):iDomStart(i+1)-1);
-    p(iax,i) = plot(V_metric(iVar),100*d_HPPL_mesh(iVar));
-    p(iax,i).Color = [color(i,:)];
-    p(iax,i).Marker = markerType(i);
-    p(iax,i).MarkerSize = 5;
-    p(iax,i).LineWidth = 1.5;
-    hold on
-
-end
-
-xlabel('volume (1000L) ', ...
-'Interpreter','latex','FontSize',fontSize-1,'fontname','Times')
-ylabel('valve coefficient (L/s/kPa^{1/2})', ...
-'Interpreter','latex','FontSize',fontSize-1,'fontname','Times')
-xLim = xlim;
-xlim([0 xLim(2)])
-yLim = ylim;
-ylim([0 yLim(2)])
