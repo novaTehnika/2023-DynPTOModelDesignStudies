@@ -135,16 +135,16 @@ par.rvConfig.active = (0)*par.rvConfig.included; % RO inlet valve is 1 - active,
 
 %% %%%%%%%%%%%%   Study Variables  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % total accumulator volume
-nVar1 = 5;%25;
-Vc_h = 1e-3*logspace(log10(2e3),log10(30e3),nVar1);% [L->m^3] total accumulator volume
+nVar1 = 10;%25;
+Vc_h = 1e-3*logspace(log10(2e3),log10(50e3),nVar1);% [L->m^3] total accumulator volume
 
 % Diameter of high-pressure pipeline
-nVar2 = 5;%20;
-d_HPPL = logspace(log10(0.11),log10(0.18),nVar2); % [m]
+nVar2 = 10;%20;
+d_HPPL = logspace(log10(0.05),log10(0.18),nVar2); % [m]
 
 % proportion of accumulator volume at RO inlet
 nVar3 = 14; % make even
-X = 1 - logspace(log10(1-0.25),log10(1-0.5),nVar3/2);
+X = 1 - logspace(log10(1-0.05),log10(1-0.5),nVar3/2);
 X = [X logspace(log10(X(end)+diff(X([end-1 end]))),log10(0.75),nVar3/2)];
 
 
