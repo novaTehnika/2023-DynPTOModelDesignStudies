@@ -163,7 +163,7 @@ end
                         y_star(par.iy.p_lin),y_star(par.iy.p_lout),par,1,1);
         [~ ,~, ~, pLsoln_HP(it)] = ...
                         pipelineNPi([],y_star(par.iy.HPPL), ...
-                        y_star(par.iy.p_hin),y_star(par.iy.p_hout),par,1,1);
+                        y_star(par.iy.p_hin),y_star(par.iy.p_hout),par,2,1);
     end
     
     % State derivatives
