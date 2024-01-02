@@ -1,4 +1,4 @@
-function out = sim_parPTO(y0,par)
+function [out, exitCode] = sim_parPTO(y0,par)
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % sim_parfPTO.m function m-file
 % AUTHORS:
@@ -56,7 +56,7 @@ function out = sim_parPTO(y0,par)
 %   along with this program. If not, see <https://www.gnu.org/licenses/>.
 %
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+exitCode = 1;
 
 %% %%%%%%%%%%%%   SOLUTION   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% Solve for states of the dynamic system
@@ -69,10 +69,24 @@ switch par.solver
      % Run solver
         tspan = [par.tstart-par.Tramp par.tend];   % time interval
         ticODE = tic;
-        [t, y] = ode1(@(t,y) sys(t,y,par), ...
+        [t, y, exitCode] = ode1(@(t,y) sys(t,y,par), ...
                                   tspan(1),dt,tspan(2),y0,downSampleRate);
         toc(ticODE)
 
+        switch exitCode
+            case 1 % normal operation, no error in solver
+                % check for negative pressure values
+                if any(y(:,[par.iy.p_a, par.iy.p_b, ...
+                        par.iy.p_lin, par.iy.p_lout]) < 0,'all')
+                    warning('Negative pressures detected.')
+                    exitCode = 3;
+                    out = [];
+                    return
+                end
+            case 2 % error, states resulted in imaginary value for dydt
+                out = [];
+                return
+        end
     case 'variable time'
  % Solver options
     options = odeset('RelTol',1e-4,...

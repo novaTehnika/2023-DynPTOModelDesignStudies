@@ -1,4 +1,4 @@
-function [tout, yout] = ode1(F,t0,dt,tfinal,y0,downSampleRate)
+function [tout, yout, exitCode] = ode1(F,t0,dt,tfinal,y0,downSampleRate)
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % ode1.m function m-file
 % AUTHORS: 
@@ -35,7 +35,7 @@ function [tout, yout] = ode1(F,t0,dt,tfinal,y0,downSampleRate)
 %   along with this program. If not, see <https://www.gnu.org/licenses/>.
 %
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    
+    exitCode = 0;
     % parse optional options
     if exist('downSampleRate','var')
         if mod(downSampleRate,1)
@@ -62,6 +62,11 @@ function [tout, yout] = ode1(F,t0,dt,tfinal,y0,downSampleRate)
     for it = 2:nt
         dydt = F(t,y);      % Calculate the state derivitive vector at 
                             % previous time
+        if imag(dydt)
+            exitCode = 2;
+            warning('error: exit code 2 states resulted in imaginary value for dydt')
+            return
+        end
 
         t = t + dt;         % Increment time from previous time
         y = y + dydt.*dt;   % Perform first order numerical integration for
