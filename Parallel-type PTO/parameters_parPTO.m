@@ -139,7 +139,8 @@ function par = parameters_parPTO(par,filenameCoeff,filenameRadSS)
     par.Vc_ro = (5000)*1e-3; % [(L) -> m^3] gas volume at charge pressure
     par.pc_ro = 4e6; % [Pa] charge pressure
 
-    % Pipelines    
+    % Pipelines
+    par.plConfig.included = 1; % pipelines are 1 - present, 0 - absent
      % LP pipeline
     LineID = 1;
     par.L_line(LineID) = 500; % [m] length of LP pipeline

@@ -120,31 +120,32 @@ par.wave.rngSeedPhase = 3; % seed for the random number generator
 par = parameters_parPTO(par,...
     'nemohResults_vantHoff2009_20180802.mat','vantHoffTFCoeff.mat');
 
-% Define initial conditions
-par.iy = stateIndex_parPTO(par); % load state indices % load state indices, provides 'iy_...'
-y0 = initialConditionDefault_parPTO(par); % default ICs, provides 'y0'
-
 %% Special modifications to base parameters
 % par.Sro = 3700; % [m^3]
 % par.D_WEC = 0.23;         % [m^3/rad] flap pump displacement
+
+% Operating parameters
 % p_ro_nom = 1e6*[4.0000 4.9435 8.0000 5.2661 8.0000 7.1052]; % [Pa]
 par.control.p_ro_nom = 6.11e6; % [Pa]
 par.duty_sv = 0.0;
+par.w_c = (2500)*2*pi/60; % [(rpm) -> rad/s] Charge pump speed
 
 % Configuration
 par.ERUconfig.present = 1;
 
 par.rvConfig.included = 0; % RO inlet valve is 1 - present, 0 - absent
 par.rvConfig.active = (0)*par.rvConfig.included; % RO inlet valve is 1 - active, 0 - passive
-% dp_rated = 1e5; % [Pa] 
-% q_rated = (100)*60/1e3; % [(lpm) -> m^3/s]
-% par.kv_rv = q_rated/dp_rated;
 
-par.w_c = (2500)*2*pi/60; % [(rpm) -> rad/s]
-
+par.plConfig.included = 0;
 
 %% %%%%%%%%%%%%   COLLECT DATA  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Define state indices
+par.iy = stateIndex_parPTO(par);
 
+% Define initial conditions
+y0 = initialConditionDefault_parPTO(par); % default ICs, provides 'y0'
+
+% Simulation
 ticSIM = tic;
 out = sim_parPTO(y0,par);
 toc(ticSIM)
