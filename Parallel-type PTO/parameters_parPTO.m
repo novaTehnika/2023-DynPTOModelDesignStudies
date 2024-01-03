@@ -144,14 +144,14 @@ function par = parameters_parPTO(par,filenameCoeff,filenameRadSS)
     LineID = 1;
     par.L_line(LineID) = 500; % [m] length of LP pipeline
     par.d_line(LineID) = 0.2; % [m] diameter of LP pipeline
-    par.A_line(LineID) = pi/4*par.d_line(LineID); % crosssectional flow area
+    par.A_line(LineID) = pi/4*par.d_line(LineID)^2; % crosssectional flow area
     par.n_seg(LineID) = 3; % minimum of 2
     par.I(LineID) = par.rho*(par.L_line(LineID)/par.n_seg(LineID))/par.A_line(LineID);
      % HP pipeline
     LineID = 2;
     par.L_line(LineID) = 500; % [m] length of HP pipeline
     par.d_line(LineID) = 0.1; % [m] diameter of HP pipeline
-    par.A_line(LineID) = pi/4*par.d_line(2); % crosssectional flow area
+    par.A_line(LineID) = pi/4*par.d_line(2)^2; % crosssectional flow area
     par.n_seg(LineID) = 3; % minimum of 2
     par.I(LineID) = par.rho*(par.L_line(LineID)/par.n_seg(LineID))/par.A_line(LineID);
 
