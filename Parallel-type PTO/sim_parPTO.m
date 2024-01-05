@@ -100,19 +100,18 @@ switch par.solver
 end
 
 % handle errors
-switch exitCode
-    case 1 % normal operation, no error in solver
-        % check for negative pressure values
-        if any(y(:,[par.iy.p_a, par.iy.p_b, ...
-                par.iy.p_lin, par.iy.p_lout]) < 0,'all')
-            warning('Negative pressures detected.')
-            exitCode = 4;
-            out = [];
-            return
-        end
-    case {2 3} % error, states resulted in imaginary value or NaN for dydt
+if exitCode == 1 % normal operation, no error in solver
+    % check for negative pressure values
+    if any(y(:,[par.iy.p_a, par.iy.p_b, ...
+            par.iy.p_lin, par.iy.p_lout]) < 0,'all')
+        warning('Negative pressures detected.')
+        exitCode = 4;
         out = [];
         return
+    end
+else % error, return empty
+    out = [];
+    return
 end
 
 %% %%%%%%%%%%%%   POST-PROCESS   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
