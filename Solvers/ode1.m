@@ -62,9 +62,15 @@ function [tout, yout, exitCode] = ode1(F,t0,dt,tfinal,y0,downSampleRate)
     for it = 2:nt
         dydt = F(t,y);      % Calculate the state derivitive vector at 
                             % previous time
-        if imag(dydt)
+
+        % handle errors
+        if any(isnan(dydt),'all')
             exitCode = 2;
-            warning('error: (exit code 2) states resulted in imaginary value for dydt')
+            warning('error: (exit code 2) states resulted in NaN for dydt')
+            return
+        elseif any(imag(dydt),'all')
+            exitCode = 3;
+            warning('error: (exit code 3) states resulted in imaginary value for dydt')
             return
         end
 

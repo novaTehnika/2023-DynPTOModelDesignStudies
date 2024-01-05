@@ -185,52 +185,52 @@ parfor iw_c = 1:nVar4
     toc(ticSIM)
 
     % postprocess simulation data
-    switch exitCode
-        case 1 % normal operation, no error
-             % Mean pressure at WEC-driven pump inlet
-            p_loutMean(iw_c) = mean(out.p_lout);
-             % Variation in pressure at WEC-driven pump inlet
-            p_loutMax(iw_c) = max(out.p_lout);
-            p_loutMin(iw_c) = min(out.p_lout);
-            p_loutVar(iw_c) = var(out.p_lout);
-            p_loutStd(iw_c) = std(out.p_lout);
-             % Minimum pressure in WEC-driven pump chambers
-            p_wpMin(iw_c) = min(min(out.p_a),min(out.p_b));
+    if exitCode == 1 % normal operation, no error
+        % Mean pressure at WEC-driven pump inlet
+        p_loutMean(iw_c) = mean(out.p_lout);
+        % Variation in pressure at WEC-driven pump inlet
+        p_loutMax(iw_c) = max(out.p_lout);
+        p_loutMin(iw_c) = min(out.p_lout);
+        p_loutVar(iw_c) = var(out.p_lout);
+        p_loutStd(iw_c) = std(out.p_lout);
+        % Minimum pressure in WEC-driven pump chambers
+        p_wpMin(iw_c) = min(min(out.p_a),min(out.p_b));
 
-             % Electric power consumption of charge pump
-            P_cElec(iw_c) = mean(out.power.P_cElec);
-            P_cElec_norm(iw_c) = P_cElec(iw_c)/mean(out.power.P_WEC);
-             % Power losses from charge pump
-            P_cLoss(iw_c) = mean(out.power.P_cLoss);
-            L_c(iw_c) = P_cLoss(iw_c)/mean(out.power.P_WEC);
+        % Electric power consumption of charge pump
+        P_cElec(iw_c) = mean(out.power.P_cElec);
+        P_cElec_norm(iw_c) = P_cElec(iw_c)/mean(out.power.P_WEC);
+        % Power losses from charge pump
+        P_cLoss(iw_c) = mean(out.power.P_cLoss);
+        L_c(iw_c) = P_cLoss(iw_c)/mean(out.power.P_WEC);
 
-             % power loss from pipeline
-            P_LPPL(iw_c) = mean(out.power.P_LPPL);
-            L_LPPL(iw_c) = P_LPPL(iw_c)/mean(out.power.P_WEC);
+        % power loss from pipeline
+        P_LPPL(iw_c) = mean(out.power.P_LPPL);
+        L_LPPL(iw_c) = P_LPPL(iw_c)/mean(out.power.P_WEC);
 
-        case {2 3}
-            % 2 - error, states resulted in imaginary value for dydt
-            % 3 - Negative pressures detected
+    else
+        % 2 - error, states resulted in NaN for dydt
+        % 3 - error, states resulted in imaginary value for dydt
+        % 4 - Negative pressures detected
 
-            p_loutMean(iw_c) = nan;
-             % Variation in pressure at WEC-driven pump inlet
-            p_loutMax(iw_c) = nan;
-            p_loutMin(iw_c) = nan;
-            p_loutVar(iw_c) = nan;
-            p_loutStd(iw_c) = nan;
-             % Minimum pressure in WEC-driven pump chambers
-            p_wpMin(iw_c) = nan;
+        p_loutMean(iw_c) = nan;
+         % Variation in pressure at WEC-driven pump inlet
+        p_loutMax(iw_c) = nan;
+        p_loutMin(iw_c) = nan;
+        p_loutVar(iw_c) = nan;
+        p_loutStd(iw_c) = nan;
+         % Minimum pressure in WEC-driven pump chambers
+        p_wpMin(iw_c) = nan;
 
-             % Electric power consumption of charge pump
-            P_cElec(iw_c) = nan;
-            P_cElec_norm(iw_c) = nan;
-             % Power losses from charge pump
-            P_cLoss(iw_c) = nan;
-            L_c(iw_c) = nan;
+         % Electric power consumption of charge pump
+        P_cElec(iw_c) = nan;
+        P_cElec_norm(iw_c) = nan;
+         % Power losses from charge pump
+        P_cLoss(iw_c) = nan;
+        L_c(iw_c) = nan;
 
-             % power loss from pipeline
-            P_LPPL(iw_c) = nan;
-            L_LPPL(iw_c) = nan;
+         % power loss from pipeline
+        P_LPPL(iw_c) = nan;
+        L_LPPL(iw_c) = nan;
 
     end
 

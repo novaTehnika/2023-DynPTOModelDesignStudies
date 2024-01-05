@@ -106,11 +106,11 @@ switch exitCode
         if any(y(:,[par.iy.p_a, par.iy.p_b, ...
                 par.iy.p_lin, par.iy.p_lout]) < 0,'all')
             warning('Negative pressures detected.')
-            exitCode = 3;
+            exitCode = 4;
             out = [];
             return
         end
-    case 2 % error, states resulted in imaginary value for dydt
+    case {2 3} % error, states resulted in imaginary value or NaN for dydt
         out = [];
         return
 end
