@@ -73,20 +73,6 @@ switch par.solver
                                   tspan(1),dt,tspan(2),y0,downSampleRate);
         toc(ticODE)
 
-        switch exitCode
-            case 1 % normal operation, no error in solver
-                % check for negative pressure values
-                if any(y(:,[par.iy.p_a, par.iy.p_b, ...
-                        par.iy.p_lin, par.iy.p_lout]) < 0,'all')
-                    warning('Negative pressures detected.')
-                    exitCode = 3;
-                    out = [];
-                    return
-                end
-            case 2 % error, states resulted in imaginary value for dydt
-                out = [];
-                return
-        end
     case 'variable time'
  % Solver options
     options = odeset('RelTol',1e-4,...
@@ -111,6 +97,22 @@ switch par.solver
     [t, y] = ode15s(@(t,y) sys(t,y,par), ...
                                 tspan,y(end-1,:)',options);
     toc(ticODE)
+end
+
+% handle errors
+switch exitCode
+    case 1 % normal operation, no error in solver
+        % check for negative pressure values
+        if any(y(:,[par.iy.p_a, par.iy.p_b, ...
+                par.iy.p_lin, par.iy.p_lout]) < 0,'all')
+            warning('Negative pressures detected.')
+            exitCode = 3;
+            out = [];
+            return
+        end
+    case 2 % error, states resulted in imaginary value for dydt
+        out = [];
+        return
 end
 
 %% %%%%%%%%%%%%   POST-PROCESS   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -208,7 +208,7 @@ parfor iw_c = 1:nVar4
             P_LPPL(iw_c) = mean(out.power.P_LPPL);
             L_LPPL(iw_c) = P_LPPL(iw_c)/mean(out.power.P_WEC);
 
-        case [2,3]
+        case {2 3}
             % 2 - error, states resulted in imaginary value for dydt
             % 3 - Negative pressures detected
 
