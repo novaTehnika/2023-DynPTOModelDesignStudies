@@ -58,7 +58,7 @@ function par = parameters_seriesPTO(par,filenameCoeff,filenameRadSS)
     % WEC-pump
     par.theta_max = pi/2; % [rad] maximum stroke (plus and minus) from upright poistion
      % pumping chamber
-    par.D_WEC = 0.23;         % [m^3/rad] flap pump displacement
+    par.D_WEC = 0.163;         % [m^3/rad] flap pump displacement
     V_wecPumpTotal = 2*par.theta_max*par.D_WEC;
     par.V_wecDead = V_wecPumpTotal/2*(0.2); % [m^3] dead volume attached to each port (a and b) of the WEC-driven pump
     par.eta_v_WEC = 1;
@@ -100,7 +100,7 @@ function par = parameters_seriesPTO(par,filenameCoeff,filenameRadSS)
     
     % power control unit
       % pump/motor
-    par.D_pm = (1000)*1e-6/(2*pi); % [(cc/rev) -> m^3/rad]  Motor displacement
+    par.D_pm = (2000)*1e-6/(2*pi); % [(cc/rev) -> m^3/rad]  Motor displacement
     par.w_pm_max = (1750)/60*2*pi; % [(rpm) -> rad/s] maximum speed of motor
     par.w_pm_min = (1)/60*2*pi; % [(rpm) -> rad/s] minimum speed of motor
 

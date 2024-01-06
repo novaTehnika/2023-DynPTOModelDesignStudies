@@ -125,8 +125,8 @@ par = parameters_seriesPTO(par,...
 % par.D_WEC = 0.23;         % [m^3/rad] flap pump displacement
 
 % Operating parameters
-% p_ro_nom = 1e6*[x x x x x x]; % [Pa]
-par.control.p_hout_nom = 6.11e6; % [Pa]
+% p_ro_nom = 1e6*[999   7.4049   10.3516    7.6581   10.3516    9.3226]; % [Pa]
+par.control.p_hout_nom = 7.4049; % [Pa]
 par.duty_sv = 0.0;
 par.w_c = (2500)*2*pi/60; % [(rpm) -> rad/s] Charge pump speed
 
