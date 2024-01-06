@@ -44,7 +44,7 @@ y0(par.iy.p_lin,1) = par.control.p_l_nom; % [Pa]
 y0(par.iy.p_lout,1) = par.control.p_l_nom; % [Pa]
 y0(par.iy.p_hin,1) = par.control.p_h_nom; % [Pa]
 y0(par.iy.p_hout,1) = par.control.p_h_nom; % [Pa]
-y0(par.iy.p_ro,1) = par.control.p_h_nom; % [Pa]
+y0(par.iy.p_ro,1) = par.control.p_ro_nom; % [Pa]
 
 y0(par.iy.p_filt,1) = par.control.p_h_nom;
 y0(par.iy.errInt_p_filt,1) = 0;

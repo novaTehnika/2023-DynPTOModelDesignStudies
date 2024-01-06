@@ -157,8 +157,8 @@ function par = parameters_seriesPTO(par,filenameCoeff,filenameRadSS)
     par.I(LineID) = par.rho*(par.L_line(LineID)/par.n_seg(LineID))/par.A_line(LineID);
 
     % Contoller Parameters
-    par.control.p_h_nom = 6e6; % [Pa]
-    par.control.p_ro_nom = par.control.p_h_nom; % [Pa] (not actually used as control ref.)
+    par.control.p_h_nom = 10e6; % [Pa]
+    par.control.p_ro_nom = 6e6; % [Pa] (not actually used as control ref.)
     par.control.p_l_nom = 0.5e6; % [Pa] (not actually used as control ref.)
     par.control.p_ro_max = 8.3e6; % [Pa]
     par.control.p_ro_min = max(3e6,par.pc_ro); % [Pa]

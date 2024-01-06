@@ -54,7 +54,7 @@ function [dydt, nonState, control] = sys_seriesPTO(t,y,par)
 
 %% PI control of p_hout using w_pm
  % Error
-err_p = y(par.iy.p_filt) - par.control.p_ro_nom;
+err_p = y(par.iy.p_filt) - par.control.p_h_nom;
  % Feedforward
 w_ff = 0*par.control.w_pm_ctrl.min;
  % Control signal
@@ -81,8 +81,8 @@ control.w_pm_dpdtMax = (control.qpm_dpdtMax/par.D_pm + a)/b;
 nomAboveMax = w_pm_nom > control.w_pm_dpdtMax;
 nomBelowMin = w_pm_nom < control.w_pm_dpdtMin;
 w_pm_nom = w_pm_nom ...
-          + nomAboveMax*(par.control.w_pm_ctrl.max - w_pm_nom) ...
-          + nomBelowMin*(par.control.w_pm_ctrl.min - w_pm_nom);
+          + nomAboveMax*(control.w_pm_dpdtMax - w_pm_nom) ...
+          + nomBelowMin*(control.w_pm_dpdtMin - w_pm_nom);
 
    % enforce limits on speed
 nomAboveMax = w_pm_nom > par.control.w_pm_ctrl.max;
@@ -94,7 +94,7 @@ control.w_pm = w_pm_nom ...
 %% deriviatives for filtered signal and error integrals (w/
  % anti-wind-up)
 dydt_control = [    % filtered signal
-                (y(par.iy.p_ro) - y(par.iy.p_filt))...
+                (y(par.iy.p_hout) - y(par.iy.p_filt))...
                 /par.control.tau_pfilt;
 
                     % error integral for pressure control
@@ -236,7 +236,7 @@ dydt(par.iy.p_hin) = dydt_p_hin + ~par.plConfig.included*dydt_p_hout;
 dydt(par.iy.p_hout) = dydt_p_hout + ~par.plConfig.included*dydt_p_hin;
 
 dydt(par.iy.p_ro) = 1/nonState.C_ro ...
-                *(nonState.q_pm + nonState.q_feed + nonState.q_ERUfeed ...
+                *(nonState.q_pm - nonState.q_feed + nonState.q_ERUfeed ...
                 - nonState.q_roPRV);
 
 % Control system
