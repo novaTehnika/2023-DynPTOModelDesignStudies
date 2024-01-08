@@ -47,71 +47,75 @@ end
 
 files = dir;
 nfiles = size(files,1);
-Done = [];
-notDone = 1:nVar;
+for SS = 1:6
+    notDone(SS).list = 1:nVar;
+    Done(SS).list = [];
+end
+
 for j = 1:nfiles
 display(['file ',num2str(j),' of ',num2str(nfiles)])
     if strfind(files(j).name,dataFileName)
-        load(files(j).name,'iVar')
-        [r,c,val] = find(notDone==iVar);
-        notDone = [notDone(1:c-1), notDone(c+1:end)];
-        Done = [Done, iVar];
+        load(files(j).name,'SS','iVar')
+        [r,c,val] = find(notDone(SS).list==iVar);
+        notDone(SS).list = [notDone(SS).list(1:c-1), notDone(SS).list(c+1:end)];
+        Done(SS).list = [Done(SS).list, iVar];
 
     end
 
 end
 
-try
-    doneArrayStr = num2str(Done(1));
-    for j = 2:length(Done)
-        switch 1
-            case 1
-                doneArrayStr = append(doneArrayStr,[',',num2str(Done(j))]);
-            case 2
-                doneArrayStr = append(doneArrayStr,[',',num2str(Done(j),['%0',floor(log10(nVar)),'.f'])]);
+for SS = 1:6
+    try
+        doneArrayStr(SS).string = num2str(Done(SS).list(1));
+        for j = 2:length(Done(SS).list)
+            switch 1
+                case 1
+                    doneArrayStr(SS).string = append(doneArrayStr(SS).string,[',',num2str(Done(SS).list(j))]);
+                case 2
+                    doneArrayStr(SS).string = append(doneArrayStr(SS).string,[',',num2str(Done(SS).list(j),['%0',floor(log10(nVar)),'.f'])]);
+            end
         end
-    end
-catch
-    % just move on
-end
-
-try
-    jobArrayStr = num2str(notDone(1));
-    for j = 2:length(notDone)
-        jobArrayStr = append(jobArrayStr,[',',num2str(notDone(j))]);
-
+    catch
+        % just move on
     end
 
-    if 1
-        nanArray = nan*ones(nVar4,1);
-        for j = 1:length(notDone)
-            iVar = notDone(j);
-             % Mean pressure at WEC-driven pump inlet
-            studyData(SS).p_loutMean(iVar,:) = nanArray;
-             % Variation in pressure at WEC-driven pump inlet
-            studyData(SS).p_loutMax(iVar,:) = nanArray;
-            studyData(SS).p_loutMin(iVar,:) = nanArray;
-            studyData(SS).p_loutVar(iVar,:) = nanArray;
-            studyData(SS).p_loutStd(iVar,:) = nanArray;
-             % Minimum pressure in WEC-driven pump chambers
-            studyData(SS).p_wpMin(iVar,:) = nanArray;
-
-             % Electric power consumption of charge pump
-            studyData(SS).P_cElec(iVar,:) = nanArray;
-            studyData(SS).P_cElec_norm(iVar,:) = nanArray;
-             % Power losses from charge pump
-            studyData(SS).P_cLoss(iVar,:) = nanArray;
-            studyData(SS).L_c(iVar,:) = nanArray;
-
-             % power loss from pipeline
-            studyData(SS).P_LPPL(iVar,:) = nanArray;
-            studyData(SS).L_LPPL(iVar,:) = nanArray;
-
+    try
+        jobArrayStr(SS).string = num2str(notDone(SS).list(1));
+        for j = 2:length(notDone(SS).list)
+            jobArrayStr(SS).string = append(jobArrayStr(SS).string,[',',num2str(notDone(SS).list(j))]);
         end
-    end
 
-catch
-    % just move on
+        if 1
+            nanArray = nan*ones(nVar4,1);
+            for j = 1:length(notDone(SS).list)
+                iVar = notDone(SS).list(j);
+                 % Mean pressure at WEC-driven pump inlet
+                studyData(SS).p_loutMean(iVar,:) = nanArray;
+                 % Variation in pressure at WEC-driven pump inlet
+                studyData(SS).p_loutMax(iVar,:) = nanArray;
+                studyData(SS).p_loutMin(iVar,:) = nanArray;
+                studyData(SS).p_loutVar(iVar,:) = nanArray;
+                studyData(SS).p_loutStd(iVar,:) = nanArray;
+                 % Minimum pressure in WEC-driven pump chambers
+                studyData(SS).p_wpMin(iVar,:) = nanArray;
+
+                 % Electric power consumption of charge pump
+                studyData(SS).P_cElec(iVar,:) = nanArray;
+                studyData(SS).P_cElec_norm(iVar,:) = nanArray;
+                 % Power losses from charge pump
+                studyData(SS).P_cLoss(iVar,:) = nanArray;
+                studyData(SS).L_c(iVar,:) = nanArray;
+
+                 % power loss from pipeline
+                studyData(SS).P_LPPL(iVar,:) = nanArray;
+                studyData(SS).L_LPPL(iVar,:) = nanArray;
+
+            end
+        end
+
+    catch
+        % just move on
+    end
 end
 
 %% Find optimal distribution of accumulator volume for each total 
