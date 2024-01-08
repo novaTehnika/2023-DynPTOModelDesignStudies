@@ -25,6 +25,7 @@ display(['file ',num2str(j),' of ',num2str(nfiles)])
             studyData(SS).p_loutStd(iVar,iw_c) = p_loutStd(iw_c);
              % Minimum pressure in WEC-driven pump chambers
             studyData(SS).p_wpMin(iVar,iw_c) = p_wpMin(iw_c);
+            studyData(SS).p_staticCVmin(iVar,iw_c) = p_staticCVmin(iw_c);
     
              % Electric power consumption of charge pump
             studyData(SS).P_cElec(iVar,iw_c) = P_cElec(iw_c);
@@ -89,6 +90,12 @@ for SS = 1:6
             nanArray = nan*ones(nVar4,1);
             for j = 1:length(notDone(SS).list)
                 iVar = notDone(SS).list(j);
+                % study variables
+                studyVar(SS).Vc_l(iVar,:) = ones(1,nVar4)*Vc_l_mesh(iVar);
+                studyVar(SS).X(iVar,:) = ones(1,nVar4)*X_mesh(iVar);
+                studyVar(SS).d_line(iVar,:) = ones(1,nVar4)*d_LPPL_mesh(iVar);
+                studyVar(SS).w_c(iVar,:) = w_c;
+
                  % Mean pressure at WEC-driven pump inlet
                 studyData(SS).p_loutMean(iVar,:) = nanArray;
                  % Variation in pressure at WEC-driven pump inlet
@@ -98,6 +105,7 @@ for SS = 1:6
                 studyData(SS).p_loutStd(iVar,:) = nanArray;
                  % Minimum pressure in WEC-driven pump chambers
                 studyData(SS).p_wpMin(iVar,:) = nanArray;
+                studyData(SS).p_staticCVmin(iVar,:) = nanArray;
 
                  % Electric power consumption of charge pump
                 studyData(SS).P_cElec(iVar,:) = nanArray;
@@ -123,8 +131,8 @@ SS = 2;
 
 % accumulator volume and pipeline diameter
  % find individuals meeting cavitation constraints
-p_cavLimit = 0.003e4; % [Pa] prescribed limit on pressure in WEC-driven pump
-id_line = 1;
+p_cavLimit = 10e3; % [Pa] prescribed limit on pressure in WEC-driven pump
+id_line = 4;
 d_line_nom = d_LPPL(id_line);
 meetsConstraints = find(studyData(SS).p_wpMin(:) >= p_cavLimit ...
                         & studyVar(SS).d_line(:) == d_line_nom);
@@ -135,14 +143,21 @@ non_dominated = paretoFront2D(studyVar(SS).Vc_l(meetsConstraints),'min', ...
                + studyData(SS).P_cElec(meetsConstraints),'min');
 [~, ii_sort] = sort(studyVar(SS).Vc_l(meetsConstraints(non_dominated)));
 iiPareto = meetsConstraints(non_dominated(ii_sort));
+
 Vc_l_opt = studyVar(SS).Vc_l(iiPareto);
+Vc_l_meetsCon = studyVar(SS).Vc_l(meetsConstraints);
+
 X_opt = studyVar(SS).X(iiPareto);
+X_meetsCon = studyVar(SS).X(meetsConstraints);
+
 d_LPPL_opt = studyVar(SS).d_line(iiPareto);
+
 w_c_opt = studyVar(SS).w_c(iiPareto);
-clearvars meetsConstraints non_dominated ii_sort
+w_c_meetsCon = studyVar(SS).w_c(meetsConstraints);
 
+% clearvars meetsConstraints non_dominated ii_sort
 
-%% Plot Pereto optimal results
+%% Plot Pareto optimal results
 
 black = [0 0 0];
 maroon = [122 0 25]/256;
@@ -375,7 +390,7 @@ xlim([0 xLim(2)])
 yLim = ylim;
 ylim([0 yLim(2)])
 
-%% Plot all results %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Plot all results meeting constraints
 
 black = [0 0 0];
 maroon = [122 0 25]/256;
@@ -406,11 +421,13 @@ fig.Position = [leftEdge bottomEdge width height ];
 
 titleString = ['Performance of Low-Pressure Circuit Branch',newline,...
                 'as a Function of Installed Low-Pressure Accumulator Volume',newline,...
-                'Sea State ',num2str(SS)];
+                'Sea State ',num2str(SS),newline,...
+                'Pipeline Diameter of ',num2str(100*d_line_nom),' cm'];
 sgtitle(titleString,...
 'Interpreter','latex','FontSize',fontSize+2,'fontname','Times')
 
-n_plots = 5;
+n_plots = 6;
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Pressure WEC-driven pump inlet
 iax = 1;
 ax(iax) = subplot(n_plots,1,iax);
@@ -420,18 +437,7 @@ ax(iax).FontSize = fontSize-1;
 hold on
 
 ip = 1;
-p(ip,iax) = scatter(Vc_l_mesh,1e-5*studyData(SS).p_loutMean,'xk');
-ip = ip+1;
-
-p(ip,iax) = scatter(Vc_l_mesh,1e-5*studyData(SS).p_loutMax,'xr');
-ip = ip+1;
-p(ip,iax) = scatter(Vc_l_mesh,1e-5*studyData(SS).p_loutMin,'xr');
-p(ip,iax).HandleVisibility='off';
-ip = ip+1;
-
-p(ip,iax) = scatter(Vc_l_mesh,1e-5*(studyData(SS).p_loutMean+studyData(SS).p_loutStd),'.k');
-ip = ip+1;
-p(ip,iax) = scatter(Vc_l_mesh,1e-5*(studyData(SS).p_loutMean-studyData(SS).p_loutStd),'.k');
+p(ip,iax) = scatter(Vc_l_meetsCon,1e-5*studyData(SS).p_loutMin(meetsConstraints),'r','Marker','x');
 p(ip,iax).HandleVisibility='off';
 ip = ip+1;
 
@@ -440,16 +446,12 @@ xlabel('volume (1000L) ', ...
 ylabel('pressure (bar)', ...
 'Interpreter','latex','FontSize',fontSize-1,'fontname','Times')
 
-titleString = ['Pressure at RO Module Feed Inlet'];
+titleString = ['Min. Pressure at WEC-Driven Pump Inlet'];
 title(titleString,...
 'Interpreter','latex','FontSize',fontSize,'fontname','Times')
 
-leg = legend('mean','max & min','mean +- 1 stdDev');
-leg.FontSize = fontSize-1;
-leg.FontName = 'Times';
-rect = [0.5, -0.2, 0.25, 0.15];
 % set(leg, 'Position', rect)
-set(leg, 'Location', 'best')
+% set(leg, 'Location', 'best')
 % set(leg, 'Location', 'southoutside')
 xLim = xlim;
 xlim([0 xLim(2)])
@@ -463,9 +465,9 @@ ax(iax).FontSize = fontSize-1;
 hold on
 
 ip = 1;
-p(ip,iax) = plot(Vc_l([1 end]),1e-5*p_cavLimit*[1 1],'r');
+p(ip,iax) = plot([min(Vc_l_meetsCon) max(Vc_l_meetsCon)],1e-5*p_cavLimit*[1 1],'r');
 ip = ip+1;
-p(ip,iax) = scatter(Vc_l_mesh,1e-5*studyData(SS).p_wpMin,'xk');
+p(ip,iax) = scatter(Vc_l_meetsCon,1e-5*studyData(SS).p_wpMin(meetsConstraints),'k','Marker','x');
 ip = ip+1;
 
 xlabel('volume (1000L) ', ...
@@ -489,7 +491,7 @@ xlim([0 xLim(2)])
 yLim = ylim;
 ylim([0 yLim(2)])
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Power Consumption of CHarge Pump
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Power Consumption of Charge Pump
 iax = 3;
 ax(iax) = subplot(n_plots,1,iax);
 ax(iax).FontName = 'times';
@@ -498,7 +500,7 @@ ax(iax).FontSize = fontSize-1;
 hold on
 
 ip = 1;
-p(ip,iax) = scatter(Vc_l_mesh,1e-3*studyData(SS).P_cElec,'xk');
+p(ip,iax) = scatter(Vc_l_meetsCon,1e-3*studyData(SS).P_cElec(meetsConstraints),'k','Marker','x');
 ip = ip+1;
 
 xlabel('volume (1000L) ', ...
@@ -524,7 +526,8 @@ ax(iax).FontSize = fontSize-1;
 hold on
 
 ip = 1;
-p(ip,iax) = scatter(Vc_l_mesh,100*studyData(SS).L_c,'xk');
+p(ip,iax) = scatter(Vc_l_meetsCon, ...
+                100*(studyData(SS).L_c(meetsConstraints)+studyData(SS).L_LPPL(meetsConstraints)),'k','Marker','x');
 ip = ip+1;
 
 xlabel('volume (1000L) ', ...
@@ -532,9 +535,16 @@ xlabel('volume (1000L) ', ...
 ylabel('power loss (x100\%)', ...
 'Interpreter','latex','FontSize',fontSize-1,'fontname','Times')
 
-titleString = ['Mean Power Loss of Charge Pump Normalized to Mean Power Capture'];
+titleString = ['Mean Power Loss of Normalized to Mean Power Capture'];
 title(titleString,...
 'Interpreter','latex','FontSize',fontSize,'fontname','Times')
+
+leg = legend('charge pump & pipeline combined');
+leg.FontSize = fontSize-1;
+leg.FontName = 'Times';
+rect = [0.5, -0.2, 0.25, 0.15];
+% set(leg, 'Position', rect)
+set(leg, 'Location', 'best')
 
 xLim = xlim;
 xlim([0 xLim(2)])
@@ -542,7 +552,7 @@ yLim = ylim;
 ylim([0 yLim(2)])
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Charge Pump Shaft Speed
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% charge pump shaft speed
 iax = 5;
 ax(iax) = subplot(n_plots,1,iax);
 ax(iax).FontName = 'times';
@@ -551,7 +561,7 @@ ax(iax).FontSize = fontSize-1;
 hold on
 
 ip = 1;
-p(ip,iax) = scatter(studyVar(SS).Vc_l(:,1),60/2/pi*w_c_min,'xk');
+p(ip,iax) = scatter(Vc_l_meetsCon,w_c_meetsCon/2/pi*60,'k','Marker','x');
 ip = ip+1;
 
 xlabel('volume (1000L) ', ...
@@ -559,7 +569,33 @@ xlabel('volume (1000L) ', ...
 ylabel('speed (rpm)', ...
 'Interpreter','latex','FontSize',fontSize-1,'fontname','Times')
 
-titleString = ['Mean Power Loss of Charge Pump Normalized to Mean Power Capture'];
+titleString = ['Charge Pump Shaft Speed'];
+title(titleString,...
+'Interpreter','latex','FontSize',fontSize,'fontname','Times')
+
+xLim = xlim;
+xlim([0 xLim(2)])
+yLim = ylim;
+ylim([0 yLim(2)])
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% distibution of volume
+iax = 6;
+ax(iax) = subplot(n_plots,1,iax);
+ax(iax).FontName = 'times';
+ax(iax).FontSize = fontSize-1;
+
+hold on
+
+ip = 1;
+p(ip,iax) = scatter(Vc_l_meetsCon,X_meetsCon,'k','Marker','x');
+ip = ip+1;
+
+xlabel('volume (1000L) ', ...
+'Interpreter','latex','FontSize',fontSize-1,'fontname','Times')
+ylabel('portion', ...
+'Interpreter','latex','FontSize',fontSize-1,'fontname','Times')
+
+titleString = ['Portion of Volume at WEC-driven Pump Inlet'];
 title(titleString,...
 'Interpreter','latex','FontSize',fontSize,'fontname','Times')
 
