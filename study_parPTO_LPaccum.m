@@ -181,11 +181,11 @@ parfor iw_c = 1:nVar4
 
     % run simulation
     ticSIM = tic;
-    [out, exitCode] = sim_parPTO(y0,par);
+    [out, exitCode(iw_c)] = sim_parPTO(y0,par);
     toc(ticSIM)
 
     % postprocess simulation data
-    if exitCode == 1 % normal operation, no error
+    if exitCode(iw_c) == 1 % normal operation, no error
         % Mean pressure at WEC-driven pump inlet
         p_loutMean(iw_c) = mean(out.p_lout);
         % Variation in pressure at WEC-driven pump inlet
@@ -195,6 +195,10 @@ parfor iw_c = 1:nVar4
         p_loutStd(iw_c) = std(out.p_lout);
         % Minimum pressure in WEC-driven pump chambers
         p_wpMin(iw_c) = min(min(out.p_a),min(out.p_b));
+        % estimated min static pressure
+        A_cvMax = out.par.kvWECin/0.6*sqrt(out.par.rho/2);
+        p_staticCVmin(iw_c) = min(min(out.p_a,out.p_b) ...
+                                - 1/2*out.par.rho*(out.q_lwp/A_cvMax).^2);
 
         % Electric power consumption of charge pump
         P_cElec(iw_c) = mean(out.power.P_cElec);
@@ -220,6 +224,7 @@ parfor iw_c = 1:nVar4
         p_loutStd(iw_c) = nan;
          % Minimum pressure in WEC-driven pump chambers
         p_wpMin(iw_c) = nan;
+        p_staticCVmin(iw_c) = nan;
 
          % Electric power consumption of charge pump
         P_cElec(iw_c) = nan;
