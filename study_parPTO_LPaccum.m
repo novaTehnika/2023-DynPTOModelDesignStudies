@@ -141,7 +141,7 @@ par.pc_lout = 0.15e6; % [Pa] charge pressure
 %% %%%%%%%%%%%%   Study Variables  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % total low-pressure accumulator volume
 nVar1 = 10;
-Vc_l = 1e-3*logspace(log10(500),log10(10000),nVar1); % [(L) -> m^3]
+Vc_l = 1e-3*logspace(log10(500),log10(15e3),nVar1); % [(L) -> m^3]
 
 % portion of low-pressure accumulator volume at WEC-driven pump inlet
 X = 1 - logspace(log10(1-0.5),log10(1-0.99),5);
@@ -149,7 +149,7 @@ nVar2 = numel(X);
 
 % Diameter of low-pressure pipeline
 nVar3 = 10;
-d_LPPL = linspace(0.05,0.2,nVar3); % [m]
+d_LPPL = linspace(0.1,0.3,nVar3); % [m]
 
 % charge pump speed
 w_c = (1600:100:3500)*2*pi/60; % [(rpm) -> rad/s]
