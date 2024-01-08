@@ -1,4 +1,4 @@
-function git_hash_string = get_current_git_hash()
+function [git_hash_string, git_status_string] = get_current_git_hash()
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % get_current_git_hash.m function m-file
 % AUTHORS: 
@@ -37,4 +37,6 @@ function git_hash_string = get_current_git_hash()
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     [~,git_hash_string] = ...
         system(['git --git-dir=.',filesep,'.git rev-parse HEAD']);
+    [~,git_status_string] = ...
+        system('git status');
 end
