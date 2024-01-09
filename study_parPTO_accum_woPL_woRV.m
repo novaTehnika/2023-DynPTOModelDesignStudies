@@ -115,16 +115,16 @@ par.wave.rngSeedPhase = 3; % seed for the random number generator
 par = parameters_parPTO(par,...
     'nemohResults_vantHoff2009_20180802.mat','vantHoffTFCoeff.mat');
 
-% Define initial conditions
-par.iy = stateIndex_parPTO(par); % load state indices % load state indices, provides 'iy_...'
-y0 = initialConditionDefault_parPTO(par); % default ICs, provides 'y0'
-
 %% Special modifications to base parameters
 % par.Sro = 3700; % [m^3]
 % par.D_WEC = 0.23;         % [m^3/rad] flap pump displacement
+
+% Operating parameters
 p_ro_nom = 1e6*[4.0000 4.9435 8.0000 5.2661 8.0000 7.1052]; % [Pa]
-% w_c = [3000 3000 3000 3000 3000 3000]*2*pi/60; % [(rpm) -> rad/s]
+w_c = [2500 2500 3000 3000 3000 3000]*2*pi/60; % [(rpm) -> rad/s]
+
 par.control.p_ro_nom = p_ro_nom(SS);
+par.w_c = w_c(SS);
 par.duty_sv = 0;
 
 % Configuration
@@ -138,7 +138,7 @@ par.rvConfig.active = (0)*par.rvConfig.included; % RO inlet valve is 1 - active,
 %% %%%%%%%%%%%%   Study Variables  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % total accumulator volume
 nVar1 = 10;%25;
-Vc_h = 1e-3*logspace(log10(2e3),log10(50e3),nVar1);% [L->m^3] total accumulator volume
+Vc_h = 1e-3*logspace(log10(2e3),log10(30e3),nVar1);% [L->m^3] total accumulator volume
 
 saveSimData = 0; % save simulation data (1) or just output variables (0)
 
@@ -153,6 +153,12 @@ parfor iVar = 1:nVar1
     par.Vc_hin = 0.25*Vc_h(iVar);
     par.Vc_hout = 0.25*Vc_h(iVar);
     par.Vc_ro = 0.5*Vc_h(iVar);
+
+    % Define state indices
+    par.iy = stateIndex_parPTO(par);
+
+    % Define initial conditions
+    y0 = initialConditionDefault_parPTO(par); % default ICs, provides 'y0'
 
     % run simulation
     ticSIM = tic;
