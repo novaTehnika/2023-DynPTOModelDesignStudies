@@ -132,9 +132,11 @@ SS = 2;
 % accumulator volume and pipeline diameter
  % find individuals meeting cavitation constraints
 p_cavLimit = 10e3; % [Pa] prescribed limit on pressure in WEC-driven pump
-id_line = 4;
+id_line = 6;
 d_line_nom = d_LPPL(id_line);
-meetsConstraints = find(studyData(SS).p_wpMin(:) >= p_cavLimit ...
+% meetsConstraints = find(studyData(SS).p_wpMin(:) >= p_cavLimit ...
+%                         & studyVar(SS).d_line(:) == d_line_nom);
+meetsConstraints = find(studyData(SS).p_staticCVmin(:) >= p_cavLimit ...
                         & studyVar(SS).d_line(:) == d_line_nom);
 
  % find non-dominated individuals from set meeting cavitation constraints
@@ -467,7 +469,8 @@ hold on
 ip = 1;
 p(ip,iax) = plot([min(Vc_l_meetsCon) max(Vc_l_meetsCon)],1e-5*p_cavLimit*[1 1],'r');
 ip = ip+1;
-p(ip,iax) = scatter(Vc_l_meetsCon,1e-5*studyData(SS).p_wpMin(meetsConstraints),'k','Marker','x');
+% p(ip,iax) = scatter(Vc_l_meetsCon,1e-5*studyData(SS).p_wpMin(meetsConstraints),'k','Marker','x');
+p(ip,iax) = scatter(Vc_l_meetsCon,1e-5*studyData(SS).p_staticCVmin(meetsConstraints),'k','Marker','x');
 ip = ip+1;
 
 xlabel('volume (1000L) ', ...
