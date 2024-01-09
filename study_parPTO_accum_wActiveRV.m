@@ -171,7 +171,6 @@ out = sim_parPTO(y0,par);
 toc(ticSIM)
 
 % Calculate metrics
-it_vec = find(out.t>=par.tstart);
 % max rate of change in pressure
 % 97th percentile ratof change
 % power loss from valve
@@ -179,17 +178,17 @@ it_vec = find(out.t>=par.tstart);
 % permeate production
 % power loss from pump/motor and power generated for normalization
 % 
-q_permMean = mean(out.q_perm(it_vec));
-PP_WEC = mean(out.power.P_WEC(it_vec));
-PP_wp = mean(out.power.P_wp(it_vec));
-PP_rv = mean(out.power.P_rv(it_vec));
+q_permMean = mean(out.q_perm);
+PP_WEC = mean(out.power.P_WEC);
+PP_wp = mean(out.power.P_wp);
+PP_rv = mean(out.power.P_rv);
 PP_pmLoss = mean(out.power.P_pmLoss);
 PP_gen = mean(out.power.P_gen);
-PP_hinPRV = mean(out.power.P_hinPRV(it_vec));
-PP_roPRV = mean(out.power.P_roPRV(it_vec));
-dpdt_max = max(abs(out.dydt(it_vec,iyp_ro)));
+PP_hinPRV = mean(out.power.P_hinPRV);
+PP_roPRV = mean(out.power.P_roPRV);
+dpdt_max = max(abs(out.dydt(:,par.iy.p_ro)));
 
-dist_dpdt = statsTimeVar_cdf(out.t(it_vec),abs(out.dydt(it_vec,iyp_ro)));
+dist_dpdt = statsTimeVar_cdf(out.t,abs(out.dydt(it_vec,iyp_ro)));
 dpdt_97 = dist_dpdt.xi(find(dist_dpdt.f > 0.97,1,'first'));
 
 if ~saveSimData

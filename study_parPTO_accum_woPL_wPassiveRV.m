@@ -194,7 +194,7 @@ PP_pmLoss = mean(out.power.P_pmLoss);
 PP_gen = mean(out.power.P_gen);
 PP_hinPRV = mean(out.power.P_hinPRV);
 PP_roPRV = mean(out.power.P_roPRV);
-dpdt_max = max(abs(out.dydt(:,iyp_ro)));
+dpdt_max = max(abs(out.dydt(:,par.iy.p_ro)));
 
 try
     dist_dpdt = statsTimeVar_cdf(out.t,abs(out.dydt(:,par.iy.p_ro)));
