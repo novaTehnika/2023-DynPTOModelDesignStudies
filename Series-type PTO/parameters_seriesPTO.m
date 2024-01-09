@@ -123,11 +123,11 @@ function par = parameters_seriesPTO(par,filenameCoeff,filenameRadSS)
     par.f = 1e-2; % fraction of dead volume of working fluid compared to 
                   % charge volume
      % LPA, onshore
-    par.Vc_lin = (3000)*1e-3; % [(L) -> m^3] gas volume at charge pressure
-    par.pc_lin = 0.2e6; % [Pa] charge pressure
+    par.Vc_lin = (2000)*1e-3; % [(L) -> m^3] gas volume at charge pressure
+    par.pc_lin = 0.15e6; % [Pa] charge pressure
      % LPA, offshore/at inelt of WEC-driven pump
-    par.Vc_lout = (3000)*1e-3; % [(L) -> m^3] gas volume at charge pressure
-    par.pc_lout = 0.2e6; % [Pa] charge pressure
+    par.Vc_lout = (8000)*1e-3; % [(L) -> m^3] gas volume at charge pressure
+    par.pc_lout = 0.15e6; % [Pa] charge pressure
      % HPA at outlet of WEC-driven pump and inlet of high-pressure pipeline
      % (offshore)
     par.Vc_hin = (5000)*1e-3; % [(L) -> m^3] gas volume at charge pressure
@@ -183,7 +183,7 @@ function par = parameters_seriesPTO(par,filenameCoeff,filenameRadSS)
 
     % Pressure relief valves
      % inlet to low-pressure pipeline/outlet of charge pump
-    maxPressure = 5e5; % [Pa]
+    maxPressure = 10e5; % [Pa]
     margin = 1e4; % [Pa]
     maxFlow = 100e-3; % [m^3/s]
     par.lPRV.p_crack = maxPressure - margin;
