@@ -270,7 +270,7 @@ fig.Units = 'inches';
 fig.Position = [leftEdge bottomEdge width height ];
 
 ax(1) = subplot(3,1,1);
-plot(out.t,out.q_hwp(:))
+plot(out.t,1e3*60*out.q_hwp(:))
 hold on
 plot(out.t,1e3*60*out.q_hin(:))
 plot(out.t,1e3*60*out.q_hout(:))
