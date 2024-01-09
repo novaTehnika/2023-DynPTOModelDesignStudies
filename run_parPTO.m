@@ -126,9 +126,11 @@ par = parameters_parPTO(par,...
 
 % Operating parameters
 % p_ro_nom = 1e6*[4.0000 4.9435 8.0000 5.2661 8.0000 7.1052]; % [Pa]
+% w_c = [2500 2500 3000 3000 3000 3000]*2*pi/60; % [(rpm) -> rad/s]
+
 par.control.p_ro_nom = 6.11e6; % [Pa]
-par.duty_sv = 0.0;
 par.w_c = (2500)*2*pi/60; % [(rpm) -> rad/s] Charge pump speed
+par.duty_sv = 0.0;
 
 % Configuration
 par.ERUconfig.present = 1;
