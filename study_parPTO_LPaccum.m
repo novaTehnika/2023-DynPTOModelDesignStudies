@@ -116,13 +116,11 @@ par.wave.rngSeedPhase = 3; % seed for the random number generator
 par = parameters_parPTO(par,...
     'nemohResults_vantHoff2009_20180802.mat','vantHoffTFCoeff.mat');
 
-% Define initial conditions
-par.iy = stateIndex_parPTO(par); % load state indices % load state indices, provides 'iy_...'
-y0 = initialConditionDefault_parPTO(par); % default ICs, provides 'y0'
-
 %% Special modifications to base parameters
 % par.Sro = 3700; % [m^3]
 % par.D_WEC = 0.23;         % [m^3/rad] flap pump displacement
+
+% Operating parameters
 p_ro_nom = 1e6*[4.0000 4.9435 8.0000 5.2661 8.0000 7.1052]; % [Pa]
 % w_c = [3000 3000 3000 3000 3000 3000]*2*pi/60; % [(rpm) -> rad/s]
 par.control.p_ro_nom = p_ro_nom(SS);
@@ -134,9 +132,10 @@ par.ERUconfig.present = 1;
 par.rvConfig.included = 0; % RO inlet valve is 1 - present, 0 - absent
 par.rvConfig.active = (0)*par.rvConfig.included; % RO inlet valve is 1 - active, 0 - passive
 
+par.plConfig.included = 0;
+
 par.pc_lin = 0.15e6; % [Pa] charge pressure
 par.pc_lout = 0.15e6; % [Pa] charge pressure
-
 
 %% %%%%%%%%%%%%   Study Variables  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % total low-pressure accumulator volume
@@ -178,6 +177,12 @@ parfor iw_c = 1:nVar4
 
     par = parBase;
     par.w_c = w_c(iw_c);
+
+    % Define state indices
+    par.iy = stateIndex_parPTO(par);
+
+    % Define initial conditions
+    y0 = initialConditionDefault_parPTO(par); % default ICs, provides 'y0'
 
     % run simulation
     ticSIM = tic;
@@ -246,6 +251,9 @@ parfor iw_c = 1:nVar4
 end
 par = parBase; clearvars parBase
 
+%% %%%%%%%%%%%%   End Computations  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+poolobj = gcp('nocreate'); delete(poolobj);
 
 %% %%%%%%%%%%%%   Save Data  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 timeStamp = datetime("now",'format','yyyy-MM-dd''T''HH:mm'); % time in ISO8601
@@ -256,9 +264,5 @@ filename = ['data_parPTO_LPaccum', ...
             '_',num2str(SS,leadingZeros(999)), ...
             '_',num2str(iVar,leadingZeros(nVar))];
 save(filename,'-v7.3')
-
-%% %%%%%%%%%%%%   End Computations  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-poolobj = gcp('nocreate'); delete(poolobj);
 
 return
