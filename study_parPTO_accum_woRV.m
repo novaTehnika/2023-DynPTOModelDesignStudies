@@ -183,6 +183,9 @@ parfor iX = 1:nVar3
      % power loss through PRVs
     PP_hinPRV(iX) = mean(out.power.P_hinPRV);
     PP_roPRV(iX) = mean(out.power.P_roPRV);
+     % power loss from pump/motor and power generated for normalization
+    PP_pmLoss(iX) = mean(out.power.P_pmLoss);
+    PP_gen(iX) = mean(out.power.P_gen);
      % power loss from valve
     PP_rv(iX) = mean(out.power.P_rv);
      % max rate of change in pressure
@@ -205,6 +208,10 @@ parfor iX = 1:nVar3
 
 end
 
+%% %%%%%%%%%%%%   End Computations  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+poolobj = gcp('nocreate'); delete(poolobj);
+
 %% %%%%%%%%%%%%   Save Data  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 timeStamp = datetime("now",'format','yyyy-MM-dd''T''HH:mm'); % time in ISO8601
 
@@ -214,9 +221,5 @@ filename = ['data_parPTO_accum_woRV', ...
             '_',num2str(SS,leadingZeros(999)), ...
             '_',num2str(iVar,leadingZeros(nVar))];
 save(filename,'-v7.3')
-
-%% %%%%%%%%%%%%   End Computations  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-poolobj = gcp('nocreate'); delete(poolobj);
 
 return

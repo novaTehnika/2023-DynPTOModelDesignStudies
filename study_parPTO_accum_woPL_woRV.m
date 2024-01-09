@@ -174,6 +174,9 @@ parfor iVar = 1:nVar1
      % power loss through PRVs
     PP_hinPRV(iVar) = mean(out.power.P_hinPRV);
     PP_roPRV(iVar) = mean(out.power.P_roPRV);
+     % power loss through pump/motor and power generated for normalization
+    PP_roPRV(iVar) = mean(out.power.P_roPRV);
+    PP_pmLoss(iVar) = mean(out.power.P_pmLoss);
      % power loss from valve
     PP_rv(iVar) = mean(out.power.P_rv);
      % max rate of change in pressure

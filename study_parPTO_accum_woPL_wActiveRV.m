@@ -185,11 +185,14 @@ it_vec = find(out.t>=par.tstart);
 % power loss from valve
 % power loss through PRVs
 % permeate production
+% power loss from pump/motor and power generated for normalization
 % 
 q_permMean = mean(out.q_perm(it_vec));
 PP_WEC = mean(out.power.P_WEC(it_vec));
 PP_wp = mean(out.power.P_wp(it_vec));
 PP_rv = mean(out.power.P_rv(it_vec));
+PP_pmLoss = mean(out.power.P_pmLoss);
+PP_gen = mean(out.power.P_gen);
 PP_hinPRV = mean(out.power.P_hinPRV(it_vec));
 PP_roPRV = mean(out.power.P_roPRV(it_vec));
 dpdt_max = max(abs(out.dydt(it_vec,iyp_ro)));
