@@ -114,7 +114,7 @@ par.WEC.nw = 1000; % num. of frequency components for harmonic superposition
 par.wave.rngSeedPhase = 3; % seed for the random number generator
 
 % load parameters
-par = parameters_parPTO(par,...
+par = parameters_seriesPTO(par,...
     'nemohResults_vantHoff2009_20180802.mat','vantHoffTFCoeff.mat');
 
 %% Special modifications to base parameters
@@ -124,6 +124,7 @@ par = parameters_parPTO(par,...
 % Operating parameters
 p_h_nom = 1e6*[999, 7.4049, 10.3516, 7.6581, 10.3516,9.3226]; % [Pa]
 p_ro_nom = 1e6*[999, 5.0533, 8, 5.3066, 8, 6.9710]; % [Pa]
+w_c = [2500 2500 3000 3000 3000 3000]*2*pi/60; % [(rpm) -> rad/s]
 
 par.control.p_h_nom = p_h_nom(SS);
 par.control.p_ro_nom = p_ro_nom(SS);
@@ -165,10 +166,10 @@ par.Vc_ro = X_mesh(iVar)*Vtotal_mesh(iVar);
 par.D_pm = D_pm_mesh(iVar);
 
 % Define state indices
-par.iy = stateIndex_parPTO(par);
+par.iy = stateIndex_seriesPTO(par);
 
 % Define initial conditions
-y0 = initialConditionDefault_parPTO(par); % default ICs, provides 'y0'
+y0 = initialConditionDefault_seriesPTO(par); % default ICs, provides 'y0'
 
 % run simulation
 ticSIM = tic;
@@ -190,7 +191,7 @@ PP_pmLoss = mean(out.power.P_pmLoss);
 PP_gen = mean(out.power.P_gen);
 PP_hinPRV = mean(out.power.P_hinPRV);
 PP_roPRV = mean(out.power.P_roPRV);
-dpdt_max = max(abs(out.dydt(:,iyp_ro)));
+dpdt_max = max(abs(out.dydt(:,par.iy.p_ro)));
 
 try
     dist_dpdt = statsTimeVar_cdf(out.t,abs(out.dydt(:,par.iy.p_ro)));
@@ -212,7 +213,7 @@ poolobj = gcp('nocreate'); delete(poolobj);
 timeStamp = datetime("now",'format','yyyy-MM-dd''T''HH:mm'); % time in ISO8601
 
 % Save data
-filename = ['data_parPTO_accum_woPL_wPassiveRV', ...
+filename = ['data_seriesPTO_accum_woPL', ...
             '_',char(datetime("now",'Format','yyyyMMdd')), ...
             '_',num2str(SS,leadingZeros(999)), ...
             '_',num2str(iVar,leadingZeros(nVar))];
