@@ -198,10 +198,10 @@ dpdt_max = max(abs(out.dydt(:,par.iy.p_ro)));
 
 try
     dist_dpdt = statsTimeVar_cdf(out.t,abs(out.dydt(:,par.iy.p_ro)));
-    dpdt_97(iVar) = dist_dpdt.xi(find(dist_dpdt.f > 0.97,1,'first'));
+    dpdt_97 = dist_dpdt.xi(find(dist_dpdt.f > 0.97,1,'first'));
 catch
     dist_dpdt = nan;
-    dpdt_97(iVar) = nan;
+    dpdt_97 = nan;
 end
 
 if ~saveSimData
