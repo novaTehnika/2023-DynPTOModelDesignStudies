@@ -105,34 +105,35 @@ K = length(X);
 
 
 test = 1;
-for i = 1:I
-    for j = 1:J
-        for k = 1:K
-            m = J*K*(i-1) + K*(j-1) + k;
+for SS = 1:6
+    for i = 1:I
+        for j = 1:J
+            for k = 1:K
+                m = J*K*(i-1) + K*(j-1) + k;
 
-            studyData(SS).q_permMean_3D(i,j,k) = studyData(SS).q_permMean(m);
-            studyData(SS).PP_WEC_3D(i,j,k) = studyData(SS).PP_WEC(m);
-            studyData(SS).PP_wp_3D(i,j,k) = studyData(SS).PP_wp(m);
-            studyData(SS).PP_rv_3D(i,j,k) = studyData(SS).PP_rv(m);
-            studyData(SS).L_rv_3D(i,j,k) = studyData(SS).L_rv(m);
-            studyData(SS).PP_hPRV_3D(i,j,k) = studyData(SS).PP_hinPRV(m);
-            studyData(SS).L_hPRV_3D(i,j,k) = studyData(SS).L_hinPRV(m);
-            studyData(SS).PP_roPRV_3D(i,j,k) = studyData(SS).PP_roPRV(m);
-            studyData(SS).L_roPRV_3D(i,j,k) = studyData(SS).L_roPRV(m);
-            studyData(SS).dpdt_max_3D(i,j,k) = studyData(SS).dpdt_max(m);
-            studyData(SS).dpdt_97_3D(i,j,k) = studyData(SS).dpdt_97(m);
+                studyData(SS).q_permMean_3D(i,j,k) = studyData(SS).q_permMean(m);
+                studyData(SS).PP_WEC_3D(i,j,k) = studyData(SS).PP_WEC(m);
+                studyData(SS).PP_wp_3D(i,j,k) = studyData(SS).PP_wp(m);
+                studyData(SS).PP_rv_3D(i,j,k) = studyData(SS).PP_rv(m);
+                studyData(SS).L_rv_3D(i,j,k) = studyData(SS).L_rv(m);
+                studyData(SS).PP_hPRV_3D(i,j,k) = studyData(SS).PP_hinPRV(m);
+                studyData(SS).L_hPRV_3D(i,j,k) = studyData(SS).L_hinPRV(m);
+                studyData(SS).PP_roPRV_3D(i,j,k) = studyData(SS).PP_roPRV(m);
+                studyData(SS).L_roPRV_3D(i,j,k) = studyData(SS).L_roPRV(m);
+                studyData(SS).dpdt_max_3D(i,j,k) = studyData(SS).dpdt_max(m);
+                studyData(SS).dpdt_97_3D(i,j,k) = studyData(SS).dpdt_97(m);
 
-            Vtotal_3D(i,j,k) = Vtotal_mesh(m);
-            X_3D(i,j,k) = X_mesh(m);
-            kv_3D(i,j,k) = kv_mesh(m);
-            test = (Vtotal_mesh(m) == Vtotal(j)) ...
-                && (X_mesh(m) == X(k)) ...
-                && (kv_mesh(m) == kv(i)) ...
-                && test;
+                Vtotal_3D(i,j,k) = Vtotal_mesh(m);
+                X_3D(i,j,k) = X_mesh(m);
+                kv_3D(i,j,k) = kv_mesh(m);
+                test = (Vtotal_mesh(m) == Vtotal(j)) ...
+                    && (X_mesh(m) == X(k)) ...
+                    && (kv_mesh(m) == kv(i)) ...
+                    && test;
+            end
         end
     end
 end
-
 if ~test; error('indexing incorrect'); end
 clearvars test
 
@@ -340,8 +341,8 @@ return
 plotCase = 1;
 switch plotCase
  case 1
-     iiK = 3:1:K-2; % distribution
-     iiI = 2:1:I;   % valve coeff.
+     iiK = 1:1:K; % distribution
+     iiI = 1:2:I;   % valve coeff.
  case 2
      iiK = 1:1:K;
      iiI = 4;
@@ -355,10 +356,10 @@ nI = length(iiI);
  % select variable to plot
 switch 1
   case 1
-    YaxisVar = 100*PP_rv_3D./PP_WEC_3D;
+    YaxisVar = 100*studyData(SS).PP_rv_3D./studyData(SS).PP_WEC_3D;
     varStr = 'Ripple Control Valve Losses';
   case 2
-    YaxisVar = 100*(PP_roPRV_3D + PP_hPRV_3D)./PP_WEC_3D;
+    YaxisVar = 100*(studyData(SS).PP_roPRV_3D + studyData(SS).PP_hPRV_3D)./studyData(SS).PP_WEC_3D;
     varStr = 'PRV Losses';
 end
 
@@ -432,12 +433,7 @@ xlabel('volume (1000L) ', ...
 'Interpreter','latex','FontSize',fontSize-1,'fontname','Times')
 ylabel('power loss (x100\%)', ...
 'Interpreter','latex','FontSize',fontSize-1,'fontname','Times')
-switch par.ERUconfig.outlet
-    case 1
-        ERUstr = '';
-    case 0
-        ERUstr = 'and ERU Feed Outlet Downstream of Valve';
-end
+
 switch par.rvConfig.active
     case 0
         rvStr = 'Passive Ripple Control';
@@ -446,7 +442,7 @@ switch par.rvConfig.active
 end
 
 titleString = ['Mean Power Loss Normalized to Mean Power Capture',newline...
-                'With ',rvStr,ERUstr,': ',varStr,newline,...
+                'With ',rvStr,': ',varStr,newline,...
                 'Sea State ',num2str(SS)];
 title(titleString,...
 'Interpreter','latex','FontSize',fontSize,'fontname','Times')
@@ -468,8 +464,8 @@ xlim([0 xLim(2)])
 plotCase = 1;
 switch plotCase
  case 1
-     iiK = 2:1:K-2; % distribution
-     iiI = 3:1:I;   % valve coeff.
+     iiK = 1:1:K; % distribution
+     iiI = 1:2:I;   % valve coeff.
  case 2
      iiK = 1:1:K;
      iiI = 4;
@@ -484,10 +480,10 @@ nI = length(iiI);
 maxOr97 = 1;
 switch maxOr97
   case 1
-    YaxisVar = dpdt_max_3D;
+    YaxisVar = studyData(SS).dpdt_max_3D;
     varTitle = 'Maximum Rate of Change in Pressure';
   case 2
-    YaxisVar = dpdt_97_3D;
+    YaxisVar = studyData(SS).dpdt_97_3D;
     varTitle = '97th Percentile Rate of Change in Pressure';
 end
 
@@ -567,12 +563,7 @@ xlabel('volume (1000L) ', ...
 'Interpreter','latex','FontSize',fontSize-1,'fontname','Times')
 ylabel('rate of change in pressure (kPa/s)', ...
 'Interpreter','latex','FontSize',fontSize-1,'fontname','Times')
-switch par.ERUconfig.outlet
-    case 1
-        ERUstr = '';
-    case 0
-        ERUstr = 'and ERU Feed Outlet Downstream of Valve';
-end
+
 switch par.rvConfig.active
     case 0
         rvStr = 'Passive Ripple Control';
@@ -580,7 +571,7 @@ switch par.rvConfig.active
         rvStr = 'Active Ripple Control';
 end
 
-titleString = [varTitle,' With ',rvStr,ERUstr,':',newline,...
+titleString = [varTitle,' With ',rvStr,':',newline,...
                 'Sea State ',num2str(SS)];
 title(titleString,...
 'Interpreter','latex','FontSize',fontSize,'fontname','Times')
