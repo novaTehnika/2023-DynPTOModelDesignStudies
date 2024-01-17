@@ -141,9 +141,9 @@ par.plConfig.included = 0;
 % distribution between motor inlet and RO inlet
 
 nVar1 = 5;
-Vtotal = 1e-3*logspace(log10(2e3),log10(30e3),nVar1);% [L->m^3] total accumulator volume
+Vtotal = 1e-3*logspace(log10(5e3),log10(25e3),nVar1);% [L->m^3] total accumulator volume
 nVar2 = 9;
-X = linspace(0.1,0.5,nVar2); % [-] accumulator volume distribution 1 - all at RO inlet, 0 - all at motor inlet
+X = linspace(0.05,0.4,nVar2); % [-] accumulator volume distribution 1 - all at RO inlet, 0 - all at motor inlet
 nVar3 = 4;
 D_pm = linspace(1000,4000,nVar3)*1e-6/(2*pi); % [(cc/rev) -> m^3/rad]  Motor displacement
 
