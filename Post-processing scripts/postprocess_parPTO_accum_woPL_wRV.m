@@ -224,16 +224,15 @@ ax(iax) = subplot(n_plots,1,iax);
 ax(iax).FontName = 'times';
 ax(iax).FontSize = fontSize-1;
 
-hold on
-
 ip = 1;
-p(ip,iax) = plot(V_metric_opt,PP_metric(iiPareto),'k','Marker','x');
+p(ip,iax) = semilogy(V_metric_opt,PP_metric(iiPareto),'k','Marker','x');
+hold on
 ip = ip+1;
-p(ip,iax) = plot(V_metric_opt,100*studyData(SS).L_rv(iiPareto),'b','Marker','o');
+p(ip,iax) = semilogy(V_metric_opt,100*studyData(SS).L_rv(iiPareto),'b','Marker','o');
 ip = ip+1;
-p(ip,iax) = plot(V_metric_opt,100*(studyData(SS).L_hinPRV(iiPareto)),'r','Marker','^');
+p(ip,iax) = semilogy(V_metric_opt,100*(studyData(SS).L_hinPRV(iiPareto)),'r','Marker','^');
 ip = ip+1;
-p(ip,iax) = plot(V_metric_opt,100*(studyData(SS).L_roPRV(iiPareto)),'g','Marker','square');
+p(ip,iax) = semilogy(V_metric_opt,100*(studyData(SS).L_roPRV(iiPareto)),'g','Marker','square');
 ip = ip+1;
 
 xlabel('volume (1000L) ', ...
@@ -333,7 +332,7 @@ title(titleString,...
 % xlim([0 xLim(2)])
 % yLim = ylim;
 % ylim([0 yLim(2)])
-
+linkaxes(ax,'x')
 return
 
 %% Plot average power loss from the ripple control valve as a function of total accumulator volume for distribution (color) and valve coefficient (line type)
@@ -464,8 +463,8 @@ xlim([0 xLim(2)])
 plotCase = 1;
 switch plotCase
  case 1
-     iiK = 1:1:K; % distribution
-     iiI = 1:2:I;   % valve coeff.
+     iiK = 1:2:K; % distribution
+     iiI = 1:3:I;   % valve coeff.
  case 2
      iiK = 1:1:K;
      iiI = 4;
