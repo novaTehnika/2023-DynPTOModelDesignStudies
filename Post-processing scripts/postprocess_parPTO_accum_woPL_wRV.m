@@ -247,6 +247,8 @@ ip = ip+1;
 p(ip,iax) = semilogy(V_metric_opt,100*(studyData(SS).L_roPRV(iiPareto)),'g','Marker','square');
 ip = ip+1;
 
+grid on
+
 xlabel('volume (1000L) ', ...
 'Interpreter','latex','FontSize',fontSize-1,'fontname','Times')
 ylabel('power loss (x100\%)', ...
@@ -280,6 +282,8 @@ ip = 1;
 p(ip,iax) = plot(V_metric_opt,1e-5*dpdt_metric(iiPareto),'k','Marker','x');
 ip = ip+1;
 
+grid on
+
 xlabel('volume (1000L) ', ...
 'Interpreter','latex','FontSize',fontSize-1,'fontname','Times')
 ylabel('rate of change (bar/s)', ...
@@ -304,6 +308,8 @@ hold on
 ip = 1;
 p(ip,iax) = plot(V_metric_opt,X_opt,'k','Marker','x');
 ip = ip+1;
+
+grid on
 
 xlabel('volume (1000L) ', ...
 'Interpreter','latex','FontSize',fontSize-1,'fontname','Times')
@@ -330,6 +336,8 @@ hold on
 ip = 1;
 p(ip,iax) = plot(V_metric_opt,kv_opt*sqrt(1000)*1000,'k','Marker','x');
 ip = ip+1;
+
+grid on
 
 xlabel('volume (1000L) ', ...
 'Interpreter','latex','FontSize',fontSize-1,'fontname','Times')
