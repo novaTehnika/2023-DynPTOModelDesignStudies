@@ -54,13 +54,13 @@ function [dydt, nonState, control] = sys_seriesPTO(t,y,par)
 
 %% PI control of p_hout using w_pm
  % Error
-err_p = y(par.iy.p_filt) - par.control.p_h_nom;
+err_p = y(par.iy.p_filt) - par.control.p_ro_nom;
  % Feedforward
 w_ff = 0*par.control.w_pm_ctrl.min;
  % Control signal
 w_pm_nom = w_ff ...
-    + (par.control.w_pm_ctrl.kp*err_p ...
-    + par.control.w_pm_ctrl.ki*y(par.iy.errInt_p_filt));
+    + (par.control.w_pm_ctrl.kp*-err_p ...
+    + par.control.w_pm_ctrl.ki*-y(par.iy.errInt_p_filt));
 
    % enforce limits on rate of change in pressure at RO inlet
    % using estimated shaft speeds giving dpdt limits
@@ -94,7 +94,7 @@ control.w_pm = w_pm_nom ...
 %% deriviatives for filtered signal and error integrals (w/
  % anti-wind-up)
 dydt_control = [    % filtered signal
-                (y(par.iy.p_hout) - y(par.iy.p_filt))...
+                (y(par.iy.p_ro) - y(par.iy.p_filt))...
                 /par.control.tau_pfilt;
 
                     % error integral for pressure control
