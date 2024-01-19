@@ -100,7 +100,7 @@ function par = parameters_seriesPTO(par,filenameCoeff,filenameRadSS)
     
     % power control unit
       % pump/motor
-    par.D_pm = (2000)*1e-6/(2*pi); % [(cc/rev) -> m^3/rad]  Motor displacement
+    par.D_pm = (2300)*1e-6/(2*pi); % [(cc/rev) -> m^3/rad]  Motor displacement
     par.w_pm_max = (1750)/60*2*pi; % [(rpm) -> rad/s] maximum speed of motor
     par.w_pm_min = (1)/60*2*pi; % [(rpm) -> rad/s] minimum speed of motor
 
