@@ -10,7 +10,6 @@ display(['file ',num2str(j),' of ',num2str(nfiles)])
         % study variables
         studyVar(SS).Vtotal(iVar) = Vtotal_mesh(iVar);
         studyVar(SS).X(iVar) = X_mesh(iVar);
-        studyVar(SS).D_pm(iVar) = D_pm_mesh(iVar);
 
         % metrics
         studyData(SS).q_permMean(iVar) = q_permMean;
@@ -78,7 +77,6 @@ for SS = 1:6
                 % study variables
                 studyVar(SS).Vtotal(iVar) = Vtotal_mesh(iVar);
                 studyVar(SS).X(iVar) = X_mesh(iVar);
-                studyVar(SS).D_pm(iVar) = D_pm_mesh(iVar);
 
                 studyData(SS).q_permMean(iVar) = NaN;
                 studyData(SS).PP_WEC(iVar) = NaN;
@@ -103,40 +101,35 @@ for SS = 1:6
 end
 
 %% Transform data to 3D variable mesh
-I = length(D_pm);
 J = length(Vtotal);
 K = length(X);
 
 
 test = 1;
 for SS = 1:6
-    for i = 1:I
-        for j = 1:J
-            for k = 1:K
-                m = J*K*(i-1) + K*(j-1) + k;
+    for j = 1:J
+        for k = 1:K
+            m = K*(j-1) + k;
 
-                studyData(SS).q_permMean_3D(i,j,k) = studyData(SS).q_permMean(m);
-                studyData(SS).PP_WEC_3D(i,j,k) = studyData(SS).PP_WEC(m);
-                studyData(SS).PP_wp_3D(i,j,k) = studyData(SS).PP_wp(m);
-                studyData(SS).PP_hPRV_3D(i,j,k) = studyData(SS).PP_hinPRV(m);
-                studyData(SS).L_hPRV_3D(i,j,k) = studyData(SS).L_hinPRV(m);
-                studyData(SS).PP_roPRV_3D(i,j,k) = studyData(SS).PP_roPRV(m);
-                studyData(SS).L_roPRV_3D(i,j,k) = studyData(SS).L_roPRV(m);
-                studyData(SS).PP_pmLoss_3D(i,j,k) = studyData(SS).PP_pmLoss(m);
-                studyData(SS).L_pmLoss_3D(i,j,k) = studyData(SS).L_pmLoss(m);
-                studyData(SS).PP_gen_3D(i,j,k) = studyData(SS).PP_gen(m);
-                studyData(SS).X_gen_3D(i,j,k) = studyData(SS).X_gen(m);
-                studyData(SS).dpdt_max_3D(i,j,k) = studyData(SS).dpdt_max(m);
-                studyData(SS).dpdt_97_3D(i,j,k) = studyData(SS).dpdt_97(m);
+            studyData(SS).q_permMean_2D(j,k) = studyData(SS).q_permMean(m);
+            studyData(SS).PP_WEC_2D(j,k) = studyData(SS).PP_WEC(m);
+            studyData(SS).PP_wp_2D(j,k) = studyData(SS).PP_wp(m);
+            studyData(SS).PP_hPRV_2D(j,k) = studyData(SS).PP_hinPRV(m);
+            studyData(SS).L_hPRV_2D(j,k) = studyData(SS).L_hinPRV(m);
+            studyData(SS).PP_roPRV_2D(j,k) = studyData(SS).PP_roPRV(m);
+            studyData(SS).L_roPRV_2D(j,k) = studyData(SS).L_roPRV(m);
+            studyData(SS).PP_pmLoss_2D(j,k) = studyData(SS).PP_pmLoss(m);
+            studyData(SS).L_pmLoss_2D(j,k) = studyData(SS).L_pmLoss(m);
+            studyData(SS).PP_gen_2D(j,k) = studyData(SS).PP_gen(m);
+            studyData(SS).X_gen_2D(j,k) = studyData(SS).X_gen(m);
+            studyData(SS).dpdt_max_2D(j,k) = studyData(SS).dpdt_max(m);
+            studyData(SS).dpdt_97_2D(j,k) = studyData(SS).dpdt_97(m);
 
-                Vtotal_3D(i,j,k) = Vtotal_mesh(m);
-                X_3D(i,j,k) = X_mesh(m);
-                D_pm_3D(i,j,k) = D_pm_mesh(m);
-                test = (Vtotal_mesh(m) == Vtotal(j)) ...
-                    && (X_mesh(m) == X(k)) ...
-                    && (D_pm_mesh(m) == D_pm(i)) ...
-                    && test;
-            end
+            Vtotal_3D(j,k) = Vtotal_mesh(m);
+            X_3D(j,k) = X_mesh(m);
+            test = (Vtotal_mesh(m) == Vtotal(j)) ...
+                && (X_mesh(m) == X(k)) ...
+                && test;
         end
     end
 end
@@ -181,9 +174,6 @@ V_metric_meetsCon = V_metric(meetsConstraints);
 X_opt = studyVar(SS).X(iiPareto);
 X_meetsCon = studyVar(SS).X(meetsConstraints);
 
-D_pm_opt = studyVar(SS).D_pm(iiPareto);
-D_pm_meetsCon = studyVar(SS).D_pm(meetsConstraints);
-
 % clearvars meetsConstraints non_dominated ii_sort
 
 %% Plot Pareto optimal results
@@ -221,7 +211,7 @@ titleString = ['Performance of High-Pressure Circuit Branch',newline,...
 sgtitle(titleString,...
 'Interpreter','latex','FontSize',fontSize+2,'fontname','Times')
 
-n_plots = 4;
+n_plots = 3;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Power loss
 iax = 1;
@@ -239,6 +229,8 @@ p(ip,iax) = semilogy(V_metric_opt,100*(studyData(SS).L_hinPRV(iiPareto)),'r','Ma
 ip = ip+1;
 p(ip,iax) = semilogy(V_metric_opt,100*(studyData(SS).L_roPRV(iiPareto)),'g','Marker','square');
 ip = ip+1;
+
+grid on
 
 xlabel('volume (1000L) ', ...
 'Interpreter','latex','FontSize',fontSize-1,'fontname','Times')
@@ -312,31 +304,6 @@ xlim([0 xLim(2)])
 yLim = ylim;
 ylim([0 yLim(2)])
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% pump/motor displacement
-iax = 4;
-ax(iax) = subplot(n_plots,1,iax);
-ax(iax).FontName = 'times';
-ax(iax).FontSize = fontSize-1;
-
-hold on
-
-ip = 1;
-p(ip,iax) = plot(V_metric_opt,D_pm_opt/1e-6*(2*pi),'k','Marker','x');
-ip = ip+1;
-
-xlabel('volume (1000L) ', ...
-'Interpreter','latex','FontSize',fontSize-1,'fontname','Times')
-ylabel('displacement (cc/rev)', ...
-'Interpreter','latex','FontSize',fontSize-1,'fontname','Times')
-
-titleString = ['Pump/Motor Displacement'];
-title(titleString,...
-'Interpreter','latex','FontSize',fontSize,'fontname','Times')
-
-% xLim = xlim;
-% xlim([0 xLim(2)])
-% yLim = ylim;
-% ylim([0 yLim(2)])
 linkaxes(ax,'x')
 return
 
@@ -469,16 +436,12 @@ plotCase = 1;
 switch plotCase
  case 1
      iiK = 1:2:K; % distribution
-     iiI = 1:3:I;   % valve coeff.
  case 2
      iiK = 1:1:K;
-     iiI = 4;
  case 3
      iiK = 3;
-     iiI = 2:I;
 end
 nK = length(iiK);
-nI = length(iiI);
    
  % select variable to plot
 maxOr97 = 1;
@@ -538,23 +501,14 @@ for k = 1:nK
         ['fraction at RO inlet = ',num2str(X(iiK(k)))]);
 end
 
-for i = 1:nI
-    plot(-99*[1, 0.5],-99*[1, 0.5],'k','LineStyle', linestyles{i});
-    iLeg = iLeg+1;
-    legLabels(iLeg) = convertCharsToStrings( ...
-        ['k_v = ',num2str(D_pm(iiI(i))/1e-6*(2*pi),2),'(cc/{rev})']);
-end
-
 % plot real data
 
 for k = 1:nK
-    for i = 1:nI
-        p(k,i) = plot(Vtotal,1e-3*YaxisVar(iiI(i),:,iiK(k)), ...
-            'LineStyle', linestyles{i}, ...
-            'Color',color(k,:), ...
-            'LineWidth',1);
-        p(k,i).HandleVisibility='off';
-    end
+    p(k) = plot(Vtotal,1e-3*YaxisVar(:,iiK(k)), ...
+        'LineStyle', linestyles{k}, ...
+        'Color',color(k,:), ...
+        'LineWidth',1);
+    p(k).HandleVisibility='off';
 end
 
 % plot target limit

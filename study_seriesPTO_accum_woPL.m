@@ -14,9 +14,9 @@
 % The parameter initiallization functions are called within this
 % script before the sim_seriesPTO.m script is called.
 %
-% This specific script studies the size of high-pressure accumulators and
+% This specific script studies the size of high-pressure accumulators
 % as they effect pressure rate of change at the RO module and the power 
-% losses in the system (e.g. power loss through pressure relief valves.
+% losses in the system (e.g. power loss through pressure relief valves).
 %
 % This script is set up to be run as part of a SLURM job array. The
 % following lines are required before this script is called:
@@ -140,17 +140,14 @@ par.plConfig.included = 0;
 % total accumulator volume
 % distribution between motor inlet and RO inlet
 
-nVar1 = 5;
-Vtotal = 1e-3*logspace(log10(5e3),log10(25e3),nVar1);% [L->m^3] total accumulator volume
-nVar2 = 9;
-X = linspace(0.05,0.4,nVar2); % [-] accumulator volume distribution 1 - all at RO inlet, 0 - all at motor inlet
-nVar3 = 4;
-D_pm = linspace(1000,4000,nVar3)*1e-6/(2*pi); % [(cc/rev) -> m^3/rad]  Motor displacement
+nVar1 = 10;
+Vtotal = 1e-3*logspace(log10(1e3),log10(25e3),nVar1);% [L->m^3] total accumulator volume
+nVar2 = 10;
+X = logspace(log10(0.01),log10(0.3),nVar2); % [-] accumulator volume distribution 1 - all at RO inlet, 0 - all at motor inlet
 
-[meshVar.Vtotal, meshVar.X, meshVar.D_pm] = meshgrid(Vtotal,X,D_pm);
+[meshVar.Vtotal, meshVar.X] = meshgrid(Vtotal,X);
 Vtotal_mesh = meshVar.Vtotal(:);
 X_mesh = meshVar.X(:);
-D_pm_mesh = meshVar.D_pm(:);
 
 nVar = length(Vtotal_mesh);
 
@@ -163,7 +160,6 @@ Vc_h = (1 - X_mesh(iVar))*Vtotal_mesh(iVar);
 par.Vc_hin = 0.5*Vc_h;
 par.Vc_hout = 0.5*Vc_h;
 par.Vc_ro = X_mesh(iVar)*Vtotal_mesh(iVar);
-par.D_pm = D_pm_mesh(iVar);
 
 % Define state indices
 par.iy = stateIndex_seriesPTO(par);
