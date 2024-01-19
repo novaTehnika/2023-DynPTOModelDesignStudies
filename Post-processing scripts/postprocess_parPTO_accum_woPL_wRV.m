@@ -23,7 +23,7 @@ display(['file ',num2str(j),' of ',num2str(nfiles)])
         studyData(SS).PP_roPRV(iVar) = PP_roPRV;
         studyData(SS).L_roPRV(iVar) = PP_roPRV/PP_WEC;
         studyData(SS).PP_pmLoss(iVar) = PP_pmLoss;
-        studyData(SS).L_pmLoss(iVar) = PP_pmLos/PP_WEC;
+        studyData(SS).L_pmLoss(iVar) = PP_pmLoss/PP_WEC;
         studyData(SS).PP_gen(iVar) = PP_gen;
         studyData(SS).X_gen(iVar) = PP_gen/PP_WEC; % proportion of power converted to electricity
         studyData(SS).dpdt_max(iVar) = dpdt_max;

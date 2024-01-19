@@ -21,7 +21,7 @@ display(['file ',num2str(j),' of ',num2str(nfiles)])
         studyData(SS).PP_roPRV(iVar) = PP_roPRV;
         studyData(SS).L_roPRV(iVar) = PP_roPRV/PP_WEC;
         studyData(SS).PP_pmLoss(iVar) = PP_pmLoss;
-        studyData(SS).L_pmLoss(iVar) = PP_pmLos/PP_WEC;
+        studyData(SS).L_pmLoss(iVar) = PP_pmLoss/PP_WEC;
         studyData(SS).PP_gen(iVar) = PP_gen;
         studyData(SS).X_gen(iVar) = PP_gen/PP_WEC; % proportion of power converted to electricity
         studyData(SS).dpdt_max(iVar) = dpdt_max;
@@ -118,8 +118,6 @@ for SS = 1:6
                 studyData(SS).q_permMean_3D(i,j,k) = studyData(SS).q_permMean(m);
                 studyData(SS).PP_WEC_3D(i,j,k) = studyData(SS).PP_WEC(m);
                 studyData(SS).PP_wp_3D(i,j,k) = studyData(SS).PP_wp(m);
-                studyData(SS).PP_rv_3D(i,j,k) = studyData(SS).PP_rv(m);
-                studyData(SS).L_rv_3D(i,j,k) = studyData(SS).L_rv(m);
                 studyData(SS).PP_hPRV_3D(i,j,k) = studyData(SS).PP_hinPRV(m);
                 studyData(SS).L_hPRV_3D(i,j,k) = studyData(SS).L_hinPRV(m);
                 studyData(SS).PP_roPRV_3D(i,j,k) = studyData(SS).PP_roPRV(m);
