@@ -171,7 +171,7 @@ function par = parameters_seriesPTO(par,filenameCoeff,filenameRadSS)
     par.control.w_pm_ctrl.max = par.w_pm_max;
     par.control.w_pm_ctrl.min = par.w_pm_min;
     par.control.w_pm_ctrl.kp = 5e-4;
-    par.control.w_pm_ctrl.ki = 0*5e-6;
+    par.control.w_pm_ctrl.ki = 5e-6;
 
     % Charging system (Intake & Boost pump)
     par.cn = 5.5;
