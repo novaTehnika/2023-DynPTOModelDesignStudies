@@ -92,7 +92,7 @@ addpath('Utilities')
 
 % Simulation timeframe
 par.tstart = 0; %[s] start time of simulation
-par.tend = 1000; %[s] end time of simulation
+par.tend = 2000; %[s] end time of simulation
 
 par.Tramp = 250; % [s] excitation force ramp period
 par.TrampWEC = min(25,par.Tramp); % [s] excitation force ramp period
@@ -142,12 +142,12 @@ par.plConfig.included = 0;
 % ditribution between motor inlet and RO inlet
 % max valve coefficient
 
-nVar1 = 10;
+nVar1 = 15;
 Vtotal = 1e-3*logspace(log10(5e3),log10(15e3),nVar1); % [L->m^3] total accumulator volume
-nVar2 = 10;
-X = linspace(0.2,0.9,nVar2); % [-] accumulator volume distribution 1 - all at RO inlet, 0 - all at motor inlet
-nVar3 = 4;
-kv = 1/sqrt(1e3)/1e3*logspace(log10(10),log10(100),nVar3); % [(L/s/kPa^0.5)->m^3/s/Pa^0.5] max valve coefficient for ripple control valve
+nVar2 = 40;
+X = linspace(0.01,0.99,nVar2); % [-] accumulator volume distribution 1 - all at RO inlet, 0 - all at motor inlet
+nVar3 = 1;
+kv = 1/sqrt(1e3)/1e3*(40); % [(L/s/kPa^0.5)->m^3/s/Pa^0.5] max valve coefficient for ripple control valve
 
 [meshVar.Vtotal, meshVar.X, meshVar.kv] = meshgrid(Vtotal,X,kv);
 Vtotal_mesh = meshVar.Vtotal(:);
