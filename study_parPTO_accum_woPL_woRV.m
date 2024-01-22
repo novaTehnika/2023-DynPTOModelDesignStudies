@@ -90,7 +90,7 @@ addpath('Utilities')
 
 % Simulation timeframe
 par.tstart = 0; %[s] start time of simulation
-par.tend = 1000;%2000; %[s] end time of simulation
+par.tend = 2000; %[s] end time of simulation
 
 par.Tramp = 250; % [s] excitation force ramp period
 par.TrampWEC = min(25,par.Tramp); % [s] excitation force ramp period
@@ -137,7 +137,7 @@ par.rvConfig.active = (0)*par.rvConfig.included; % RO inlet valve is 1 - active,
 
 %% %%%%%%%%%%%%   Study Variables  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % total accumulator volume
-nVar1 = 10;%25;
+nVar1 = 40;
 Vc_h = 1e-3*logspace(log10(2e3),log10(30e3),nVar1);% [L->m^3] total accumulator volume
 
 saveSimData = 0; % save simulation data (1) or just output variables (0)
@@ -175,8 +175,9 @@ parfor iVar = 1:nVar1
     PP_hinPRV(iVar) = mean(out.power.P_hinPRV);
     PP_roPRV(iVar) = mean(out.power.P_roPRV);
      % power loss through pump/motor and power generated for normalization
-    PP_roPRV(iVar) = mean(out.power.P_roPRV);
     PP_pmLoss(iVar) = mean(out.power.P_pmLoss);
+    PP_gen(iVar) = mean(out.power.P_gen);
+    PP_battery(iVar) = mean(out.power.P_battery);
      % power loss from valve
     PP_rv(iVar) = mean(out.power.P_rv);
      % max rate of change in pressure
