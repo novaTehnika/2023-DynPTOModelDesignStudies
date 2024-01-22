@@ -178,6 +178,7 @@ parfor iVar = 1:nVar1
     PP_pmLoss(iVar) = mean(out.power.P_pmLoss);
     PP_gen(iVar) = mean(out.power.P_gen);
     PP_battery(iVar) = mean(out.power.P_battery);
+    PP_genLoss(iVar) = mean(out.power.P_genLoss);
      % power loss from valve
     PP_rv(iVar) = mean(out.power.P_rv);
      % max rate of change in pressure
