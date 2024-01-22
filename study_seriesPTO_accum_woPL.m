@@ -92,7 +92,7 @@ addpath('Utilities')
 
 % Simulation timeframe
 par.tstart = 0; %[s] start time of simulation
-par.tend = 1000;%2000; %[s] end time of simulation
+par.tend = 2000;%2000; %[s] end time of simulation
 
 par.Tramp = 250; % [s] excitation force ramp period
 par.TrampWEC = min(25,par.Tramp); % [s] excitation force ramp period
@@ -140,10 +140,10 @@ par.plConfig.included = 0;
 % total accumulator volume
 % distribution between motor inlet and RO inlet
 
-nVar1 = 10;
-Vtotal = 1e-3*logspace(log10(1e3),log10(25e3),nVar1);% [L->m^3] total accumulator volume
-nVar2 = 10;
-X = logspace(log10(0.01),log10(0.3),nVar2); % [-] accumulator volume distribution 1 - all at RO inlet, 0 - all at motor inlet
+nVar1 = 20;
+Vtotal = 1e-3*logspace(log10(1e3),log10(15e3),nVar1);% [L->m^3] total accumulator volume
+nVar2 = 40;
+X = logspace(log10(0.01),log10(0.95),nVar2); % [-] accumulator volume distribution 1 - all at RO inlet, 0 - all at motor inlet
 
 [meshVar.Vtotal, meshVar.X] = meshgrid(Vtotal,X);
 Vtotal_mesh = meshVar.Vtotal(:);
