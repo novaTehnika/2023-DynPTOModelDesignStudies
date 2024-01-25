@@ -23,6 +23,8 @@ display(['file ',num2str(j),' of ',num2str(nfiles)])
         studyData(SS).L_pmLoss(iVar) = PP_pmLoss/PP_WEC;
         studyData(SS).PP_gen(iVar) = PP_gen;
         studyData(SS).X_gen(iVar) = PP_gen/PP_WEC; % proportion of power converted to electricity
+        studyData(SS).PP_genLoss(iVar) = PP_genLoss;
+        studyData(SS).L_genLoss(iVar) = PP_genLoss/PP_WEC;
         studyData(SS).dpdt_max(iVar) = dpdt_max;
         studyData(SS).dpdt_97(iVar) = dpdt_97(end);
 
@@ -89,6 +91,8 @@ for SS = 1:6
                 studyData(SS).L_pmLoss(iVar) = NaN;
                 studyData(SS).PP_gen(iVar) = NaN;
                 studyData(SS).X_gen(iVar) = NaN;
+                studyData(SS).PP_genLoss(iVar) = NaN;
+                studyData(SS).L_genLoss(iVar) = NaN;
                 studyData(SS).dpdt_max(iVar) = NaN;
                 studyData(SS).dpdt_97(iVar) = NaN;
 
@@ -122,6 +126,8 @@ for SS = 1:6
             studyData(SS).L_pmLoss_2D(j,k) = studyData(SS).L_pmLoss(m);
             studyData(SS).PP_gen_2D(j,k) = studyData(SS).PP_gen(m);
             studyData(SS).X_gen_2D(j,k) = studyData(SS).X_gen(m);
+            studyData(SS).PP_genLoss_2D(j,k) = studyData(SS).PP_genLoss(m);
+            studyData(SS).L_genLoss_2D(j,k) = studyData(SS).L_genLoss(m);
             studyData(SS).dpdt_max_2D(j,k) = studyData(SS).dpdt_max(m);
             studyData(SS).dpdt_97_2D(j,k) = studyData(SS).dpdt_97(m);
 
@@ -142,6 +148,7 @@ SS = 2;
 
 V_metric = studyVar(SS).Vtotal;
 PP_metric = 100*(studyData(SS).PP_pmLoss ...
+                + studyData(SS).PP_genLoss ...
                 + studyData(SS).PP_hinPRV ...
                 + studyData(SS).PP_roPRV) ...
                 ./studyData(SS).PP_WEC;
@@ -223,7 +230,7 @@ ip = 1;
 p(ip,iax) = semilogy(V_metric_opt,PP_metric(iiPareto),'k','Marker','x');
 hold on
 ip = ip+1;
-p(ip,iax) = semilogy(V_metric_opt,100*studyData(SS).L_pmLoss(iiPareto),'b','Marker','o');
+p(ip,iax) = semilogy(V_metric_opt,100*(studyData(SS).L_pmLoss(iiPareto)+studyData(SS).L_genLoss(iiPareto)),'b','Marker','o');
 ip = ip+1;
 p(ip,iax) = semilogy(V_metric_opt,100*(studyData(SS).L_hinPRV(iiPareto)),'r','Marker','^');
 ip = ip+1;
@@ -241,7 +248,7 @@ titleString = ['Mean Power Loss of Normalized to Mean Power Capture'];
 title(titleString,...
 'Interpreter','latex','FontSize',fontSize,'fontname','Times')
 
-leg = legend('combined','pump/motor','PRV at WEC-driven pump','PRV at RO inlet');
+leg = legend('combined','pump/motor & generator','PRV at WEC-driven pump','PRV at RO inlet');
 leg.FontSize = fontSize-1;
 leg.FontName = 'Times';
 rect = [0.5, -0.2, 0.25, 0.15];
