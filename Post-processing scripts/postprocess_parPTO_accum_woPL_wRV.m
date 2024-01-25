@@ -26,6 +26,8 @@ display(['file ',num2str(j),' of ',num2str(nfiles)])
         studyData(SS).L_pmLoss(iVar) = PP_pmLoss/PP_WEC;
         studyData(SS).PP_gen(iVar) = PP_gen;
         studyData(SS).X_gen(iVar) = PP_gen/PP_WEC; % proportion of power converted to electricity
+        studyData(SS).PP_genLoss(iVar) = PP_genLoss;
+        studyData(SS).L_genLoss(iVar) = PP_genLoss/PP_WEC;
         studyData(SS).dpdt_max(iVar) = dpdt_max;
         studyData(SS).dpdt_97(iVar) = dpdt_97(end);
 
@@ -95,6 +97,8 @@ for SS = 1:6
                 studyData(SS).L_pmLoss(iVar) = NaN;
                 studyData(SS).PP_gen(iVar) = NaN;
                 studyData(SS).X_gen(iVar) = NaN;
+                studyData(SS).PP_genLoss(iVar) = NaN;
+                studyData(SS).L_genLoss(iVar) = NaN;
                 studyData(SS).dpdt_max(iVar) = NaN;
                 studyData(SS).dpdt_97(iVar) = NaN;
 
@@ -132,6 +136,8 @@ for SS = 1:6
                 studyData(SS).L_pmLoss_3D(i,j,k) = studyData(SS).L_pmLoss(m);
                 studyData(SS).PP_gen_3D(i,j,k) = studyData(SS).PP_gen(m);
                 studyData(SS).X_gen_3D(i,j,k) = studyData(SS).X_gen(m);
+                studyData(SS).PP_genLoss_3D(i,j,k) = studyData(SS).PP_genLoss(m);
+                studyData(SS).L_genLoss_3D(i,j,k) = studyData(SS).L_genLoss(m);
                 studyData(SS).dpdt_max_3D(i,j,k) = studyData(SS).dpdt_max(m);
                 studyData(SS).dpdt_97_3D(i,j,k) = studyData(SS).dpdt_97(m);
 
@@ -147,7 +153,7 @@ for SS = 1:6
     end
 end
 if ~test; error('indexing incorrect'); end
-clearvars test
+% clearvars test
 
 
 %% Find optimal distribution of accumulator volume for each total 
@@ -156,7 +162,9 @@ SS = 2;
 V_metric = studyVar(SS).Vtotal;
 PP_metric = 100*(studyData(SS).PP_rv ...
                 + studyData(SS).PP_hinPRV ...
-                + studyData(SS).PP_roPRV) ...
+                + studyData(SS).PP_roPRV ...
+                + studyData(SS).PP_pmLoss ...
+                + studyData(SS).PP_genLoss) ...
                 ./studyData(SS).PP_WEC;
 dpdt_ub = par.control.dpdt_ROmax;
 maxOr97 = 1;
@@ -174,8 +182,10 @@ end
 % accumulator volume and pipeline diameter
  % find individuals meeting dpdt constraint
 dpdt_ub = par.control.dpdt_ROmax;
-meetsConstraints = find(dpdt_metric <= dpdt_ub);
-
+meetsConstraints = find(dpdt_metric <= 1.00*dpdt_ub);
+if 0 % 1 to turn off dpdt constraint
+    meetsConstraints = 1:nVar;
+end
  % find non-dominated individuals from set meeting cavitation constraints
 non_dominated = paretoFront2D(V_metric(meetsConstraints),'min', ...
                PP_metric(meetsConstraints),'min');
@@ -246,6 +256,9 @@ p(ip,iax) = semilogy(V_metric_opt,100*(studyData(SS).L_hinPRV(iiPareto)),'r','Ma
 ip = ip+1;
 p(ip,iax) = semilogy(V_metric_opt,100*(studyData(SS).L_roPRV(iiPareto)),'g','Marker','square');
 ip = ip+1;
+p(ip,iax) = semilogy(V_metric_opt, ...
+    100*(studyData(SS).L_pmLoss(iiPareto)+studyData(SS).L_genLoss(iiPareto)),'b','Marker','x');
+ip = ip+1;
 
 grid on
 
@@ -258,7 +271,7 @@ titleString = ['Mean Power Loss of Normalized to Mean Power Capture'];
 title(titleString,...
 'Interpreter','latex','FontSize',fontSize,'fontname','Times')
 
-leg = legend('combined','resistive element','PRV at WEC-driven pump','PRV at RO inlet');
+leg = legend('combined','resistive element','PRV at WEC-driven pump','PRV at RO inlet','pump/motor & generator');
 leg.FontSize = fontSize-1;
 leg.FontName = 'Times';
 rect = [0.5, -0.2, 0.25, 0.15];
@@ -480,14 +493,14 @@ xlim([0 xLim(2)])
 
 %% Plot rate of change as a function of total accumulator volume for distribution (color) and valve coefficient (line type)
  % select indices to plot
-plotCase = 1;
+plotCase = 2;
 switch plotCase
  case 1
      iiK = 1:2:K; % distribution
      iiI = 1:3:I;   % valve coeff.
  case 2
-     iiK = 1:1:K;
-     iiI = 4;
+     iiK = 4:6:K;
+     iiI = 1;
  case 3
      iiK = 3;
      iiI = 2:I;
