@@ -238,7 +238,7 @@ titleString = ['Performance of High-Pressure Circuit Branch',newline,...
 sgtitle(titleString,...
 'Interpreter','latex','FontSize',fontSize+2,'fontname','Times')
 
-n_plots = 4;
+n_plots = 5;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Power loss
 iax = 1;
@@ -310,8 +310,34 @@ title(titleString,...
 xLim = xlim;
 xlim([0 xLim(2)])
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% distibution of volume
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% permeate production
 iax = 3;
+ax(iax) = subplot(n_plots,1,iax);
+ax(iax).FontName = 'times';
+ax(iax).FontSize = fontSize-1;
+
+hold on
+
+ip = 1;
+p(ip,iax) = plot(V_metric_opt,studyData(SS).q_permMean(iiPareto)*3600*24,'k','Marker','x');
+ip = ip+1;
+
+xlabel('volume (1000L) ', ...
+'Interpreter','latex','FontSize',fontSize-1,'fontname','Times')
+ylabel('production rate ($m^3/day$)', ...
+'Interpreter','latex','FontSize',fontSize-1,'fontname','Times')
+
+titleString = ['Permeate Production'];
+title(titleString,...
+'Interpreter','latex','FontSize',fontSize,'fontname','Times')
+
+xLim = xlim;
+xlim([0 xLim(2)])
+% yLim = ylim;
+% ylim([0 yLim(2)])
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% distibution of volume
+iax = 4;
 ax(iax) = subplot(n_plots,1,iax);
 ax(iax).FontName = 'times';
 ax(iax).FontSize = fontSize-1;
@@ -339,7 +365,7 @@ yLim = ylim;
 ylim([0 yLim(2)])
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% valve coefficient
-iax = 4;
+iax = 5;
 ax(iax) = subplot(n_plots,1,iax);
 ax(iax).FontName = 'times';
 ax(iax).FontSize = fontSize-1;
