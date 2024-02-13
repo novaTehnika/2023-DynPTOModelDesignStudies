@@ -57,7 +57,7 @@ end
 % ...
 
 %% Plotting
-SS = 2;
+SS = 3;
 err_endNorm = @(x) x./x(end); 
 
 black = [0 0 0];
@@ -94,7 +94,7 @@ hold on
 xlabel('time span (s)', ...
 'Interpreter','latex','FontSize',fontSize-1,'fontname','Times')
 title(['Normalized Energy and Volume Balance: Sea State',num2str(SS)], ...
-'Interpreter','latex','FontSize',fontSize,'fontname','Times')
+'Interpreter','latex','FontSize',supTitleFontSize,'fontname','Times')
 yyaxis left
 plot(tspan,abs(studyData.Ebal_error(:,SS)));
 hold on
@@ -225,10 +225,165 @@ plot(tspan,err_endNorm(studyData.L_LPPL(:,SS)));
 
 legend('P_LPPL','L_LPPL')
 
+%% permeate
+black = [0 0 0];
+maroon = [122 0 25]/256;
+gold = [255 204 51]/256;
+blue = [0 75 135]/256;
+orange = [226 100 55]/256;
+green = [63 150 87]/256;
+color = [maroon; gold; blue; orange; green];
+
+linestyles = {'-', '--', ':', '-.'};
+
+bottomEdge = 1;
+leftEdge = 3;
+width = 5.75; % one column: 3+9/16, two column: 7.5
+height = 2;
+supTitleFontSize = 9;
+subTitleFontSize = 9;
+axFontSize = 8;
+lineWidth = 1;
+
+clearvars leg
+
+fig = figure;
+fig.Units = 'inches';
+fig.Position = [leftEdge bottomEdge width height ];
+
+semilogy(tspan,err_endNorm(studyData.q_permMean(:,SS)),'color',black,'LineWidth',lineWidth)
+
+grid on
+
+ylabel('error', ...
+'Interpreter','latex','FontSize',axFontSize,'fontname','Times')
+xlabel('time span (s)', ...
+'Interpreter','latex','FontSize',axFontSize,'fontname','Times')
+title(['Permeate Production Convergence Study: Sea State ',num2str(SS)],...
+'Interpreter','latex','FontSize',supTitleFontSize,'fontname','Times')
+
+% leg = legend('energy','volume', ...
+%              'Interpreter','latex');
+% leg.FontSize = axFontSize;
+% leg.FontName = 'Times';
+% leg.Orientation = 'horizontal';
+% pos = leg.Position;
+% leg.Position = [0.5-pos(3)/2, 0, pos(3), pos(4)];
+% leg.Box = 'off';
+
+ax = gca;
+ax.FontName = 'Times';
+ax.FontSize = axFontSize;
+
+%% power
+black = [0 0 0];
+maroon = [122 0 25]/256;
+gold = [255 204 51]/256;
+blue = [0 75 135]/256;
+orange = [226 100 55]/256;
+green = [63 150 87]/256;
+color = [maroon; gold; blue; orange; green];
+
+linestyles = {'-', '--', ':', '-.'};
+
+bottomEdge = 1;
+leftEdge = 3;
+width = 5.75; % one column: 3+9/16, two column: 7.5
+height = 2;
+supTitleFontSize = 9;
+subTitleFontSize = 9;
+axFontSize = 8;
+lineWidth = 1;
+
+clearvars leg
+
+fig = figure;
+fig.Units = 'inches';
+fig.Position = [leftEdge bottomEdge width height ];
+
+
+semilogy(tspan,err_endNorm(studyData.PP_WEC(:,SS)),'color',black,'LineWidth',lineWidth)
+
+grid on
+
+ylabel('error', ...
+'Interpreter','latex','FontSize',axFontSize,'fontname','Times')
+xlabel('time span (s)', ...
+'Interpreter','latex','FontSize',axFontSize,'fontname','Times')
+title(['WEC Power Capture Convergence Study: Sea State ',num2str(SS)],...
+'Interpreter','latex','FontSize',supTitleFontSize,'fontname','Times')
+
+% leg = legend('energy','volume', ...
+%              'Interpreter','latex');
+% leg.FontSize = axFontSize;
+% leg.FontName = 'Times';
+% leg.Orientation = 'horizontal';
+% pos = leg.Position;
+% leg.Position = [0.5-pos(3)/2, 0, pos(3), pos(4)];
+% leg.Box = 'off';
+
+ax = gca;
+ax.FontName = 'Times';
+ax.FontSize = axFontSize;
+
+%% pressure dpdt
+black = [0 0 0];
+maroon = [122 0 25]/256;
+gold = [255 204 51]/256;
+blue = [0 75 135]/256;
+orange = [226 100 55]/256;
+green = [63 150 87]/256;
+color = [maroon; gold; blue; orange; green];
+
+linestyles = {'-', '--', ':', '-.'};
+
+bottomEdge = 1;
+leftEdge = 3;
+width = 5.75; % one column: 3+9/16, two column: 7.5
+height = 2;
+supTitleFontSize = 9;
+subTitleFontSize = 9;
+axFontSize = 8;
+lineWidth = 1;
+
+clearvars leg
+
+fig = figure;
+fig.Units = 'inches';
+fig.Position = [leftEdge bottomEdge width height ];
+
+plot(tspan,err_endNorm(studyData.dpdt_max(:,SS)));
+plot(tspan,err_endNorm(studyData.dpdt_97(:,SS)));
+
+semilogy(tspan,err_endNorm(studyData.dpdt_max(:,SS)),'color',black,'LineWidth',lineWidth)
+hold on
+semilogy(tspan,err_endNorm(studyData.dpdt_97(:,SS)),'color',maroon,'LineWidth',lineWidth)
+grid on
+
+ylabel('error', ...
+'Interpreter','latex','FontSize',axFontSize,'fontname','Times')
+xlabel('time span (s)', ...
+'Interpreter','latex','FontSize',axFontSize,'fontname','Times')
+title(['Rate of Change in Feed Pressure Convergence Study: Sea State ',num2str(SS)],...
+'Interpreter','latex','FontSize',supTitleFontSize,'fontname','Times')
+
+leg = legend('$|dp_f/dt|$','$P_{97}|dp_f/dt|$', ...
+             'Interpreter','latex');
+leg.FontSize = axFontSize;
+leg.FontName = 'Times';
+% leg.Orientation = 'horizontal';
+% pos = leg.Position;
+% leg.Position = [0.5-pos(3)/2, 0, pos(3), pos(4)];
+% leg.Box = 'off';
+
+ax = gca;
+ax.FontName = 'Times';
+ax.FontSize = axFontSize;
+
 %% for accum_woRV and accum_wRV
 bottomEdge = 1;
 leftEdge = 3;
-width = 7.5; % one column: 3+9/16, two column: 7.5
+width = 5.75; % one column: 3+9/16, two column: 7.5
 height = 8;
 fontSize = 9;
 lineWidth = 1;

@@ -61,7 +61,7 @@ catch
 end
 
 %% Plot normalized energy and volume balance error as a function of timestep
-SS = 3;
+SS = 2;
 
 black = [0 0 0];
 maroon = [122 0 25]/256;
@@ -75,9 +75,11 @@ linestyles = {'-', '--', ':', '-.'};
 
 bottomEdge = 1;
 leftEdge = 3;
-width = 7.5; % one column: 3+9/16, two column: 7.5
-height = 3.25;
-fontSize = 9;
+width = 5.75; % one column: 3+9/16, two column: 7.5
+height = 2;
+supTitleFontSize = 9;
+subTitleFontSize = 9;
+axFontSize = 8;
 lineWidth = 1;
 
 clearvars leg
@@ -86,26 +88,28 @@ fig = figure;
 fig.Units = 'inches';
 fig.Position = [leftEdge bottomEdge width height ];
 
-n_plots = 1;
-ax1 = subplot(n_plots,1,1);
-ax1.FontName = 'times';
-ax1.FontSize = fontSize-1;
-
+semilogy(MaxStep*1e3,abs(Ebal_error_array(:,SS)),'color',maroon,'LineWidth',lineWidth)
 hold on
+semilogy(MaxStep*1e3,abs(Vbal_error_array(:,SS)),'color',gold,'LineWidth',lineWidth)
 
-xlabel('time step (s)', ...
-'Interpreter','latex','FontSize',fontSize-1,'fontname','Times')
-title(['Normalized Energy and Volume Balance Study: Sea State',num2str(SS)],...
-'Interpreter','latex','FontSize',fontSize,'fontname','Times')
-yyaxis left
-semilogx(MaxStep,abs(Ebal_error_array(:,SS)))
-hold on
-ylabel('energy balance error, normalized', ...
-'Interpreter','latex','FontSize',fontSize-1,'fontname','Times')
+grid on
 
+ylabel('error', ...
+'Interpreter','latex','FontSize',axFontSize,'fontname','Times')
+xlabel('time step (ms)', ...
+'Interpreter','latex','FontSize',axFontSize,'fontname','Times')
+title(['Normalized Energy and Volume Balance Study: Sea State ',num2str(SS)],...
+'Interpreter','latex','FontSize',supTitleFontSize,'fontname','Times')
 
-yyaxis right
-hold on
-semilogx(MaxStep,abs(Vbal_error_array(:,SS)))
-ylabel('volume balance error, normalized', ...
-'Interpreter','latex','FontSize',fontSize-1,'fontname','Times')
+leg = legend('energy','volume', ...
+             'Interpreter','latex');
+leg.FontSize = axFontSize;
+leg.FontName = 'Times';
+% leg.Orientation = 'horizontal';
+% pos = leg.Position;
+% leg.Position = [0.5-pos(3)/2, 0, pos(3), pos(4)];
+% leg.Box = 'off';
+
+ax = gca;
+ax.FontName = 'Times';
+ax.FontSize = axFontSize;
