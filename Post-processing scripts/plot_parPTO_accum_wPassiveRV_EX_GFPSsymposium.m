@@ -34,12 +34,12 @@ titleString = ['Pressure and Control: Parallel-Type with Passive Element'];
 set(fig,'defaultAxesColorOrder',[black; black]);
 
 yyaxis left
-plot(out.t([1 end]),1e-6*out.par.control.p_ro_nom*[1 1],'--k','LineWidth',lineWidth)
-hold on
+
 plot(out.t,1e-6*out.p_ro,'-','LineWidth',lineWidth,'Color',maroon)
+hold on
 plot(out.t,1e-6*out.p_hin,'-.','LineWidth',lineWidth,'Color',gold)
 plot(out.t,1e-6*out.p_ro,'-','LineWidth',lineWidth,'Color',maroon,'HandleVisibility','off')
-
+plot(out.t([1 end]),1e-6*out.par.control.p_ro_nom*[1 1],'--k','LineWidth',lineWidth)
 
 yLim = ylim;
 ylim([4 yLim(2)])
@@ -57,7 +57,7 @@ ylabel('flow rate (L/s)', ...
 yLim = ylim;
 ylim([0 yLim(2)])
 
-leg = legend('nom. feed pressure','$p_{ro}$','$p_{h}$','$q_{m}$', ...
+leg = legend('$p_{f}$','$p_{h}$','nom. feed pressure','$q_{m}$', ...
              'Interpreter','latex');
 leg.FontSize = axFontSize;
 leg.FontName = 'Times';
@@ -117,8 +117,8 @@ ylabel('rate (kPa/s)', ...
 % yLim = ylim;
 % ylim([0 yLim(2)])
 
-leg = legend('$dp_{ro}/dt$','target limit','$\pm P_{97} |dp_{ro}/dt|$', ...
-             '$\pm P_{99} |dp_{ro}/dt|$', ...
+leg = legend('$dp_{f}/dt$','target limit','$\pm P_{97} |dp_{f}/dt|$', ...
+             '$\pm P_{99} |dp_{f}/dt|$', ...
              'Interpreter','latex');
 leg.FontSize = axFontSize;
 leg.FontName = 'Times';
