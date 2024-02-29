@@ -10,22 +10,21 @@ display(['file ',num2str(j),' of ',num2str(nfiles)])
         if sum(imag(out.p_lout+out.p_a+out.p_b)) == 0
 
              % Mean pressure at WEC-driven pump inlet
-            p_loutMean(iVar) = mean(out.p_lout);
+            p_loutMean(iVar) = p_loutMean;
              % Variation in pressure at WEC-driven pump inlet
-            p_loutMax(iVar) = max(out.p_lout);
-            p_loutMin(iVar) = min(out.p_lout);
-            p_loutVar(iVar) = var(out.p_lout);
-            p_loutStd(iVar) = std(out.p_lout);
+            p_loutMax(iVar) = p_loutMax;
+            p_loutMin(iVar) = p_loutMin;
+            p_loutVar(iVar) = p_loutVar;
+            p_loutStd(iVar) = p_loutStd;
              % Minimum pressure in WEC-driven pump chambers
-            p_wpMin(iVar) = min(min(out.p_a),min(out.p_b));
+            p_wpMin(iVar) = p_wpMin;
     
              % Electric power consumption of charge pump
-            P_cElec(iVar) = mean(out.power.P_cElec);
-            L_cElec(iVar) = P_cElec(iVar)/mean(out.power.P_WEC);
-             % Power losses from charge pump
-            P_cLoss(iVar) = mean(out.power.P_cLoss);
-            L_c(iVar) = P_cLoss(iVar)/mean(out.power.P_WEC);
-            L_cTotal = L_c + L_cElec;
+            P_cElec(iVar) = P_cElec;
+            L_cElec(iVar) = L_cElec;
+             % Power losses from charge pump (inlcudes electric motor loss)
+            P_cLoss(iVar) = P_cLoss;
+            L_c(iVar) = L_c;
 
         else
 
@@ -44,7 +43,6 @@ display(['file ',num2str(j),' of ',num2str(nfiles)])
              % Power losses from charge pump
             P_cLoss(iVar) = nan;
             L_c(iVar) = nan;
-            L_cTotal = nan;
 
         end
 
@@ -60,7 +58,7 @@ p_cavLimit = 0.5e4; % [Pa] prescribed limit on pressure in WEC-driven pump
 [~,meetsConstraints] = find(p_wpMin >= p_cavLimit);
  % find non-dominated individuals from set meeting dpdt criterion
 non_dominated = paretoFront2D(Vc_l_mesh(meetsConstraints),'min', ...
-                              L_cTotal(meetsConstraints),'min');
+                              L_c(meetsConstraints),'min');
 [~, ii_sort] = sort(Vc_l_mesh(meetsConstraints(non_dominated)));
 iiPareto = meetsConstraints(non_dominated(ii_sort));
 Vc_l_opt = Vc_l_mesh(iiPareto);

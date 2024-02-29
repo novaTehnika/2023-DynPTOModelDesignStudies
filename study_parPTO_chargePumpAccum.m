@@ -94,9 +94,9 @@ addpath('Utilities')
 
 % Simulation timeframe
 par.tstart = 0; %[s] start time of simulation
-par.tend = 2000; %[s] end time of simulation
+par.tend = 2.000; %[s] end time of simulation
 
-par.Tramp = 250; % [s] excitation force ramp period
+par.Tramp = 2.50; % [s] excitation force ramp period
 par.TrampWEC = min(25,par.Tramp); % [s] excitation force ramp period
 
 % Solver parameters
@@ -162,7 +162,7 @@ Vc_l_mesh = meshVar.Vc_l(:);
 
 nVar = length(w_c_mesh);
 
-saveSimData = 1; % save simulation data (1) or just output variables (0)
+saveSimData = 0; % save simulation data (1) or just output variables (0)
 
 %% %%%%%%%%%%%%   COLLECT DATA  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -179,6 +179,23 @@ toc(ticSIM)
 if ~saveSimData
     clear out
 end
+
+
+p_loutMean = mean(out.p_lout);
+ % Variation in pressure at WEC-driven pump inlet
+p_loutMax = max(out.p_lout);
+p_loutMin = min(out.p_lout);
+p_loutVar = var(out.p_lout);
+p_loutStd = std(out.p_lout);
+ % Minimum pressure in WEC-driven pump chambers
+p_wpMin = min(min(out.p_a),min(out.p_b));
+
+ % Electric power consumption of charge pump
+P_cElec = mean(out.power.P_cElec);
+L_cElec = P_cElec/mean(out.power.P_WEC);
+ % Power losses from charge pump
+P_cLoss = mean(out.power.P_cLoss);
+L_c = P_cLoss/mean(out.power.P_WEC);
 
 %% %%%%%%%%%%%%   Save Data  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 timeStamp = datetime("now",'format','yyyy-MM-dd''T''HH:mm'); % time in ISO8601
