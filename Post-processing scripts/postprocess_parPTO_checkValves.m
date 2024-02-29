@@ -60,7 +60,7 @@ catch
     % just move on
 end
 
-%% Plot Maximum Rate of Change in Pressure as a function of total accumulator volume
+%% Plot min Pressure as a function of total accumulator volume
 SS = 2;
 
 black = [0 0 0];
