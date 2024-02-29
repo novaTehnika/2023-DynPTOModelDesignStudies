@@ -12,7 +12,7 @@
 cd ~/2023-DynPTOModelDesignStudies
 module load matlab
 matlab -nodisplay -r \
-SS = ${SS}; \
+"SS = ${SS}; \
 display(['SS = ',num2str(SS)]); \
 addpath('Utilities'); \
 nWorkers = ${SLURM_NTASKS}-1; \
