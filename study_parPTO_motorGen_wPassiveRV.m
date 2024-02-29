@@ -130,6 +130,8 @@ par.duty_sv = 0;
 % Configuration
 par.ERUconfig.present = 1;
 
+par.plConfig.included = 0;
+
 par.rvConfig.included = 1; % RO inlet valve is 1 - present, 0 - absent
 par.rvConfig.active = (0)*par.rvConfig.included; % RO inlet valve is 1 - active, 0 - passive
 par.kv_rv = (4.7)/sqrt(1e3)/1e3; % [(L/s/kPa^0.5) -> m^3/s/Pa^0.5]
