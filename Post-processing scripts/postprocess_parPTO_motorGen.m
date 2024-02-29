@@ -16,9 +16,9 @@ display(['file ',num2str(j),' of ',num2str(nfiles)])
         p_roStd(iVar) = std(out.p_ro);
          % Rate of change in pressure at RO module
           % max
-        dpdt_max(iVar) = max(out.dydt(:,iyp_ro));
+        dpdt_max(iVar) = max(out.dydt(:,out.par.iy.p_ro));
           % 97th percentile
-        dist_dpdt = statsTimeVar_cdf(out.t,abs(out.dydt(:,iyp_ro)));
+        dist_dpdt = statsTimeVar_cdf(out.t,abs(out.dydt(:,out.par.iy.p_ro)));
         dpdt_97(iVar) = dist_dpdt.xi(find(dist_dpdt.f > 0.97,1,'first'));
         clearvars dist_dpdt
 
@@ -61,12 +61,14 @@ color = [maroon; gold; blue; orange; green; pink; blue1; purple; green1];
 
 linestyles = {'-', '--', '-.', ':','-', '--', '-.', ':',};
 
+supTitleFontSize = 10;
+subTitleFontSize = 9;
+axFontSize = 8;
 bottomEdge = 1;
 leftEdge = 3;
-width = 7.5; % one column: 3+9/16, two column: 7.5
-height = 10;
-fontSize = 9;
-lineWidth = 1;
+width = 5.75; % one column: 3+9/16, two column: 7.5
+height = 7;
+lineWidth = 0.5;
 
 clearvars leg
 
@@ -80,17 +82,15 @@ switch par.rvConfig.active
     case 1
         rvStr = 'Active Ripple Control';
 end
-titleString = ['Performance With ',rvStr,newline,...
+titleString = ['Hydraulic Motor Sizing Study with ',rvStr,':',newline,...
                 'Sea State ',num2str(SS)];
 sgtitle(titleString,...
-'Interpreter','latex','FontSize',fontSize+2,'fontname','Times')
+'Interpreter','latex','FontSize',supTitleFontSize,'fontname','Times')
 
 n_plots = 5;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Pressure
 iax = 1;
 ax(iax) = subplot(n_plots,1,iax);
-ax(iax).FontName = 'times';
-ax(iax).FontSize = fontSize-1;
 
 hold on
 
@@ -110,30 +110,34 @@ p(ip,iax) = plot(Dpm*DpmUnitConvert,1e-6*(p_roMean-p_roStd),':k','Marker','x');
 p(ip,iax).HandleVisibility='off';
 ip = ip+1;
 
+grid on
+
 xlabel('displacement (cc/rev) ', ...
-'Interpreter','latex','FontSize',fontSize-1,'fontname','Times')
+'Interpreter','latex','FontSize',axFontSize,'fontname','Times')
 ylabel('pressure (MPa)', ...
-'Interpreter','latex','FontSize',fontSize-1,'fontname','Times')
+'Interpreter','latex','FontSize',axFontSize,'fontname','Times')
 
 titleString = ['Pressure at RO Module Feed Inlet'];
 title(titleString,...
-'Interpreter','latex','FontSize',fontSize,'fontname','Times')
+'Interpreter','latex','FontSize',subTitleFontSize,'fontname','Times')
 
-leg = legend('mean','max & min','mean +- 1 stdDev');
-leg.FontSize = fontSize-1;
+axL = gca;
+axL.FontName = 'Liberation Serif';
+axL.FontSize = axFontSize;
+
+leg = legend('mean','max. and min.','mean +- 1 stdDev');
+leg.FontSize = axFontSize;
+leg.Interpreter = 'latex';
 leg.FontName = 'Times';
-rect = [0.5, -0.2, 0.25, 0.15];
-% set(leg, 'Position', rect)
 set(leg, 'Location', 'best')
-% set(leg, 'Location', 'southoutside')
+
+
 xLim = xlim;
 xlim([0 xLim(2)])
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% rate of change in pressure
-iax = 2;
+iax = iax + 1;
 ax(iax) = subplot(n_plots,1,iax);
-ax(iax).FontName = 'times';
-ax(iax).FontSize = fontSize-1;
 
 hold on
 
@@ -146,32 +150,35 @@ ip = ip+1;
 p(ip,iax) = plot(Dpm*DpmUnitConvert,1e-3*dpdt_97,'--k','Marker','x');
 ip = ip+1;
 
+grid on
+
 xlabel('displacement (cc/rev) ', ...
-'Interpreter','latex','FontSize',fontSize-1,'fontname','Times')
-ylabel('rate of change in pressure (kPa/s)', ...
-'Interpreter','latex','FontSize',fontSize-1,'fontname','Times')
+'Interpreter','latex','FontSize',axFontSize,'fontname','Times')
+ylabel('rate of change (kPa/s)', ...
+'Interpreter','latex','FontSize',axFontSize,'fontname','Times')
 
 titleString = ['Rate of Change in Pressure at RO Module Feed Inlet'];
 title(titleString,...
-'Interpreter','latex','FontSize',fontSize,'fontname','Times')
+'Interpreter','latex','FontSize',subTitleFontSize,'fontname','Times')
 
-leg = legend('limit','max','97th p-tile');
-leg.FontSize = fontSize-1;
+axL = gca;
+axL.FontName = 'Liberation Serif';
+axL.FontSize = axFontSize;
+
+leg = legend('limit','max','P97');
+leg.FontSize = axFontSize;
+leg.Interpreter = 'latex';
 leg.FontName = 'Times';
-rect = [0.5, -0.2, 0.25, 0.15];
-% set(leg, 'Position', rect)
 set(leg, 'Location', 'best')
-% set(leg, 'Location', 'southoutside')
+
 xLim = xlim;
 xlim([0 xLim(2)])
 yLim = ylim;
 ylim([0 yLim(2)])
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Power generation
-iax = 3;
+iax = iax + 1;
 ax(iax) = subplot(n_plots,1,iax);
-ax(iax).FontName = 'times';
-ax(iax).FontSize = fontSize-1;
 
 hold on
 
@@ -179,14 +186,20 @@ ip = 1;
 p(ip,iax) = plot(Dpm*DpmUnitConvert,1e-3*P_gen,'k','Marker','x');
 ip = ip+1;
 
+grid on
+
 xlabel('displacement (cc/rev) ', ...
-'Interpreter','latex','FontSize',fontSize-1,'fontname','Times')
+'Interpreter','latex','FontSize',axFontSize,'fontname','Times')
 ylabel('power (kW)', ...
-'Interpreter','latex','FontSize',fontSize-1,'fontname','Times')
+'Interpreter','latex','FontSize',axFontSize,'fontname','Times')
 
 titleString = ['Mean Electric Power Generation'];
 title(titleString,...
-'Interpreter','latex','FontSize',fontSize,'fontname','Times')
+'Interpreter','latex','FontSize',subTitleFontSize,'fontname','Times')
+
+axL = gca;
+axL.FontName = 'Liberation Serif';
+axL.FontSize = axFontSize;
 
 xLim = xlim;
 xlim([0 xLim(2)])
@@ -194,47 +207,48 @@ yLim = ylim;
 ylim([0 yLim(2)])
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Power loss
-iax = 4;
+iax = iax + 1;
 ax(iax) = subplot(n_plots,1,iax);
-ax(iax).FontName = 'times';
-ax(iax).FontSize = fontSize-1;
 
 hold on
 
 ip = 1;
-p(ip,iax) = plot(Dpm*DpmUnitConvert,100*L_pm,'k','Marker','x');
+p(ip,iax) = plot(Dpm*DpmUnitConvert,L_pm,'k','Marker','x');
 ip = ip+1;
-p(ip,iax) = plot(Dpm*DpmUnitConvert,100*L_gen,'--k','Marker','x');
+p(ip,iax) = plot(Dpm*DpmUnitConvert,L_gen,'--k','Marker','x');
 ip = ip+1;
-p(ip,iax) = plot(Dpm*DpmUnitConvert,100*L_prv,'-.k','Marker','x');
+p(ip,iax) = plot(Dpm*DpmUnitConvert,L_prv,'-.k','Marker','x');
 ip = ip+1;
 
+grid on
+
 xlabel('displacement (cc/rev) ', ...
-'Interpreter','latex','FontSize',fontSize-1,'fontname','Times')
-ylabel('power loss (x100\%)', ...
-'Interpreter','latex','FontSize',fontSize-1,'fontname','Times')
+'Interpreter','latex','FontSize',axFontSize,'fontname','Times')
+ylabel('power loss', ...
+'Interpreter','latex','FontSize',axFontSize,'fontname','Times')
 
 titleString = ['Mean Power Loss Normalized to Mean Power Capture'];
 title(titleString,...
-'Interpreter','latex','FontSize',fontSize,'fontname','Times')
+'Interpreter','latex','FontSize',subTitleFontSize,'fontname','Times')
+
+axL = gca;
+axL.FontName = 'Liberation Serif';
+axL.FontSize = axFontSize;
 
 leg = legend('hyd. motor','generator','pressure relief valves');
-leg.FontSize = fontSize-1;
+leg.FontSize = axFontSize;
+leg.Interpreter = 'latex';
 leg.FontName = 'Times';
-rect = [0.5, -0.2, 0.25, 0.15];
-% set(leg, 'Position', rect)
 set(leg, 'Location', 'best')
-% set(leg, 'Location', 'southoutside')
+
 xLim = xlim;
 xlim([0 xLim(2)])
 yLim = ylim;
 ylim([0 yLim(2)])
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Permeate production
-iax = 5;
+iax = iax + 1;
 ax(iax) = subplot(n_plots,1,iax);
-ax(iax).FontName = 'times';
-ax(iax).FontSize = fontSize-1;
 
 hold on
 
@@ -242,14 +256,20 @@ ip = 1;
 p(ip,iax) = plot(Dpm*DpmUnitConvert,24*3600*q_perm,'k','Marker','x');
 ip = ip+1;
 
+grid on
+
 xlabel('displacement (cc/rev) ', ...
-'Interpreter','latex','FontSize',fontSize-1,'fontname','Times')
-ylabel('production rate ($m^3/day$)', ...
-'Interpreter','latex','FontSize',fontSize-1,'fontname','Times')
+'Interpreter','latex','FontSize',axFontSize,'fontname','Times')
+ylabel('production rate (m\textsuperscript{3}/day)', ...
+'Interpreter','latex','FontSize',axFontSize,'fontname','Times')
 
 titleString = ['Mean Rate of Permeate Production'];
 title(titleString,...
-'Interpreter','latex','FontSize',fontSize,'fontname','Times')
+'Interpreter','latex','FontSize',subTitleFontSize,'fontname','Times')
+
+axL = gca;
+axL.FontName = 'Liberation Serif';
+axL.FontSize = axFontSize;
 
 xLim = xlim;
 xlim([0 xLim(2)])

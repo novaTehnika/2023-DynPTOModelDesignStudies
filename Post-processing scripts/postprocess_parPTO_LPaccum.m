@@ -132,7 +132,7 @@ SS = 2;
 % accumulator volume and pipeline diameter
  % find individuals meeting cavitation constraints
 p_cavLimit = 10e3; % [Pa] prescribed limit on pressure in WEC-driven pump
-id_line = 6;
+id_line = 10;
 d_line_nom = d_LPPL(id_line);
 % meetsConstraints = find(studyData(SS).p_wpMin(:) >= p_cavLimit ...
 %                         & studyVar(SS).d_line(:) == d_line_nom);
@@ -195,7 +195,7 @@ titleString = ['Performance of Low-Pressure Circuit Branch',newline,...
 sgtitle(titleString,...
 'Interpreter','latex','FontSize',fontSize+2,'fontname','Times')
 
-n_plots = 6;
+n_plots = 5;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Pressure WEC-driven pump inlet
 iax = 1;
@@ -220,6 +220,8 @@ ip = ip+1;
 p(ip,iax) = plot(Vc_l_opt,1e-5*(studyData(SS).p_loutMean(iiPareto)-studyData(SS).p_loutStd(iiPareto)),':k','Marker','x');
 p(ip,iax).HandleVisibility='off';
 ip = ip+1;
+
+grid on
 
 xlabel('volume (1000L) ', ...
 'Interpreter','latex','FontSize',fontSize-1,'fontname','Times')
@@ -254,6 +256,8 @@ ip = ip+1;
 p(ip,iax) = plot(Vc_l_opt,1e-5*studyData(SS).p_wpMin(iiPareto),'k','Marker','x');
 ip = ip+1;
 
+grid on
+
 xlabel('volume (1000L) ', ...
 'Interpreter','latex','FontSize',fontSize-1,'fontname','Times')
 ylabel('pressure (bar)', ...
@@ -275,48 +279,57 @@ xlim([0 xLim(2)])
 yLim = ylim;
 ylim([0 yLim(2)])
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Power Consumption of Charge Pump
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Power Consumption of Charge Pump
+% iax = 3;
+% ax(iax) = subplot(n_plots,1,iax);
+% ax(iax).FontName = 'times';
+% ax(iax).FontSize = fontSize-1;
+% 
+% hold on
+% 
+% ip = 1;
+% p(ip,iax) = plot(Vc_l_opt,1e-3*studyData(SS).P_cElec(iiPareto),'k','Marker','x');
+% ip = ip+1;
+% 
+% grid on
+% 
+% xlabel('volume (1000L) ', ...
+% 'Interpreter','latex','FontSize',fontSize-1,'fontname','Times')
+% ylabel('power (kW)', ...
+% 'Interpreter','latex','FontSize',fontSize-1,'fontname','Times')
+% 
+% titleString = ['Mean Electric Power Consumption of Charge Pump'];
+% title(titleString,...
+% 'Interpreter','latex','FontSize',fontSize,'fontname','Times')
+% 
+% xLim = xlim;
+% xlim([0 xLim(2)])
+% yLim = ylim;
+% ylim([0 yLim(2)])
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Power loss
 iax = 3;
 ax(iax) = subplot(n_plots,1,iax);
 ax(iax).FontName = 'times';
 ax(iax).FontSize = fontSize-1;
 
-hold on
+
 
 ip = 1;
-p(ip,iax) = plot(Vc_l_opt,1e-3*studyData(SS).P_cElec(iiPareto),'k','Marker','x');
-ip = ip+1;
-
-xlabel('volume (1000L) ', ...
-'Interpreter','latex','FontSize',fontSize-1,'fontname','Times')
-ylabel('power (kW)', ...
-'Interpreter','latex','FontSize',fontSize-1,'fontname','Times')
-
-titleString = ['Mean Electric Power Consumption of Charge Pump'];
-title(titleString,...
-'Interpreter','latex','FontSize',fontSize,'fontname','Times')
-
-xLim = xlim;
-xlim([0 xLim(2)])
-yLim = ylim;
-ylim([0 yLim(2)])
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Power loss
-iax = 4;
-ax(iax) = subplot(n_plots,1,iax);
-ax(iax).FontName = 'times';
-ax(iax).FontSize = fontSize-1;
-
+p(ip,iax) = semilogy(Vc_l_opt,100*studyData(SS).L_c(iiPareto),'r','Marker','^');
 hold on
 
-ip = 1;
-p(ip,iax) = plot(Vc_l_opt,100*studyData(SS).L_c(iiPareto),'r','Marker','^');
 ip = ip+1;
-p(ip,iax) = plot(Vc_l_opt,100*studyData(SS).L_LPPL(iiPareto),'b','Marker','o');
+p(ip,iax) = semilogy(Vc_l_opt,100*studyData(SS).L_LPPL(iiPareto),'b','Marker','o');
 ip = ip+1;
-p(ip,iax) = plot(Vc_l_opt, ...
+p(ip,iax) = semilogy(Vc_l_opt, ...
                 100*(studyData(SS).L_c(iiPareto)+studyData(SS).L_LPPL(iiPareto)),'k','Marker','x');
 ip = ip+1;
+
+grid on
+
+yLim = ylim;
+ylim([yLim(1) 100])
 
 xlabel('volume (1000L) ', ...
 'Interpreter','latex','FontSize',fontSize-1,'fontname','Times')
@@ -341,7 +354,7 @@ ylim([0 yLim(2)])
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% charge pump shaft speed
-iax = 5;
+iax = 4;
 ax(iax) = subplot(n_plots,1,iax);
 ax(iax).FontName = 'times';
 ax(iax).FontSize = fontSize-1;
@@ -351,6 +364,8 @@ hold on
 ip = 1;
 p(ip,iax) = plot(Vc_l_opt,w_c_opt/2/pi*60,'k','Marker','x');
 ip = ip+1;
+
+grid on
 
 xlabel('volume (1000L) ', ...
 'Interpreter','latex','FontSize',fontSize-1,'fontname','Times')
@@ -367,7 +382,7 @@ yLim = ylim;
 ylim([0 yLim(2)])
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% distibution of volume
-iax = 6;
+iax = 5;
 ax(iax) = subplot(n_plots,1,iax);
 ax(iax).FontName = 'times';
 ax(iax).FontSize = fontSize-1;
@@ -377,6 +392,8 @@ hold on
 ip = 1;
 p(ip,iax) = plot(Vc_l_opt,X_opt,'k','Marker','x');
 ip = ip+1;
+
+grid on
 
 xlabel('volume (1000L) ', ...
 'Interpreter','latex','FontSize',fontSize-1,'fontname','Times')

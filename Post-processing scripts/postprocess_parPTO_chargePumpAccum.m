@@ -82,12 +82,14 @@ color = [maroon; gold; blue; orange; green; pink; blue1; purple; green1];
 
 linestyles = {'-', '--', '-.', ':','-', '--', '-.', ':',};
 
+supTitleFontSize = 10;
+subTitleFontSize = 9;
+axFontSize = 8;
 bottomEdge = 1;
 leftEdge = 3;
-width = 7.5; % one column: 3+9/16, two column: 7.5
-height = 10;
-fontSize = 9;
-lineWidth = 1;
+width = 5.75; % one column: 3+9/16, two column: 7.5
+height = 7;
+lineWidth = 0.5;
 
 clearvars leg
 
@@ -99,14 +101,12 @@ titleString = ['Performance of Low-Pressure Circuit Branch',newline,...
                 'as a Function of Installed Low-Pressure Accumulator Volume',newline,...
                 'Sea State ',num2str(SS)];
 sgtitle(titleString,...
-'Interpreter','latex','FontSize',fontSize+2,'fontname','Times')
+'Interpreter','latex','FontSize',supTitleFontSize,'fontname','Times')
 
 n_plots = 4;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Pressure WEC-driven pump inlet
 iax = 1;
 ax(iax) = subplot(n_plots,1,iax);
-ax(iax).FontName = 'times';
-ax(iax).FontSize = fontSize-1;
 
 hold on
 
@@ -127,29 +127,26 @@ p(ip,iax).HandleVisibility='off';
 ip = ip+1;
 
 xlabel('volume (1000L) ', ...
-'Interpreter','latex','FontSize',fontSize-1,'fontname','Times')
+'Interpreter','latex','FontSize',axFontSize,'fontname','Times')
 ylabel('pressure (bar)', ...
-'Interpreter','latex','FontSize',fontSize-1,'fontname','Times')
+'Interpreter','latex','FontSize',axFontSize,'fontname','Times')
 
 titleString = ['Pressure at RO Module Feed Inlet'];
 title(titleString,...
-'Interpreter','latex','FontSize',fontSize,'fontname','Times')
+'Interpreter','latex','FontSize',subTitleFontSize,'fontname','Times')
 
 leg = legend('mean','max & min','mean +- 1 stdDev');
-leg.FontSize = fontSize-1;
+leg.FontSize = axFontSize;
+leg.Interpreter = 'latex';
 leg.FontName = 'Times';
-rect = [0.5, -0.2, 0.25, 0.15];
-% set(leg, 'Position', rect)
 set(leg, 'Location', 'best')
-% set(leg, 'Location', 'southoutside')
+
 xLim = xlim;
 xlim([0 xLim(2)])
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Pressure in WEC-driven pump
 iax = iax + 1;
 ax(iax) = subplot(n_plots,1,iax);
-ax(iax).FontName = 'times';
-ax(iax).FontSize = fontSize-1;
 
 hold on
 
@@ -160,21 +157,24 @@ p(ip,iax) = plot(Vc_l_opt,1e-5*p_wpMin(iiPareto),'k','Marker','x');
 ip = ip+1;
 
 xlabel('volume (1000L) ', ...
-'Interpreter','latex','FontSize',fontSize-1,'fontname','Times')
+'Interpreter','latex','FontSize',axFontSize,'fontname','Times')
 ylabel('pressure (bar)', ...
-'Interpreter','latex','FontSize',fontSize-1,'fontname','Times')
+'Interpreter','latex','FontSize',axFontSize,'fontname','Times')
 
 titleString = ['Minimum Pressure in WEC-Driven Pump'];
 title(titleString,...
-'Interpreter','latex','FontSize',fontSize,'fontname','Times')
+'Interpreter','latex','FontSize',subTitleFontSize,'fontname','Times')
+
+axL = gca;
+axL.FontName = 'Liberation Serif';
+axL.FontSize = axFontSize;
 
 leg = legend('limit');
-leg.FontSize = fontSize-1;
+leg.FontSize = axFontSize;
+leg.Interpreter = 'latex';
 leg.FontName = 'Times';
-rect = [0.5, -0.2, 0.25, 0.15];
-% set(leg, 'Position', rect)
 set(leg, 'Location', 'best')
-% set(leg, 'Location', 'southoutside')
+
 xLim = xlim;
 xlim([0 xLim(2)])
 yLim = ylim;
@@ -183,8 +183,6 @@ ylim([0 yLim(2)])
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Power Consumption of Charge Pump
 % iax = iax + 1;
 % ax(iax) = subplot(n_plots,1,iax);
-% ax(iax).FontName = 'times';
-% ax(iax).FontSize = fontSize-1;
 % 
 % hold on
 % 
@@ -193,14 +191,18 @@ ylim([0 yLim(2)])
 % ip = ip+1;
 % 
 % xlabel('volume (1000L) ', ...
-% 'Interpreter','latex','FontSize',fontSize-1,'fontname','Times')
+% 'Interpreter','latex','FontSize',axFontSize,'fontname','Times')
 % ylabel('power (kW)', ...
-% 'Interpreter','latex','FontSize',fontSize-1,'fontname','Times')
+% 'Interpreter','latex','FontSize',axFontSize,'fontname','Times')
 % 
 % titleString = ['Mean Electric Power Consumption of Charge Pump'];
 % title(titleString,...
-% 'Interpreter','latex','FontSize',fontSize,'fontname','Times')
+% 'Interpreter','latex','FontSize',subTitleFontSize,'fontname','Times')
 % 
+% axL = gca;
+% axL.FontName = 'Liberation Serif';
+% axL.FontSize = axFontSize;
+%
 % xLim = xlim;
 % xlim([0 xLim(2)])
 % yLim = ylim;
@@ -209,8 +211,6 @@ ylim([0 yLim(2)])
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Power loss
 iax = iax + 1;
 ax(iax) = subplot(n_plots,1,iax);
-ax(iax).FontName = 'times';
-ax(iax).FontSize = fontSize-1;
 
 hold on
 
@@ -219,13 +219,17 @@ p(ip,iax) = plot(Vc_l_opt,100*L_c(iiPareto),'k','Marker','x');
 ip = ip+1;
 
 xlabel('volume (1000L) ', ...
-'Interpreter','latex','FontSize',fontSize-1,'fontname','Times')
+'Interpreter','latex','FontSize',axFontSize,'fontname','Times')
 ylabel('power loss (x100\%)', ...
-'Interpreter','latex','FontSize',fontSize-1,'fontname','Times')
+'Interpreter','latex','FontSize',axFontSize,'fontname','Times')
 
 titleString = ['Mean Power Loss of Charge Pump Normalized to Mean Power Capture'];
 title(titleString,...
-'Interpreter','latex','FontSize',fontSize,'fontname','Times')
+'Interpreter','latex','FontSize',subTitleFontSize,'fontname','Times')
+
+axL = gca;
+axL.FontName = 'Liberation Serif';
+axL.FontSize = axFontSize;
 
 xLim = xlim;
 xlim([0 xLim(2)])
@@ -236,8 +240,6 @@ ylim([0 yLim(2)])
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Charge Pump Shaft Speed
 iax = iax + 1;
 ax(iax) = subplot(n_plots,1,iax);
-ax(iax).FontName = 'times';
-ax(iax).FontSize = fontSize-1;
 
 hold on
 
@@ -246,13 +248,17 @@ p(ip,iax) = plot(Vc_l_opt,60/2/pi*w_c_opt,'k','Marker','x');
 ip = ip+1;
 
 xlabel('volume (1000L) ', ...
-'Interpreter','latex','FontSize',fontSize-1,'fontname','Times')
+'Interpreter','latex','FontSize',axFontSize,'fontname','Times')
 ylabel('speed (rpm)', ...
-'Interpreter','latex','FontSize',fontSize-1,'fontname','Times')
+'Interpreter','latex','FontSize',axFontSize,'fontname','Times')
 
 titleString = ['Mean Power Loss of Charge Pump Normalized to Mean Power Capture'];
 title(titleString,...
-'Interpreter','latex','FontSize',fontSize,'fontname','Times')
+'Interpreter','latex','FontSize',subTitleFontSize,'fontname','Times')
+
+axL = gca;
+axL.FontName = 'Liberation Serif';
+axL.FontSize = axFontSize;
 
 xLim = xlim;
 xlim([0 xLim(2)])
