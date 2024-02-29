@@ -16,10 +16,7 @@ matlab -nodisplay -r \
 display(['iVar = ',num2str(iVar)]); \
 SS = ${SS}; \
 display(['SS = ',num2str(SS)]); \
-addpath('Utilities'); \
-parSafeStartSlurm; \
-study_parPTO_chargePumpAccum; \
-rmdir(storage_folder)"
+study_parPTO_chargePumpAccum;"
 
 # Commands to use
 # sbatch --export=SS=1 --array=1-280 ~/2023-DynPTOModelDesignStudies/study_parPTO_chargePumpAccum.sh
