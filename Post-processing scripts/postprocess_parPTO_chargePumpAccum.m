@@ -21,10 +21,11 @@ display(['file ',num2str(j),' of ',num2str(nfiles)])
     
              % Electric power consumption of charge pump
             P_cElec(iVar) = mean(out.power.P_cElec);
-            P_cElec_norm(iVar) = P_cElec(iVar)/mean(out.power.P_WEC);
+            L_cElec(iVar) = P_cElec(iVar)/mean(out.power.P_WEC);
              % Power losses from charge pump
             P_cLoss(iVar) = mean(out.power.P_cLoss);
             L_c(iVar) = P_cLoss(iVar)/mean(out.power.P_WEC);
+            L_cTotal = L_c + L_cElec;
 
         else
 
@@ -39,10 +40,11 @@ display(['file ',num2str(j),' of ',num2str(nfiles)])
     
              % Electric power consumption of charge pump
             P_cElec(iVar) = nan;
-            P_cElec_norm(iVar) = nan;
+            L_cElec(iVar) = nan;
              % Power losses from charge pump
             P_cLoss(iVar) = nan;
             L_c(iVar) = nan;
+            L_cTotal = nan;
 
         end
 
@@ -58,7 +60,7 @@ p_cavLimit = 0.5e4; % [Pa] prescribed limit on pressure in WEC-driven pump
 [~,meetsConstraints] = find(p_wpMin >= p_cavLimit);
  % find non-dominated individuals from set meeting dpdt criterion
 non_dominated = paretoFront2D(Vc_l_mesh(meetsConstraints),'min', ...
-                              P_cElec(meetsConstraints),'min');
+                              L_cTotal(meetsConstraints),'min');
 [~, ii_sort] = sort(Vc_l_mesh(meetsConstraints(non_dominated)));
 iiPareto = meetsConstraints(non_dominated(ii_sort));
 Vc_l_opt = Vc_l_mesh(iiPareto);
@@ -101,7 +103,7 @@ titleString = ['Performance of Low-Pressure Circuit Branch',newline,...
 sgtitle(titleString,...
 'Interpreter','latex','FontSize',fontSize+2,'fontname','Times')
 
-n_plots = 5;
+n_plots = 4;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Pressure WEC-driven pump inlet
 iax = 1;
 ax(iax) = subplot(n_plots,1,iax);
@@ -146,7 +148,7 @@ xLim = xlim;
 xlim([0 xLim(2)])
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Pressure in WEC-driven pump
-iax = 2;
+iax = iax + 1;
 ax(iax) = subplot(n_plots,1,iax);
 ax(iax).FontName = 'times';
 ax(iax).FontSize = fontSize-1;
@@ -180,34 +182,34 @@ xlim([0 xLim(2)])
 yLim = ylim;
 ylim([0 yLim(2)])
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Power Consumption of CHarge Pump
-iax = 3;
-ax(iax) = subplot(n_plots,1,iax);
-ax(iax).FontName = 'times';
-ax(iax).FontSize = fontSize-1;
-
-hold on
-
-ip = 1;
-p(ip,iax) = plot(Vc_l_opt,1e-3*P_cElec(iiPareto),'k','Marker','x');
-ip = ip+1;
-
-xlabel('volume (1000L) ', ...
-'Interpreter','latex','FontSize',fontSize-1,'fontname','Times')
-ylabel('power (kW)', ...
-'Interpreter','latex','FontSize',fontSize-1,'fontname','Times')
-
-titleString = ['Mean Electric Power Consumption of Charge Pump'];
-title(titleString,...
-'Interpreter','latex','FontSize',fontSize,'fontname','Times')
-
-xLim = xlim;
-xlim([0 xLim(2)])
-yLim = ylim;
-ylim([0 yLim(2)])
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Power Consumption of Charge Pump
+% iax = iax + 1;
+% ax(iax) = subplot(n_plots,1,iax);
+% ax(iax).FontName = 'times';
+% ax(iax).FontSize = fontSize-1;
+% 
+% hold on
+% 
+% ip = 1;
+% p(ip,iax) = plot(Vc_l_opt,1e-3*P_cElec(iiPareto),'k','Marker','x');
+% ip = ip+1;
+% 
+% xlabel('volume (1000L) ', ...
+% 'Interpreter','latex','FontSize',fontSize-1,'fontname','Times')
+% ylabel('power (kW)', ...
+% 'Interpreter','latex','FontSize',fontSize-1,'fontname','Times')
+% 
+% titleString = ['Mean Electric Power Consumption of Charge Pump'];
+% title(titleString,...
+% 'Interpreter','latex','FontSize',fontSize,'fontname','Times')
+% 
+% xLim = xlim;
+% xlim([0 xLim(2)])
+% yLim = ylim;
+% ylim([0 yLim(2)])
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Power loss
-iax = 4;
+iax = iax + 1;
 ax(iax) = subplot(n_plots,1,iax);
 ax(iax).FontName = 'times';
 ax(iax).FontSize = fontSize-1;
@@ -234,7 +236,7 @@ ylim([0 yLim(2)])
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Charge Pump Shaft Speed
-iax = 5;
+iax = iax + 1;
 ax(iax) = subplot(n_plots,1,iax);
 ax(iax).FontName = 'times';
 ax(iax).FontSize = fontSize-1;
