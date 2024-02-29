@@ -140,6 +140,7 @@ par.rvConfig.active = (0)*par.rvConfig.included; % RO inlet valve is 1 - active,
 
 par.plConfig.included = 0;
 
+
 %% %%%%%%%%%%%%   COLLECT DATA  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Define state indices
 par.iy = stateIndex_parPTO(par);
@@ -232,28 +233,28 @@ ylabel('Pressure (MPa)')
 legend('p_{lin}','p_{lout}')
 
 ax(3) = subplot(3,1,3);
-plot(out.t,1e-5*out.dydt(:,par.iy.p_ro))
+plot(out.t,1e-3*out.dydt(:,par.iy.p_ro))
 hold on
 
 addpath('Utilities')
 dist_dpdt = statsTimeVar_cdf(out.t,abs(out.dydt(:,par.iy.p_ro)));
 dpdt_97 = dist_dpdt.xi(find(dist_dpdt.f > 0.97,1,'first'));
-plot(out.t([1 end]),1e-5*dpdt_97*[1 1],'-.k')
-p(1) = plot(out.t([1 end]),1e-5*dpdt_97*[-1 -1],'-.k');
+plot(out.t([1 end]),1e-3*dpdt_97*[1 1],'-.k')
+p(1) = plot(out.t([1 end]),1e-3*dpdt_97*[-1 -1],'-.k');
 p(1).HandleVisibility='off';
 
 dist_dpdt = statsTimeVar_cdf(out.t,abs(out.dydt(:,par.iy.p_ro)));
 dpdt_99 = dist_dpdt.xi(find(dist_dpdt.f > 0.99,1,'first'));
-plot(out.t([1 end]),1e-5*dpdt_99*[1 1],'-.k')
-p(2) = plot(out.t([1 end]),1e-5*dpdt_99*[-1 -1],'--k');
+plot(out.t([1 end]),1e-3*dpdt_99*[1 1],'-.k')
+p(2) = plot(out.t([1 end]),1e-3*dpdt_99*[-1 -1],'--k');
 p(2).HandleVisibility='off';
 
-plot(out.t([1 end]),1e-5*out.par.control.dpdt_ROmax*[1 1],'-r')
-p(3) = plot(out.t([1 end]),1e-5*out.par.control.dpdt_ROmax*[-1 -1],'-r');
+plot(out.t([1 end]),1e-3*out.par.control.dpdt_ROmax*[1 1],'-r')
+p(3) = plot(out.t([1 end]),1e-3*out.par.control.dpdt_ROmax*[-1 -1],'-r');
 p(3).HandleVisibility='off';
 
 xlabel('Time (s)')
-ylabel('Rate of change in pressure (bar/s)')
+ylabel('Rate of change in pressure (kPa/s)')
 legend('dpdt_{ro}','+-97th p-tile |dpdt_{ro}|','+-99th p-tile |dpdt_{ro}|','target limit')
 
 linkaxes(ax,'x');
@@ -278,10 +279,11 @@ hold on
 plot(out.t,1e3*60*out.q_hin(:))
 plot(out.t,1e3*60*out.q_hout(:))
 plot(out.t,1e3*60*out.q_pm(:))
+plot(out.t,1e3*60*out.q_hinPRV(:))
 plot(out.t,1e3*60*out.q_rv(:))
 xlabel('Time (s)')
 ylabel('Flow rate (Lpm)')
-legend('q_{hwp}','q_{hin}','q_{hout}','q_{pm}','q_{rv}')
+legend('q_{hwp}','q_{hin}','q_{hout}','q_{pm}','q_{hinPRV}','q_{rv}')
 
 ax(2) = subplot(3,1,2);
 plot(out.t,1e3*60*out.q_rv(:))
@@ -289,9 +291,10 @@ hold on
 plot(out.t,1e3*60*out.q_ERUfeed(:))
 plot(out.t,1e3*60*out.q_feed(:))
 plot(out.t,1e3*60*out.q_perm(:))
+plot(out.t,1e3*60*out.q_roPRV(:))
 xlabel('Time (s)')
 ylabel('Flow rate (Lpm)')
-legend('q_{rv}','q_{ERUfeed}','q_{feed}','q_{perm}')
+legend('q_{rv}','q_{ERUfeed}','q_{feed}','q_{perm}','q_{roPRV}')
 
 ax(3) = subplot(3,1,3);
 plot(out.t,1e3*60*out.q_lwp(:))
