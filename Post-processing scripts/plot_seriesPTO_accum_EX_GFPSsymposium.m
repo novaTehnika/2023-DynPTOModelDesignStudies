@@ -1,4 +1,4 @@
-load("Data\data_seriesPTO_accum_woPL_20240131_02_4370L.mat")
+load(['Data',filesep,'data_seriesPTO_accum_woPL_20240131_02_4370L.mat'])
 
 black = [0 0 0];
 maroon = [122 0 25]/256;

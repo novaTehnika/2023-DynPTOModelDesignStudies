@@ -1,28 +1,28 @@
-load("Data\parPTO_woPL\allData_accum_woPL_wPassiveRV_20240123_02.mat")
+load(['Data',filesep,'parPTO_woPL',filesep,'allData_accum_woPL_wPassiveRV_20240123_02.mat'])
 SS = 2;
 Vc_h_wPassiveRV = Vtotal_mesh(iiPareto);
 L_wPassiveRV = PP_metric(iiPareto);
 q_permMean_wPassiveRV = studyData(SS).q_permMean(iiPareto);
 
-load("Data\parPTO_woPL\allData_accumNoDpDt_woPL_wPassive_20240122.mat")
+load(['Data',filesep,'parPTO_woPL',filesep,'allData_accumNoDpDt_woPL_wPassive_20240122.mat'])
 SS = 2;
 Vc_h_wPassiveRV_noDpDt = Vtotal_mesh(iiPareto);
 L_wPassiveRV_noDpDt = PP_metric(iiPareto);
 q_permMean_wPassiveRV_noDpDt = studyData(SS).q_permMean(iiPareto);
 
-load("Data\parPTO_woPL\allData_accum_woPL_wActiveRV_20240122_2.mat")
+load(['Data',filesep,'parPTO_woPL',filesep,'allData_accum_woPL_wActiveRV_20240122_2.mat'])
 SS = 2;
 Vc_h_wActiveRV = Vtotal_mesh(iiPareto);
 L_wActiveRV = PP_metric(iiPareto);
 q_permMean_wActiveRV = studyData(SS).q_permMean(iiPareto);
 
-load("Data\seriesPTO_woPL\allData_data_seriesPTO_accum_woPL_20240122.mat")
+load(['Data',filesep,'seriesPTO_woPL',filesep,'allData_data_seriesPTO_accum_woPL_20240122.mat'])
 SS = 2;
 Vc_h_series = Vtotal_mesh(iiPareto);
 L_series = PP_metric(iiPareto);
 q_permMean_series = studyData(SS).q_permMean(iiPareto);
 
-load("Data\parPTO_woPL\data_parPTO_accum_woPL_woRV_20240127_02.mat")
+load(['Data',filesep,'parPTO_woPL',filesep,'data_parPTO_accum_woPL_woRV_20240127_02.mat'])
 SS = 2;
 Vc_h_baseline = Vc_h;
 L_baseline = 100*(PP_hinPRV + PP_roPRV + PP_genLoss +  PP_pmLoss)./PP_WEC;
