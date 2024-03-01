@@ -176,11 +176,7 @@ ticSIM = tic;
 out = sim_parPTO(y0,par);
 toc(ticSIM)
 
-if ~saveSimData
-    clear out
-end
-
-
+% Collect Data
 p_loutMean = mean(out.p_lout);
  % Variation in pressure at WEC-driven pump inlet
 p_loutMax = max(out.p_lout);
@@ -196,6 +192,10 @@ L_cElec = P_cElec/mean(out.power.P_WEC);
  % Power losses from charge pump
 P_cLoss = mean(out.power.P_cLoss);
 L_c = P_cLoss/mean(out.power.P_WEC);
+
+if ~saveSimData
+    clear out
+end
 
 %% %%%%%%%%%%%%   Save Data  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 timeStamp = datetime("now",'format','yyyy-MM-dd''T''HH:mm'); % time in ISO8601
